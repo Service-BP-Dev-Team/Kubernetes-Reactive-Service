@@ -1,0 +1,7 @@
+# ignore application
+
+/Application/**
+
+#ignore vagrant
+
+.vagrant/**
