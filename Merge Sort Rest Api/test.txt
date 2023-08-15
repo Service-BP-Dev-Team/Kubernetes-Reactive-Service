@@ -1,0 +1,3 @@
+curl -X POST localhost:8000/api/mergesort/create-input -d '{"size": 10 }'
+curl -X POST localhost:8000/api/mergesort/sort -d '{"size": 10 }'
+

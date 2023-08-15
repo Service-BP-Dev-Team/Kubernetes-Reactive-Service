@@ -2,6 +2,7 @@
 
 /Application/**
 
+
 #ignore vagrant
 
 .vagrant/**
