@@ -40,7 +40,7 @@ WORKDIR /app
 COPY . .
 
 #RUN mvn dependency:resolve
-#RUN mvn clean package
+RUN mvn clean package
 EXPOSE 8000
 RUN cd target
 #CMD ["/bin/bash"]

@@ -1,0 +1,14 @@
+sudo docker build . -t java-rest
+sudo docker tag java-rest 10.0.0.10:5000/java-rest:v2
+sudo docker push 10.0.0.10:5000/java-rest:v2
+kubectl delete deployment --all
+kubectl apply -f ../Application/deployment.yml 
+kubectl get pods
+
+kubectl exec --stdin --tty java-rest-5dccb9f467-v9sx9 -- /bin/bash
+
+curl -X POST java-rest-service:8000/api/mergesort/create-input -d '{"size": 10 }'
+curl -X POST java-rest-service:8000/api/mergesort/sort -d '{"size": 6000000 }'
+
+8 millions for 6 pods;
+5 milions for 4 pods
