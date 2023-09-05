@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.consulner.app.api.Constants;
 
 public class DistributedSort {
 	
@@ -50,7 +51,7 @@ public class DistributedSort {
     	try {
 			String jsonData = obj.writeValueAsString(arrayInput);
 			//System.out.println(jsonData);
-			String result = JsonHttpPost.postRequestAndReturnString(jsonData, "http://localhost:8000/api/mergesort/sort-array");
+			String result = JsonHttpPost.postRequestAndReturnString(jsonData, Constants.SERVICE_NAME+"/api/mergesort/sort-array");
 			try {
 				ArrayInput response=obj.readValue(new ByteArrayInputStream(result.getBytes()), ArrayInput.class);
 				array = response.getArray(); // the result

@@ -47,11 +47,11 @@ public class SortInputHandler extends Handler {
 		long size =rq.getSize();
 		String jsonData = "{\"size\":"+size+"}";
 		System.out.println("posting data 1");
-		String result = JsonHttpPost.postRequestAndReturnString(jsonData, "http://localhost:8000/api/mergesort/create-input");
+		String result = JsonHttpPost.postRequestAndReturnString(jsonData, Constants.SERVICE_NAME+"/api/mergesort/create-input");
 		System.out.println("posting data 2");
 		
 		jsonData = result;
-		result = JsonHttpPost.postRequestAndReturnString(jsonData, "http://localhost:8000/api/mergesort/sort-array");
+		result = JsonHttpPost.postRequestAndReturnString(jsonData, Constants.SERVICE_NAME+"/api/mergesort/sort-array");
 		ArrayInput response=super.readRequest(new ByteArrayInputStream(result.getBytes()), ArrayInput.class);
 		System.out.println("posting finished");
         //  make curl here
