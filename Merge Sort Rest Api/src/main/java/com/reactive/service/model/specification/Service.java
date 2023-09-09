@@ -89,6 +89,33 @@ public class Service implements Serializable{
 	}
 	
 	
+	public Parameter getInputParameterByName(String name) {
+		Parameter result=null;
+		for(Parameter par: inputParameters) {
+			if(par.getName().equals(name)) {
+				result=par;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public Parameter getOutputParameterByName(String name) {
+		Parameter result=null;
+		for(Parameter par: outputParameters) {
+			if(par.getName().equals(name)) {
+				result=par;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public Parameter getParameterByName(String name) {
+		Parameter result = this.getInputParameterByName(name);
+		if(result==null) {result=this.getOutputParameterByName(name);}
+		return result;
+	}
 	
 	
 	

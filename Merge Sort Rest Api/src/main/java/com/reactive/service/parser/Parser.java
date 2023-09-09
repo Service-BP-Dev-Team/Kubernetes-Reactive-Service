@@ -96,13 +96,18 @@ public class Parser {
 		String[] actionSplit = action.trim().split("=");
 		String left=actionSplit[0].trim();
 		String right=actionSplit[1].trim();
-		String computationSymbol=right.split("\\(")[0].trim();
+		String[] computationPart=right.split("\\(");
+		if(computationPart.length>1) {
+		String computationSymbol=computationPart[0].trim();
 		FunctionDeclaration f = findFunctionByName(rule, computationSymbol);
 			if(f!=null) {
 				processFunctionAction(left,right, f, rule);
 			}else {
 				processServiceAction(left,right, rule);
 			}
+		}else {
+			processAssignmentAction(left, right, rule);
+		}
 		
 		}
 		
@@ -169,6 +174,17 @@ public class Parser {
 		eq.setLeftpart(idl);
 		eq.setRightpart(fe);
 		rule.getSemantics().add(eq);
+	}
+	
+	private void processAssignmentAction(String left, String right, DecompositionRule rule) {
+		IdExpression idl = getRuleIdExpression(rule, left);
+		IdExpression idr = getRuleIdExpression(rule, right);
+		Equation eq = new Equation();
+		eq.setLeftpart(idl);
+		eq.setRightpart(idr);
+		rule.getSemantics().add(eq);
+		
+		
 	}
 	
 	private void processRuleGuard(YAMLSpec R, DecompositionRule rule){

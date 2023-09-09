@@ -9,7 +9,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 public class GAG {
 
 	private String name;
-	private RuntimeData configuration;
 	private ArrayList<Service> services;
 	
 	public GAG() {
@@ -22,12 +21,7 @@ public class GAG {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public RuntimeData getConfiguration() {
-		return configuration;
-	}
-	public void setConfiguration(RuntimeData configuration) {
-		this.configuration = configuration;
-	}
+	
 	@XmlElement(name="service")
 	public ArrayList<Service> getServices() {
 		return services;

@@ -11,6 +11,7 @@ public class Task implements Serializable{
 	private Service service;
 	private ArrayList<Data> inputs;
 	private ArrayList<Data> outputs;
+	private ArrayList<Data> locals;
 	private ArrayList<Task> subTasks;
 	
 	public Task() {
@@ -54,6 +55,12 @@ public class Task implements Serializable{
 	}
 	public void setSubTasks(ArrayList<Task> subTask) {
 		this.subTasks = subTask;
+	}
+	public ArrayList<Data> getLocals() {
+		return locals;
+	}
+	public void setLocals(ArrayList<Data> locals) {
+		this.locals = locals;
 	} 
 	
 	

@@ -9,6 +9,8 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import com.reactive.service.model.specification.GAG;
+import com.reactive.service.util.Context;
+import com.reactive.service.util.Executor;
 
 public class Main {
 
@@ -58,7 +60,11 @@ public class Main {
 		        String print2 = g.getServices().get(1).getRules().get(0).getSemanticAsString();
 		        System.out.println(print1);
 		        System.out.println(print2);
-		        System.out.println(g.getServices().get(2).getRules().get(0).getGuard().getLocation());
+		       // System.out.println(g.getServices().get(2).getRules().get(0).getGuard().getLocation());
+		        Context nContext = new Context();
+		        Executor exec=new Executor(nContext, g);
+		        exec.execute();
+		        System.out.println("the size of root tasks is : "+ exec.getConfiguration().getRoot().getSubTasks().size());
 		    }
 		
 
