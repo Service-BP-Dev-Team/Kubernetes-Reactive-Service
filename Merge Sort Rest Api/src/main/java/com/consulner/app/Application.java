@@ -2,7 +2,7 @@ package com.consulner.app;
 
 import static com.consulner.app.Configuration.getErrorHandler;
 import static com.consulner.app.Configuration.getObjectMapper;
-import static com.consulner.app.Configuration.getUserService;
+
 import static com.consulner.app.api.ApiUtils.splitQuery;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import com.consulner.app.api.mergesort.BuildRandomInputHandler;
 import com.consulner.app.api.mergesort.SortInputDistributedHandler;
 import com.consulner.app.api.mergesort.SortInputHandler;
-import com.consulner.app.api.user.RegistrationHandler;
+import com.reactive.service.app.api.ServiceMessageHandler;
 import com.sun.net.httpserver.BasicAuthenticator;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
@@ -34,38 +34,15 @@ class Application {
         
         // Set the server's executor to the created ExecutorService
         server.setExecutor(executor);
-        RegistrationHandler registrationHandler = new RegistrationHandler(getUserService(), getObjectMapper(),
-            getErrorHandler());
+      
         BuildRandomInputHandler randomInputHandler = new BuildRandomInputHandler(getObjectMapper(), getErrorHandler()); 
         SortInputHandler sortInputHandler = new SortInputHandler(getObjectMapper(), getErrorHandler());
         SortInputDistributedHandler sortInputDistributedHandler = new SortInputDistributedHandler(getObjectMapper(), getErrorHandler());
-        server.createContext("/api/users/register", registrationHandler::handle);
+        ServiceMessageHandler serviceMessageHandler = new ServiceMessageHandler(getObjectMapper(), getErrorHandler());
         server.createContext("/api/mergesort/create-input", randomInputHandler::handle);
         server.createContext("/api/mergesort/sort", sortInputHandler::handle);
         server.createContext("/api/mergesort/sort-array", sortInputDistributedHandler::handle);
-
-        HttpContext context =server.createContext("/api/hello", (exchange -> {
-
-            if ("GET".equals(exchange.getRequestMethod())) {
-                Map<String, List<String>> params = splitQuery(exchange.getRequestURI().getRawQuery());
-                String noNameText = "Anonymous";
-                String name = params.getOrDefault("name", List.of(noNameText)).stream().findFirst().orElse(noNameText);
-                String respText = String.format("Hello %s!", name);
-                exchange.sendResponseHeaders(200, respText.getBytes().length);
-                OutputStream output = exchange.getResponseBody();
-                output.write(respText.getBytes());
-                output.flush();
-            } else {
-                exchange.sendResponseHeaders(405, -1);// 405 Method Not Allowed
-            }
-            exchange.close();
-        }));
-        context.setAuthenticator(new BasicAuthenticator("myrealm") {
-            @Override
-            public boolean checkCredentials(String user, String pwd) {
-                return user.equals("admin") && pwd.equals("admin");
-            }
-        });
+        server.createContext("/api/service",serviceMessageHandler::handle);
 
         //server.setExecutor(null); // creates a default executor
         server.start();

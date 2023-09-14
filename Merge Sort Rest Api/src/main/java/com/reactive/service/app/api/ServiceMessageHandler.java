@@ -1,6 +1,5 @@
-package com.consulner.app.api.user;
+package com.reactive.service.app.api;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -10,23 +9,19 @@ import com.consulner.app.api.ResponseEntity;
 import com.consulner.app.api.StatusCode;
 import com.consulner.app.errors.ApplicationExceptions;
 import com.consulner.app.errors.GlobalExceptionHandler;
-import com.consulner.domain.user.NewUser;
-import com.consulner.domain.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 
-public class RegistrationHandler extends Handler {
+public class ServiceMessageHandler extends Handler {
 
-    private final UserService userService;
+	public ServiceMessageHandler(ObjectMapper objectMapper, GlobalExceptionHandler exceptionHandler) {
+		super(objectMapper, exceptionHandler);
+		// TODO Auto-generated constructor stub
+	}
 
-    public RegistrationHandler(UserService userService, ObjectMapper objectMapper,
-                               GlobalExceptionHandler exceptionHandler) {
-        super(objectMapper, exceptionHandler);
-        this.userService = userService;
-    }
-
-    @Override
-    protected void execute(HttpExchange exchange) throws IOException {
+	@Override
+	protected void execute(HttpExchange exchange) throws Exception {
+		// TODO Auto-generated method stub
         byte[] response;
         if ("POST".equals(exchange.getRequestMethod())) {
             ResponseEntity e = doPost(exchange.getRequestBody());
@@ -41,21 +36,31 @@ public class RegistrationHandler extends Handler {
         OutputStream os = exchange.getResponseBody();
         os.write(response);
         os.close();
-    }
+	}
 
-    private ResponseEntity<RegistrationResponse> doPost(InputStream is) {
-        RegistrationRequest registerRequest = super.readRequest(is, RegistrationRequest.class);
-
-        NewUser user = NewUser.builder()
-            .login(registerRequest.getLogin())
-            .password(PasswordEncoder.encode(registerRequest.getPassword()))
-            .build();
-
-        String userId = userService.create(user);
-
-        RegistrationResponse response = new RegistrationResponse(userId);
+	private ResponseEntity doPost(InputStream is) {
+		// TODO Auto-generated method stub
+		Message request= super.readRequest(is, Message.class);
+		Object response;
+		if(request.getType().equals(Message.BIND_MESSAGE_TYPE)) {
+			response= new BindResponse();
+			String ip = InMemoryWorkspace.processBindMessage(request.getBind());
+			((BindResponse) response).setIpAddress(ip);
+		}
+		else if(request.getType().equals(Message.NOTIFICATION_MESSAGE_TYPE)) {
+			InMemoryWorkspace.processInNotification(request.getNotification());
+			response= new EmptyResponse();
+		}
+		else {
+			InMemoryWorkspace.addCall(request.getServiceCall());
+			response = new EmptyResponse();
+		}
 
         return new ResponseEntity<>(response,
             getHeaders(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON), StatusCode.OK);
-    }
+		
+	}
+	
+	
+
 }

@@ -48,6 +48,7 @@ public class Parser {
 		s.setRemote(S.isRemote());
 		s.setInputParameters(new ArrayList<Parameter>());
 		s.setOutputParameters(new ArrayList<Parameter>());
+		s.setRemote(S.isRemote());
 		for(YAMLParameter param : S.getInputs()) {
 			Parameter par = new Parameter();
 			par.setName(param.getName().trim());

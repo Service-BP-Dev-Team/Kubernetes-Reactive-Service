@@ -15,10 +15,11 @@ public class Service implements Serializable{
 	private ArrayList<Parameter> inputParameters;
 	private ArrayList<Parameter> outputParameters;
 	private ArrayList<DecompositionRule> rules;
+	
 	// fields that apply when the service is remote
 	
 	private Boolean remote=false; // default false
-	private String location;
+	private String kubename;
 	
 	//just to add specific action when triggering a service as axiom for specific example
 	private String exampleSignature="";
@@ -73,13 +74,7 @@ public class Service implements Serializable{
 	public void setRemote(Boolean remote) {
 		this.remote = remote;
 	}
-	@XmlAttribute
-	public String getLocation() {
-		return location;
-	}
-	public void setLocation(String location) {
-		this.location = location;
-	}
+	
 	public String getExampleSignature() {
 		return exampleSignature;
 	}
@@ -115,6 +110,18 @@ public class Service implements Serializable{
 		Parameter result = this.getInputParameterByName(name);
 		if(result==null) {result=this.getOutputParameterByName(name);}
 		return result;
+	}
+	public String getKubename() {
+		return kubename;
+	}
+	public void setKubename(String kubename) {
+		this.kubename = kubename;
+	}
+	public Boolean getAxiom() {
+		return axiom;
+	}
+	public Boolean getRemote() {
+		return remote;
 	}
 	
 	

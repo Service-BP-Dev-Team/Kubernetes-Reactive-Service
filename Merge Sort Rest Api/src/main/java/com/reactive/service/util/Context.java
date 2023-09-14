@@ -53,10 +53,18 @@ public class Context {
 	
 	public Hashtable<Task,List<DecompositionRule>> getReadyTasks(){
 
-		// return the task that are ready using groovy to execute guards.
+		// return the task that are ready using reflexion to execute guards.
 		List <Task> tasks = getPendingTasks();
-		Hashtable<Task,List<DecompositionRule>> result = new Hashtable<Task,List<DecompositionRule>>();
+		
+		// remove from the list the remote tasks
+		List <Task> localtasks = new ArrayList<>();
 		for(Task t: tasks) {
+			if(!t.isRemote()) {
+				localtasks.add(t);
+			}
+		}
+		Hashtable<Task,List<DecompositionRule>> result = new Hashtable<Task,List<DecompositionRule>>();
+		for(Task t: localtasks) {
 			List<DecompositionRule> list = getReadyRules(t);
 			if(list!=null && !list.isEmpty()) {
 				result.put(t, list);

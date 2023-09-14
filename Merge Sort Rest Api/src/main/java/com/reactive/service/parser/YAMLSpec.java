@@ -12,6 +12,7 @@ public class YAMLSpec {
 	private List<YAMLLocalFunction> functions;
 	private YAMLLocalFunction guard;
 	private boolean remote =false;
+	private String kubename;
 	public String getKind() {
 		return kind;
 	}
@@ -65,6 +66,12 @@ public class YAMLSpec {
 	}
 	public void setGuard(YAMLLocalFunction guard) {
 		this.guard = guard;
+	}
+	public String getKubename() {
+		return kubename;
+	}
+	public void setKubename(String kubename) {
+		this.kubename = kubename;
 	}
 	
 	

@@ -11,7 +11,7 @@ public class Func {
 		}
 		int valb=0;
 		if(b instanceof String) {
-			vala= Integer.parseInt((String)b);
+			valb= Integer.parseInt((String)b);
 		}else {
 			valb=(Integer)b;
 		}
@@ -22,7 +22,7 @@ public class Func {
 		if(a instanceof String) {
 			return Integer.parseInt((String)a)+5;
 		}
-		return (Integer)a + 10;
+		return (Integer)a + 5;
 	}
 	
 	public boolean guards1(Object a, Object b) {

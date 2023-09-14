@@ -13,6 +13,7 @@ public class Task implements Serializable{
 	private ArrayList<Data> outputs;
 	private ArrayList<Data> locals;
 	private ArrayList<Task> subTasks;
+	private boolean remote = false;
 	
 	public Task() {
 		inputs = new ArrayList<Data>();
@@ -61,7 +62,14 @@ public class Task implements Serializable{
 	}
 	public void setLocals(ArrayList<Data> locals) {
 		this.locals = locals;
+	}
+	public boolean isRemote() {
+		return remote;
+	}
+	public void setRemote(boolean remote) {
+		this.remote = remote;
 	} 
+	
 	
 	
 }

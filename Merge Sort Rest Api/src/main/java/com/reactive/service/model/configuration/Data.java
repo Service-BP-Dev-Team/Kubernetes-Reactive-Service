@@ -1,6 +1,7 @@
 package com.reactive.service.model.configuration;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import com.reactive.service.model.specification.Parameter;
 
@@ -16,14 +17,25 @@ public class Data implements Serializable{
 	
 	private boolean defined;
 	
-	private int id;
+	private String id;
 	
+	private String serviceCallId; // use to quickly retrieve a configuration that have a data
+	
+	private String host; // use to quickly retrieve the host where to send the data
 	public Data() {
-		id = idCounter;
 		idCounter++;
+	    id = UUID.randomUUID().toString();
 	}
 	
 	
+	
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+
+
 
 	public static int getIdCounter() {
 		return idCounter;
@@ -60,14 +72,42 @@ public class Data implements Serializable{
 		this.defined = defined;
 	}
 
-	public int getId() {
+	public String getGlobalID(Configuration conf) {
+		return conf.getId()+id;
+	}
+
+
+	public String getServiceCallId() {
+		return serviceCallId;
+	}
+
+
+
+
+	public void setServiceCallId(String serviceCallId) {
+		this.serviceCallId = serviceCallId;
+	}
+
+
+
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+
+
+
+	public String getHost() {
+		return host;
 	}
-	
+
+
+
+
+	public void setHost(String host) {
+		this.host = host;
+	}
 	
 	
 	
