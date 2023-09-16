@@ -1,0 +1,26 @@
+---
+kind : service
+name : S1
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : a }
+ - { name : b }
+outputs:
+ - { name : c }
+---
+kind : service
+name : S2
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : a }
+outputs:
+ - { name : b }
+---
+kind : service
+name : S3
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : a }
+outputs:
+ - { name : b }
+ - { name : c }

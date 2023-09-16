@@ -55,9 +55,11 @@ public class Message {
 			receiver = message.bind.getReceiver();
 		}
 		try {
-			result = JsonHttpPost.postRequestAndReturnString(objmapper.writeValueAsString(message), receiver+"/api/service");
+			String content =objmapper.writeValueAsString(message);
+			System.out.println(content);
+			result = JsonHttpPost.postRequestAndReturnString(content, "http://"+receiver+"/api/service");
 
-			objmapper.readValue(result, Message.class);
+			//objmapper.readValue(result, Message.class);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

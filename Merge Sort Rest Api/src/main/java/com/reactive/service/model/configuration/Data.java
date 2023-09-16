@@ -3,6 +3,7 @@ package com.reactive.service.model.configuration;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.reactive.service.model.specification.Parameter;
 
 import com.reactive.service.util.NameGenerator;
@@ -44,7 +45,7 @@ public class Data implements Serializable{
 	public static void setIdCounter(int idCounter) {
 		Data.idCounter = idCounter;
 	}
-
+	
 	public Parameter getParameter() {
 		return parameter;
 	}

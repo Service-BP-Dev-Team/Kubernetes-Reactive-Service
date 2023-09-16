@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<GAG name="My GAG">
+    <service name="Init" axiom="true">
+        <production name="Start" subServices="Register" >>
+            <semantic>
+			</semantic>
+			
+			
+        </production>
+    </service> 
+    <service name="Register" remote="true" location="CB">
+		<input name="personal information" shortName="infos" />
+		<input name="cover letter" shortName="letter" />
+		<input name="resume" shortName="resume" />
+		<input name="class" shortName="class" />
+		<input name="debit" shortName="debit" />
+		<output name="decision" shortName="decision" />
+		<output name="grant suggestion" shortName="suggestion" />
+		<output name="receipt" shortName="receipt" />
+		
+	</service>
+	
+
+</GAG>

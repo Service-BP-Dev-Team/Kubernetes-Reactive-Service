@@ -30,5 +30,15 @@ public class GAG {
 		this.services = services;
 	}
 	
+	public Service findByName(String serviceName) {
+		Service result=null;
+		for(Service s: services) {
+			if(s.getName().equals(serviceName)) {
+				return s;
+			}
+		}
+		return result;
+	}
+	
 	
 }

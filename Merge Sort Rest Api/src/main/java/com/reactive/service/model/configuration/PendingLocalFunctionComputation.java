@@ -64,10 +64,10 @@ public class PendingLocalFunctionComputation {
 	public Object execute() {
 		Object result=null;
 		if(isReady()) {
-			
+			//System.out.println("I execute a function");
 			if(isIdFunction) {
 				result = actualParameters.get(0).getValue();
-				System.out.println(result);
+				//System.out.println(result);
 			}
 			else {
 				ArrayList<Object> params= new ArrayList<>();

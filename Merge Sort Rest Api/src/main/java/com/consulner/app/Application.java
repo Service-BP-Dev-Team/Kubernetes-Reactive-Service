@@ -21,7 +21,7 @@ import com.sun.net.httpserver.BasicAuthenticator;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 
-class Application {
+public class Application {
 
     public static void main(String[] args) throws IOException {
     	// Create an ExecutorService with a fixed number of threads

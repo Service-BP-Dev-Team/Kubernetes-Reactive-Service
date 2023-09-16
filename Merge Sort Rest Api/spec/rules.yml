@@ -1,0 +1,32 @@
+---
+kind : rule
+name : R1
+service : S1
+guard : 
+ classPath: com.local.Func
+ method: guards1
+functions :
+ - { classPath: com.local.Func, method: f, label : f }
+actions :
+ - c = f(a,b)
+---
+kind : rule
+name : R2
+service : S2
+functions:
+ - { classPath: com.local.Func, method: g, label: g }
+guard : 
+ classPath: com.local.Func
+ method: guards2
+actions:
+ - b = g(a)
+---
+kind : rule
+name : R3
+service : S3
+actions :
+ - b = __call S2(a)
+ - inter = __call S1(a,b)
+ - c = inter
+
+ 

@@ -3,6 +3,7 @@ package com.reactive.service.model.specification;
 public class ServiceInstance {
 	String name;
 	Service service;
+	private boolean remote=false;
 	public String getName() {
 		return name;
 	}
@@ -15,5 +16,13 @@ public class ServiceInstance {
 	public void setService(Service service) {
 		this.service = service;
 	}
+	public boolean isRemote() {
+		return remote;
+	}
+	public void setRemote(boolean remote) {
+		this.remote = remote;
+	}
+	
+	
 	
 }

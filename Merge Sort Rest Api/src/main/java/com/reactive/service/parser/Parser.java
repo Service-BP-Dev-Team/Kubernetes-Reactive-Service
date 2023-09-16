@@ -49,6 +49,7 @@ public class Parser {
 		s.setInputParameters(new ArrayList<Parameter>());
 		s.setOutputParameters(new ArrayList<Parameter>());
 		s.setRemote(S.isRemote());
+		s.setKubename(S.getKubename());
 		for(YAMLParameter param : S.getInputs()) {
 			Parameter par = new Parameter();
 			par.setName(param.getName().trim());
@@ -116,6 +117,14 @@ public class Parser {
 	
 	private void processServiceAction(String left, String right, DecompositionRule rule) {
 		String computationSymbol=right.split("\\(")[0].trim();
+		boolean remote=false;
+		String callPrefix="__call ";
+		if(computationSymbol.startsWith(callPrefix)) {
+			remote=true;
+			//System.out.println(computationSymbol);
+			computationSymbol=computationSymbol.substring(callPrefix.length(),computationSymbol.length());
+			computationSymbol=computationSymbol.trim();
+		}
 		String cutright = right.split("\\(")[1];
 		cutright=cutright.substring(0,cutright.length()-1);
 		String[] ctleftTable= left.split("\\(");
@@ -129,6 +138,7 @@ public class Parser {
 		// create idexpressions and equations for inputs
 		int inputCounter=0;
 		ServiceInstance si = createServiceInstanceByName(rule, computationSymbol);
+		si.setRemote(remote);
 		for(String rv : rvariables) {
 			IdExpression idl = new IdExpression();
 			idl.setServiceInstance(si);

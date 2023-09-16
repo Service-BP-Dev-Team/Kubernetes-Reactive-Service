@@ -2,6 +2,8 @@ package com.reactive.service.model.specification;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
@@ -14,6 +16,7 @@ public class Parameter implements Serializable{
 
 	
 	@XmlTransient
+	@JsonIgnore
 	public Service getService() {
 		return Service;
 	}

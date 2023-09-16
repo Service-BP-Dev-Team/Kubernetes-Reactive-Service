@@ -1,0 +1,3 @@
+curl request
+
+curl -X POST localhost:8000/api/service -d '{"bind":{"sender": "127.0.0.1"},"type":"BIND_MESSAGE_TYPE"}'

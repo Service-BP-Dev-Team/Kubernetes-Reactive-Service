@@ -1,0 +1,27 @@
+---
+kind : rule
+name : R1
+service : S1
+functions :
+ - { classPath: local.f, method: f, label : f }
+actions :
+ - c = f(a,b)
+---
+kind : rule
+name : R2
+service : S2
+functions:
+ - { classPath: local.g, method: g, label: g }
+actions:
+ - a = g(b)
+---
+kind : rule
+name : R3
+service : S3
+actions :
+ - S1.a = S3.a
+ - S1.b = S2.b
+ - S2.a = S3.a
+ - S3.b = S2.b
+ - S3.c = S1.c
+ 

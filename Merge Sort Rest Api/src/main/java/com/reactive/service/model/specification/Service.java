@@ -3,6 +3,8 @@ package com.reactive.service.model.specification;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlID;
@@ -61,6 +63,7 @@ public class Service implements Serializable{
 		this.outputParameters = outputParameters;
 	}
 	@XmlElement(name="production")
+	@JsonIgnore
 	public ArrayList<DecompositionRule> getRules() {
 		return rules;
 	}

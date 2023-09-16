@@ -7,17 +7,23 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import com.consulner.app.Application;
+import com.consulner.app.errors.ApplicationException;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.Data;
+import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.GAG;
+import com.reactive.service.model.specification.Service;
 import com.reactive.service.parser.Parser;
 import com.reactive.service.parser.YAMLSpec;
 import com.reactive.service.util.Context;
@@ -31,14 +37,17 @@ public class InMemoryWorkspace {
 	public static final ConcurrentHashMap<String, Pair<String,Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String,Data>>();
 	private static GAG gag;
 	public static void addCall(ServiceCall sc) {
+		ServiceCall local = new ServiceCall();
 		Configuration conf = new Configuration();
 		conf.setRoot(sc.getTask());
 		conf.getRoot().setRemote(false);// transform the task to a local one
 		conf.setId(sc.getId());
+		//bind to local service
+		conf.getRoot().setService(getGag().findByName(sc.getTask().getService().getName()));
 		//create and add subscriptions to undefined input
 		for(Data din : sc.getTask().getInputs()) {
 			if(!din.isDefined()) {
-			din.setServiceCallId(sc.getId());
+			din.setServiceCallId(local.getId());
 			inSubscriptions.put(din.getId(), new Pair<>(sc.getSender(),din));
 			}
 		}
@@ -51,10 +60,14 @@ public class InMemoryWorkspace {
 		//add the configuration
 		Executor exec = new Executor();
 		Context ctx = new Context();
+		ctx.setExecutor(exec);
 		exec.setConfiguration(conf);
 		exec.setGag(gag);
 		exec.setContext(ctx);
-		inMemoryCalls.put(sc.getId(), exec);
+		inMemoryCalls.put(local.getId(), exec);
+		
+		//execute the GAG
+		exec.execute();
 	}
 	
 	public static void processInNotification(Notification nf) {
@@ -62,22 +75,30 @@ public class InMemoryWorkspace {
 		Data d= p.getValue();
 		if(d!=null) {
 			d.setValue(nf.getData().getValue());
-			inSubscriptions.remove(nf.getGlobalId());
+			inSubscriptions.remove(nf.getData().getId());
+			try {
+				System.out.println(getObjectMapper().writeValueAsString(d));
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Executor executor = inMemoryCalls.get(d.getServiceCallId());
 			if(executor!=null) {
-				executor.computePendingLocalComputations();
+				System.out.println("find the executor");
+				executor.execute();
 			}
 		}
 	}
 	
-	public static void processOutNotification(Notification nf) {
-		Pair<String,Data> p =outSubscriptions.get(nf.getData().getId());
-		String host= p.getKey();
+	public static void processOutNotification(Notification nf,String host) {
+		//Pair<String,Data> p =outSubscriptions.get(nf.getData().getId());
+		//String host= p.getKey();
 		Message m = new Message();
 		m.setType(Message.NOTIFICATION_MESSAGE_TYPE);
 		m.setNotification(nf);
 		nf.setReceiver(host);
 		nf.setSender(getHostIp());
+		outSubscriptions.remove(nf.getData().getId());
 		Message.sendMessage(m);
 	}
 	
@@ -92,10 +113,15 @@ public class InMemoryWorkspace {
 		for(Data d: sc.getTask().getInputs()) {
 			d.setServiceCallId(sc.getId());
 			d.setHost(receiver); 
+			// create subscriptions for undefined data
+			if(!d.isDefined()) {
+				outSubscriptions.put(d.getId(),new Pair<String,Data>(d.getHost(),d));
+			}
 		}
 		for(Data d: sc.getTask().getOutputs()) {
 			d.setServiceCallId(sc.getId());
-			
+			//register in subscriptions
+			inSubscriptions.put(d.getId(),new Pair<String,Data>(d.getHost(),d));
 		}
 		// send the message
 		Message m= new Message();
@@ -103,6 +129,7 @@ public class InMemoryWorkspace {
 		m.setServiceCall(sc);
 		sc.setSender(getHostIp());
 		sc.setReceiver(receiver);
+		Message.sendMessage(m);
 	
 		
 	}
@@ -113,6 +140,7 @@ public class InMemoryWorkspace {
 		m.setType(Message.BIND_MESSAGE_TYPE);
 		Bind bind=new Bind();
 		bind.setReceiver(kubename);
+		bind.setSender(getHostIp());
 		m.setBind(bind);
 		ObjectMapper objMapper = getObjectMapper();
 		try {
@@ -148,12 +176,9 @@ public class InMemoryWorkspace {
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
         }
-		return result;
+		return result+":8000";
 	}
 	
-	public static void main(String args[]) {
-		System.out.println(getHostIp());
-	}
 
 	public static GAG getGag() {
 		if(gag==null) {
@@ -194,6 +219,7 @@ public class InMemoryWorkspace {
 	        Parser parser = new Parser();
 	        parser.setSpecs(allSpecs);
 	        gag = parser.getGAG();
+	        System.out.println(gag);
 		}
 		return gag;
 	}
@@ -202,5 +228,39 @@ public class InMemoryWorkspace {
 		InMemoryWorkspace.gag = gag;
 	}
 	
+	
+
+	public static void main(String args[]) {
+		System.out.println(getHostIp());
+		ServiceCall sc=new ServiceCall();
+		Task t=new Task();
+		t.getInputs().add(new Data());
+		t.setService(new Service());
+		sc.setTask(t);
+		try {
+			System.out.println(getObjectMapper().writeValueAsString(sc));
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			// create the server
+			Application.main(new String[] {});
+			// execute the gag
+			GAG g= getGag();
+			//System.out.println(g);
+			 String print1 = g.getServices().get(2).getRules().get(0).getSemanticAsString();
+			 System.out.println(print1);
+			Executor defaulte= new Executor();
+			defaulte.setGag(g);
+			Context ctx = new Context();
+			ctx.setExecutor(defaulte);
+			defaulte.setContext(ctx);
+			defaulte.execute();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 }

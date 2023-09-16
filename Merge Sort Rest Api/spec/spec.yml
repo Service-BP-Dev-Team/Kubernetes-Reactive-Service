@@ -1,0 +1,257 @@
+---
+  GAG: 
+    name: "My GAG"
+    service: 
+      - 
+        axiom: "true"
+        name: "Register"
+        input: 
+          - 
+            name: "personal information"
+            shortName: "infos"
+          - 
+            name: "cover letter"
+            shortName: "letter"
+          - 
+            name: "resume"
+            shortName: "resume"
+          - 
+            name: "class"
+            shortName: "class"
+          - 
+            name: "debit"
+            shortName: "debit"
+        output: 
+          - 
+            name: "decision"
+            shortName: "decision"
+          - 
+            name: "grant suggestion"
+            shortName: "suggestion"
+          - 
+            name: "receipt"
+            shortName: "receipt"
+        production: 
+          name: "Process"
+          subServices: "Apply Subscribe"
+          semantic: 
+            action: 
+              - 
+                leftpart: 
+                  service: "Register"
+                  parameter: "decision"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Apply"
+                  parameter: "decision"
+              - 
+                leftpart: 
+                  service: "Register"
+                  parameter: "grant suggestion"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Apply"
+                  parameter: "grant suggestion"
+              - 
+                leftpart: 
+                  service: "Register"
+                  parameter: "receipt"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Subscribe"
+                  parameter: "receipt"
+              - 
+                leftpart: 
+                  service: "Apply"
+                  parameter: "personal information"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Register"
+                  parameter: "personal information"
+              - 
+                leftpart: 
+                  service: "Apply"
+                  parameter: "cover letter"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Register"
+                  parameter: "cover letter"
+              - 
+                leftpart: 
+                  service: "Apply"
+                  parameter: "resume"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Register"
+                  parameter: "resume"
+              - 
+                leftpart: 
+                  service: "Subscribe"
+                  parameter: "decision"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Apply"
+                  parameter: "decision"
+              - 
+                leftpart: 
+                  service: "Subscribe"
+                  parameter: "class"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Register"
+                  parameter: "class"
+              - 
+                leftpart: 
+                  service: "Subscribe"
+                  parameter: "debit"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "idExpression"
+                  service: "Register"
+                  parameter: "debit"
+      - 
+        name: "Apply"
+        input: 
+          - 
+            name: "personal information"
+            shortName: "infos"
+          - 
+            name: "cover letter"
+            shortName: "letter"
+          - 
+            name: "resume"
+            shortName: "resume"
+        output: 
+          - 
+            name: "syst"
+            shortName: "syst"
+          - 
+            name: "decision"
+            shortName: "decision"
+          - 
+            name: "grant suggestion"
+            shortName: "suggestion"
+        production: 
+          name: "decide"
+          subServices: ""
+          guard: 
+            location: "../LocalFunctions/bin"
+            method: "cb.Apply.guardDecide"
+          semantic: 
+            function-declaration: 
+              - 
+                location: "../LocalFunctions/bin"
+                method: "cb.Apply.system"
+                name: "system"
+              - 
+                location: "../LocalFunctions/bin"
+                method: "cb.Apply.decide"
+                name: "decide"
+              - 
+                location: "../LocalFunctions/bin"
+                method: "cb.Apply.grant"
+                name: "grant"
+            action: 
+              - 
+                leftpart: 
+                  service: "Apply"
+                  parameter: "decision"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "functionExpression"
+                  function: "decide"
+                  arg: 
+                    service: "Apply"
+                    parameter: "syst"
+              - 
+                leftpart: 
+                  service: "Apply"
+                  parameter: "syst"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "functionExpression"
+                  function: "system"
+                  arg: 
+                    - 
+                      service: "Apply"
+                      parameter: "personal information"
+                    - 
+                      service: "Apply"
+                      parameter: "cover letter"
+                    - 
+                      service: "Apply"
+                      parameter: "resume"
+              - 
+                leftpart: 
+                  service: "Apply"
+                  parameter: "grant suggestion"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "functionExpression"
+                  function: "grant"
+                  arg: 
+                    service: "Apply"
+                    parameter: "syst"
+      - 
+        name: "Subscribe"
+        input: 
+          - 
+            name: "class"
+            shortName: "class"
+          - 
+            name: "debit"
+            shortName: "debit"
+          - 
+            name: "decision"
+            shortName: "decision"
+        output: 
+          name: "receipt"
+          shortName: "receipt"
+        production: 
+          - 
+            name: "Subscribe"
+            guard: 
+              location: "../LocalFunctions/bin"
+              method: "cb.Subscribe.guardSubscribe"
+            semantic: 
+              function-declaration: 
+                location: "../LocalFunctions/bin"
+                method: "cb.Subscribe.subscribe"
+                name: "subscribe"
+              action: 
+                leftpart: 
+                  service: "Subscribe"
+                  parameter: "receipt"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "functionExpression"
+                  function: "subscribe"
+                  $t: ""
+          - 
+            name: "terminate"
+            guard: 
+              location: "../LocalFunctions/bin"
+              method: "cb.Subscribe.guardTerminate"
+            semantic: 
+              function-declaration: 
+                location: "../LocalFunctions/bin"
+                method: "cb.Subscribe.terminate"
+                name: "terminate"
+              action: 
+                leftpart: 
+                  service: "Subscribe"
+                  parameter: "receipt"
+                rightpart: 
+                  xmlns:xsi: "http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:type: "functionExpression"
+                  function: "terminate"
+                  $t: ""
+
