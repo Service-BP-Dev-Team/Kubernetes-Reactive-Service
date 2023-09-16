@@ -23,8 +23,8 @@ public class SequentialSort {
         
         // Divide the list into two halves
         int mid = list.size() / 2;
-        List<Long> left = new ArrayList<>(list.subList(0, mid));
-        List<Long> right = new ArrayList<>(list.subList(mid, list.size()));
+        List<Long> left = new ArrayList<Long>(list.subList(0, mid));
+        List<Long> right = new ArrayList<Long>(list.subList(mid, list.size()));
         
         // Recursively sort the two halves
         mergeSort(left);

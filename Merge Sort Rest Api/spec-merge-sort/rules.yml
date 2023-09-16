@@ -1,0 +1,37 @@
+---
+kind : rule
+name : R1
+service : Sort
+guard : 
+ classPath: com.local.MergeFunc
+ method: guardDivide
+functions :
+ - { classPath: com.local.MergeFunc, method: merge, label : merge }
+ - { classPath: com.local.MergeFunc, method: divide, label : divide }
+ - { classPath: com.local.MergeFunc, method: first, label : first }
+ - { classPath: com.local.MergeFunc, method: second, label : second }
+actions :
+ - division = divide(a)
+ - part1 = first(division)
+ - part2 = second(division)
+ - (r1,r2) = __call Sort(part1)
+ - (r3,r4) = __call Sort(part2)
+ - b = merge(r1,r2)
+ - c = merge(r3,r4) 
+---
+kind : rule
+name : R2
+service : Sort
+functions:
+ - { classPath: com.local.MergeFunc, method: simpleSort, label: simpleSort }
+ - { classPath: com.local.MergeFunc, method: first, label : first }
+ - { classPath: com.local.MergeFunc, method: second, label : second }
+guard : 
+ classPath: com.local.MergeFunc
+ method: guardSimpleSort
+actions:
+ - result = simpleSort(a)
+ - b = first(result)
+ - c = second(result) 
+
+ 

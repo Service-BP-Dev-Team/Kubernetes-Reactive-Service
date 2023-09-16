@@ -14,11 +14,13 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import com.consulner.app.Application;
+import com.consulner.app.api.mergesort.ArrayInput;
 import com.consulner.app.errors.ApplicationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.local.ObjectMessage;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.Data;
 import com.reactive.service.model.configuration.Task;
@@ -28,6 +30,7 @@ import com.reactive.service.parser.Parser;
 import com.reactive.service.parser.YAMLSpec;
 import com.reactive.service.util.Context;
 import com.reactive.service.util.Executor;
+import com.reactive.service.util.Operation;
 
 import static com.consulner.app.Configuration.getObjectMapper;
 public class InMemoryWorkspace {
@@ -182,10 +185,17 @@ public class InMemoryWorkspace {
 
 	public static GAG getGag() {
 		if(gag==null) {
+			getGagWithRootFolder("spec");
+		}
+		return gag;
+	}
+	
+	public static GAG getGagWithRootFolder(String rootFolder) {
+		if(gag==null) {
 			//fetch the GAG  
 	        ArrayList<YAMLSpec> myServices= new ArrayList<>(); 
 	        //reading services 
-	        File fileService = new File("spec/services.yml");
+	        File fileService = new File(rootFolder+"/services.yml");
 	        try (InputStream inputStream = new FileInputStream(fileService)) {
 	            // Read the file content using the InputStream
 	        	 Yaml yaml = new Yaml(new Constructor(YAMLSpec.class));
@@ -193,15 +203,12 @@ public class InMemoryWorkspace {
 	        	 for (Object object : specs) {
 	        		 myServices.add((YAMLSpec) object);
 	        	 }
-	        	 YAMLSpec spec = myServices.get(2);
-	        	 System.out.println(spec.getName());
-	        	 System.out.println(spec.getInputs().get(0).getName());
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
 	        //reading rules
 	        ArrayList<YAMLSpec> myRules= new ArrayList<>();
-	        File fileRule = new File("spec/rules.yml");
+	        File fileRule = new File(rootFolder+"/rules.yml");
 	        try (InputStream inputStream = new FileInputStream(fileRule)) {
 	            // Read the file content using the InputStream
 	        	 Yaml yaml = new Yaml(new Constructor(YAMLSpec.class));
@@ -231,6 +238,39 @@ public class InMemoryWorkspace {
 	
 
 	public static void main(String args[]) {
+		mainMergeSort();
+	}
+	
+	public static void mainMergeSort() {
+		
+		// create the server
+		try {
+			Application.main(new String[] {});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// execute the gag
+		GAG g= getGagWithRootFolder("spec-merge-sort");
+		//System.out.println(g);
+		
+		Executor defaulte= new Executor();
+		defaulte.setGag(g);
+		Context ctx = new Context();
+		ctx.setExecutor(defaulte);
+		defaulte.setContext(ctx);
+		Hashtable<String, Object> inputs = new Hashtable<String,Object>();
+		ArrayInput arr = ArrayInput.createRandomInput(13);
+		ObjectMessage obj=new ObjectMessage();
+		obj.setTable(arr.getArray());
+		inputs.put("a", obj);
+		Task t= Operation.createTask(g.getServices().get(0), inputs);
+		Configuration conf = new Configuration();
+		conf.setRoot(t);
+		defaulte.setConfiguration(conf);
+		defaulte.execute();
+	}
+	public static void mainSimpleTest() {
 		System.out.println(getHostIp());
 		ServiceCall sc=new ServiceCall();
 		Task t=new Task();
@@ -262,5 +302,4 @@ public class InMemoryWorkspace {
 			e.printStackTrace();
 		}
 	}
-	
 }

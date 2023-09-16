@@ -1,0 +1,9 @@
+---
+kind : service
+name : Sort
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : a }
+outputs:
+ - { name : b }
+ - { name : c }

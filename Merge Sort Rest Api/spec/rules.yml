@@ -9,6 +9,7 @@ functions :
  - { classPath: com.local.Func, method: f, label : f }
 actions :
  - c = f(a,b)
+ - d = f(c,a)
 ---
 kind : rule
 name : R2
@@ -26,7 +27,7 @@ name : R3
 service : S3
 actions :
  - b = __call S2(a)
- - inter = __call S1(a,b)
+ - (inter,f) = __call S1(a,b)
  - c = inter
 
  

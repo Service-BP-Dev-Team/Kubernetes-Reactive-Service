@@ -7,6 +7,7 @@ inputs :
  - { name : b }
 outputs:
  - { name : c }
+ - { name : d }
 ---
 kind : service
 name : S2
