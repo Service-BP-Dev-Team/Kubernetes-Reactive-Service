@@ -23,6 +23,8 @@ public class Data implements Serializable{
 	private String serviceCallId; // use to quickly retrieve a configuration that have a data
 	
 	private String host; // use to quickly retrieve the host where to send the data
+	
+	private OutputWatcher watcher;
 	public Data() {
 		idCounter++;
 	    id = UUID.randomUUID().toString();
@@ -62,6 +64,9 @@ public class Data implements Serializable{
 		this.value = value;
 		if(value!=null) {
 			this.defined=true;
+			if(watcher!=null) {
+				watcher.setExecutionToEndWithData(this);
+			}
 		}
 	}
 
@@ -108,6 +113,20 @@ public class Data implements Serializable{
 
 	public void setHost(String host) {
 		this.host = host;
+	}
+
+
+
+	@JsonIgnore
+	public OutputWatcher getWatcher() {
+		return watcher;
+	}
+
+
+
+
+	public void setWatcher(OutputWatcher watcher) {
+		this.watcher = watcher;
 	}
 	
 	

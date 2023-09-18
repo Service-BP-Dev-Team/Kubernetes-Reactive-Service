@@ -79,15 +79,10 @@ public class InMemoryWorkspace {
 		if(d!=null) {
 			d.setValue(nf.getData().getValue());
 			inSubscriptions.remove(nf.getData().getId());
-			try {
-				System.out.println(getObjectMapper().writeValueAsString(d));
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 			Executor executor = inMemoryCalls.get(d.getServiceCallId());
 			if(executor!=null) {
-				System.out.println("find the executor");
+				//System.out.println("find the executor");
 				executor.execute();
 			}
 		}
@@ -226,7 +221,7 @@ public class InMemoryWorkspace {
 	        Parser parser = new Parser();
 	        parser.setSpecs(allSpecs);
 	        gag = parser.getGAG();
-	        System.out.println(gag);
+	        //System.out.println(gag);
 		}
 		return gag;
 	}
@@ -271,18 +266,12 @@ public class InMemoryWorkspace {
 		defaulte.execute();
 	}
 	public static void mainSimpleTest() {
-		System.out.println(getHostIp());
+		//System.out.println(getHostIp());
 		ServiceCall sc=new ServiceCall();
 		Task t=new Task();
 		t.getInputs().add(new Data());
 		t.setService(new Service());
-		sc.setTask(t);
-		try {
-			System.out.println(getObjectMapper().writeValueAsString(sc));
-		} catch (JsonProcessingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		
 		try {
 			// create the server
 			Application.main(new String[] {});
@@ -290,7 +279,7 @@ public class InMemoryWorkspace {
 			GAG g= getGag();
 			//System.out.println(g);
 			 String print1 = g.getServices().get(2).getRules().get(0).getSemanticAsString();
-			 System.out.println(print1);
+			 //System.out.println(print1);
 			Executor defaulte= new Executor();
 			defaulte.setGag(g);
 			Context ctx = new Context();

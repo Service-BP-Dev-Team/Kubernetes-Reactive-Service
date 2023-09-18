@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.local.MergeFunc;
 import com.consulner.app.api.Constants;
 
 public class DistributedSort {
@@ -23,9 +24,17 @@ public class DistributedSort {
 
 	
     public static void mergeSort(List<Long> list, ObjectMapper obj) {
-        if (list.size() < 2) {
-            return; // Base case: list is already sorted
-        }
+    	
+    	if(list.size()<MergeFunc.threshold) {
+    		ArrayList<Long> array = new ArrayList<Long>(list);
+        	ArrayInput arrayInput = new ArrayInput();
+        	arrayInput.setSize(list.size());
+        	arrayInput.setArray(array);
+    		ArrayList<Long> val = SequentialSort.sort(arrayInput).getArray();
+    		list.removeAll(list);
+    		list.addAll(val);
+    		return;
+    	}
         
         // Divide the list into two halves
         int mid = list.size() / 2;
@@ -45,9 +54,7 @@ public class DistributedSort {
     	ArrayInput arrayInput = new ArrayInput();
     	arrayInput.setSize(list.size());
     	arrayInput.setArray(array);
-    	if(list.size()<100000) {
-    		return SequentialSort.sort(arrayInput).getArray();
-    	}
+    	
     	try {
 			String jsonData = obj.writeValueAsString(arrayInput);
 			//System.out.println(jsonData);

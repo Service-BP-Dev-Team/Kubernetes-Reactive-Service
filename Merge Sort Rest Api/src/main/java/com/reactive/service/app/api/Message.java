@@ -56,7 +56,7 @@ public class Message {
 		}
 		try {
 			String content =objmapper.writeValueAsString(message);
-			System.out.println(content);
+			//System.out.println(content);
 			result = JsonHttpPost.postRequestAndReturnString(content, "http://"+receiver+"/api/service");
 
 			//objmapper.readValue(result, Message.class);

@@ -48,23 +48,18 @@ public class Executor {
 	
 	public void execute() {
 		if(configuration==null) {Task t = context.getStartingTask();}
-		System.out.println("size of pending local computation : "+configuration.getPendingLocalComputations().size());
+		//System.out.println("size of pending local computation : "+configuration.getPendingLocalComputations().size());
 		Hashtable<Task, List<DecompositionRule>> readyTasks= context.getReadyTasks();
 		computePendingLocalComputations();
 		while(readyTasks.size()!=0) {
 			for(Task task: readyTasks.keySet()) {
-				System.out.println(task.getService().getName());
+				//System.out.println(task.getService().getName());
 				applyRule(task,readyTasks.get(task).get(0));
 				computePendingLocalComputations();
 			}
 			readyTasks= context.getReadyTasks();
 		}
-		try {
-			System.out.println(getObjectMapper().writeValueAsString(configuration.getRoot()));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 	private void applyRule(Task task, DecompositionRule rule) {
 		
@@ -136,7 +131,7 @@ public class Executor {
 			}
 			configuration.getPendingLocalComputations().add(pendingComputation);
 		}
-		System.out.println("size of pending local computation : "+configuration.getPendingLocalComputations().size());
+		//System.out.println("size of pending local computation : "+configuration.getPendingLocalComputations().size());
 	}
 	
 	public Data findDataByParameterNameInTask(Task task,String parameterName) {

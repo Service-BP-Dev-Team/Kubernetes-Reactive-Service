@@ -16,7 +16,9 @@ import java.util.concurrent.Executors;
 import com.consulner.app.api.mergesort.BuildRandomInputHandler;
 import com.consulner.app.api.mergesort.SortInputDistributedHandler;
 import com.consulner.app.api.mergesort.SortInputHandler;
+import com.consulner.app.api.mergesort.SortInputWithAssessmentHandler;
 import com.reactive.service.app.api.ServiceMessageHandler;
+import com.reactive.service.app.api.ServiceMessageWithAssessmentHandler;
 import com.sun.net.httpserver.BasicAuthenticator;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
@@ -37,12 +39,18 @@ public class Application {
       
         BuildRandomInputHandler randomInputHandler = new BuildRandomInputHandler(getObjectMapper(), getErrorHandler()); 
         SortInputHandler sortInputHandler = new SortInputHandler(getObjectMapper(), getErrorHandler());
+        SortInputWithAssessmentHandler sortInputWithAssessmentHandler = new SortInputWithAssessmentHandler(getObjectMapper(), getErrorHandler());
         SortInputDistributedHandler sortInputDistributedHandler = new SortInputDistributedHandler(getObjectMapper(), getErrorHandler());
+        
         ServiceMessageHandler serviceMessageHandler = new ServiceMessageHandler(getObjectMapper(), getErrorHandler());
+        ServiceMessageWithAssessmentHandler serviceMessageWithAssessmentHandler = new ServiceMessageWithAssessmentHandler(getObjectMapper(), getErrorHandler());
+        
         server.createContext("/api/mergesort/create-input", randomInputHandler::handle);
         server.createContext("/api/mergesort/sort", sortInputHandler::handle);
+        server.createContext("/api/mergesort/sort/assessment", sortInputWithAssessmentHandler::handle);
         server.createContext("/api/mergesort/sort-array", sortInputDistributedHandler::handle);
         server.createContext("/api/service",serviceMessageHandler::handle);
+        server.createContext("/api/service/assessment",serviceMessageWithAssessmentHandler::handle);
 
         //server.setExecutor(null); // creates a default executor
         server.start();

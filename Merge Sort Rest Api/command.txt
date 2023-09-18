@@ -5,11 +5,21 @@ kubectl delete deployment --all
 kubectl apply -f ../Application/deployment.yml 
 kubectl get pods
 
-kubectl exec --stdin --tty java-rest-5dccb9f467-6qg7t -- /bin/bash
+kubectl exec --stdin --tty java-rest-5dccb9f467-fn695 -- /bin/bash
 
 curl -X POST java-rest-service:8000/api/mergesort/create-input -d '{"size": 10 }'
 curl -X POST java-rest-service:8000/api/mergesort/sort -d '{"size": 9000000 }'
 
+curl -X POST java-rest-service:8000/api/service -d '{"bind":{"sender": "127.0.0.1"},"type":"BIND_MESSAGE_TYPE"}'
+curl -X POST 127.0.0.1:8000/api/service/assessment -d '{"size": 200 }'
+curl -X POST 127.0.0.1:8000/api/mergesort/sort/assessment -d '{"size": 200 }'
+
+curl -X POST java-rest-service:8000/api/mergesort/sort/assessment -d '{"size": 500000 }'
+it takes 10 second
+
+curl -X POST java-rest-service:8000/api/service/assessment -d '{"size": 500000 }'
+
+it takes 9 second
 8 millions for 6 pods;
 5 milions for 4 pods
 
