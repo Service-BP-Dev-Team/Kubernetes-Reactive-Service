@@ -1,22 +1,16 @@
-## REST API in pure Java without any frameworks
+## Kubernetes-compatible java rest application for assessment and deployment of distributed service-based application
 
-This is a demo application developed in Java 11 using 
+This is an application for the deployment of distributed rest services using GAG and Java. The application is developped using Java 11 with 
 [`jdk.httpserver`](https://docs.oracle.com/javase/10/docs/api/com/sun/net/httpserver/package-summary.html) module 
-and a few additional Java libraries (like [vavr](http://www.vavr.io/), [lombok](https://projectlombok.org/)).
+and a few additional Java libraries (like [vavr](http://www.vavr.io/), [lombok](https://projectlombok.org/))..
+The application consist of a java server that allows to execute the rest services of a GAG application on a distributed conatiner-based architecture. By doing so such services can be deploy in container orchestrator such as kubernetes.
 
-## Genesis of this project
-I am a day-to-day Spring developer and I got used to this framework so much that I imagined how it would be to forget about it for a while
-and try to build completely pure Java application from scratch. 
+##
 
-I thought it could be interesting from learning perspective and a bit refreshing.
-
-When I started building this I often came across situations when I missed some features which Spring provides out of the box.
-
-At that times, instead of switching on another Spring capability, I had to rethink it and develop it myself.
-
-It occurred that for real business case I would probably still prefer to use Spring instead of reinventing a wheel.
-
-Still, I believe the exercise was pretty interesting experience.
+## Package description
+The project contains 10 packages, each package has a readme describing in more details its purpose and implentation. The package list is the following :
+- com.comsulner.app this package contains the project launcher class named com.comsulner.app.Application. It serves to launch the application 
+- 
 
 ## Beginning.
 I will go through this exercise step by step but not always pasting a complete code in text
