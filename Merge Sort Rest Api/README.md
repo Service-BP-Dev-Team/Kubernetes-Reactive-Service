@@ -1,16 +1,23 @@
-## Kubernetes-compatible java rest application for assessment and deployment of distributed service-based application
+## Kubernetes-compatible java rest framework for assessment and deployment of distributed service-based application
 
-This is an application for the deployment of distributed rest services using GAG and Java. The application is developped using Java 11 with 
+This is a framework for the deployment of distributed rest services using GAG (Guarded Attribute Grammars), Java and Docker. The application is developped in Java 11 with 
 [`jdk.httpserver`](https://docs.oracle.com/javase/10/docs/api/com/sun/net/httpserver/package-summary.html) module 
 and a few additional Java libraries (like [vavr](http://www.vavr.io/), [lombok](https://projectlombok.org/))..
-The application consist of a java server that allows to execute the rest services of a GAG application on a distributed conatiner-based architecture. By doing so such services can be deploy in container orchestrator such as kubernetes.
+The application consist of a java server that allows to execute the rest services of a GAG specification on a distributed conatiner-based architecture. By doing so, such services can be deploy in a container orchestrator such as kubernetes.
 
-##
+## Example of distibuted services
+The framework provide a yaml syntax to define both service interfaces and service specifications. The interface of a service defines the list of expected inputs, and the list of expected outputs after providing the inputs. The term "expected inputs" means that the services are incremental and lazy. More precisely, a service can compute some output even though some inputs might be still missing. In fact, a output is computed as soon as all the inputs it depends on are provided. This behavior is particularly suitable for distributed architecture where inputs may come from several sources (other pending services). Hence it allows to avoid latencies that the waiting of all the inputs may cause. 
+Let's consider for instance the ex
 
-## Package description
+## Package list
 The project contains 10 packages, each package has a readme describing in more details its purpose and implentation. The package list is the following :
-- com.comsulner.app this package contains the project launcher class named com.comsulner.app.Application. It serves to launch the application 
-- 
+- **com.comsulner.app**. This package contains the project launcher class named com.comsulner.app.Application. It serves to launch the application 
+- **com.consulner.app.api**. This package contains constant and utility classes to handle http communication.
+-  **com.consulner.app.api.mergesort**. This package contains controllers that execute the merge sort in a distributed manner using json as the communication format.
+-  **com.consulner.app.errors**. This packahe contains utility classes to handle http communication errors.
+-  **com.local**. This package contains local java methods that are used in the rest service specifications.
+-  **com.reactive.service.api**. This package contains controllers to handle the execution of the distributed rest services.
+-     
 
 ## Beginning.
 I will go through this exercise step by step but not always pasting a complete code in text
