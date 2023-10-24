@@ -1,16 +1,11 @@
 package com.reactive.service.model.specification;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
-
 
 public class IdExpression extends Expression{
 	private ServiceInstance serviceInstance;
 	private String parameterName;
 	
 	
-	@XmlAttribute(name="parameter")
 	public String getParameterName() {
 		return parameterName;
 	}

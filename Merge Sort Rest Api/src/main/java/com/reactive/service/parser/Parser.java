@@ -100,10 +100,19 @@ public class Parser {
 		String right=actionSplit[1].trim();
 		String[] computationPart=right.split("\\(");
 		if(computationPart.length>1) {
+		//check if it is a thread function
+		String threadPrefix="__thread ";
 		String computationSymbol=computationPart[0].trim();
+		boolean threadFunction =false;
+			if(computationSymbol.startsWith(threadPrefix)) {
+				threadFunction=true;
+				//System.out.println(computationSymbol);
+				computationSymbol=computationSymbol.substring(threadPrefix.length(),computationSymbol.length());
+				computationSymbol=computationSymbol.trim();
+			}
 		FunctionDeclaration f = findFunctionByName(rule, computationSymbol);
 			if(f!=null) {
-				processFunctionAction(left,right, f, rule);
+				processFunctionAction(left,right, f, rule,threadFunction);
 			}else {
 				processServiceAction(left,right, rule);
 			}
@@ -169,7 +178,7 @@ public class Parser {
 			rule.getSemantics().add(eq);
 		}
 	}
-	private void processFunctionAction(String left, String right, FunctionDeclaration f, DecompositionRule rule) {
+	private void processFunctionAction(String left, String right, FunctionDeclaration f, DecompositionRule rule, boolean threadFunction) {
 		IdExpression idl = getRuleIdExpression(rule, left);
 		
 		String cut = right.split("\\(")[1];
@@ -177,6 +186,7 @@ public class Parser {
 		String[] variables = cut.split(","); 
 		FunctionExpression fe = new FunctionExpression();
 		fe.setFunction(f);
+		fe.setThreadFunction(threadFunction);
 		for(String v : variables) {
 			IdExpression idr=getRuleIdExpression(rule, v.trim());
 			fe.getIdExpressions().add(idr);

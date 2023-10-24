@@ -42,21 +42,11 @@
       <version>1.18.0</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-			<groupId>jakarta.xml.bind</groupId>
-			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>3.0.1</version>
-		</dependency>
+    
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>1.21</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<version>3.0.15</version>
-			<type>pom</type>
 		</dependency>
   </dependencies>
   <build>

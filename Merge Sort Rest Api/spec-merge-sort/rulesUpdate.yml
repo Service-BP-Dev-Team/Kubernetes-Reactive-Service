@@ -13,11 +13,16 @@ functions :
 actions :
  - division = divide(a)
  - part1 = first(division)
+ - pivot = pivot(division)
  - part2 = second(division)
- - (r1,r3) = __call  Sort(part1)
- - (r3,r4) = __call  Sort(part2)
- - b = merge(r1,r2)
- - c = merge(r3,r4)
+ - r1 = __call  Sort(part1)
+ - r2 = __call  Sort(part2)
+ - b = merge(r1,pivot,r2)
+ #b must be a list of list ([id1,4,5,6,7,8:pivot2:[id2,undefined]]],pivot,[id2,undefined])
+ # an update function which receive an id and a value, then replace the value
+ # at the place of the id
+ # update only notify and forward the value
+ 
  
 ---
 kind : rule

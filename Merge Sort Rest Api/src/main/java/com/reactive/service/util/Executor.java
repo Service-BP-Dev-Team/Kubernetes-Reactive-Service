@@ -123,6 +123,7 @@ public class Executor {
 			else {
 				FunctionExpression funcExpr = (FunctionExpression) eq.getRightpart();
 				pendingComputation.setFunctionDeclaration(funcExpr.getFunction());
+				pendingComputation.setThreadFunction(funcExpr.isThreadFunction());
 				for(IdExpression right: funcExpr.getIdExpressions()) {
 					Task taskRight = servicetask.get(right.getServiceInstance());
 					Data dright = findDataByParameterNameInTask(taskRight, right.getParameterName());

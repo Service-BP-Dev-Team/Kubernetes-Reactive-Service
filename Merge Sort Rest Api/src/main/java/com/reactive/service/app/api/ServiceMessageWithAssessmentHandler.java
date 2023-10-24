@@ -56,7 +56,7 @@ public class ServiceMessageWithAssessmentHandler extends Handler {
 		Pair<Task,Pair<OutputWatcher,OutputWatcher>> launchedTask = buildTheTask(request.getSize());
 		OutputWatcher response ;
 		OutputWatcher outWatcher1 = launchedTask.getValue().getFirst();
-		OutputWatcher outWatcher2 = launchedTask.getValue().getFirst();
+		OutputWatcher outWatcher2 = launchedTask.getValue().getSecond();
 		while(! (outWatcher1.isEnded() && outWatcher2.isEnded()  )) {
 			try {
 				Thread.sleep(3000);

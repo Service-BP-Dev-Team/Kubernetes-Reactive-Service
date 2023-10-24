@@ -2,10 +2,6 @@ package com.reactive.service.model.specification;
 
 import java.io.Serializable;
 
-import jakarta.xml.bind.annotation.XmlAnyElement;
-import jakarta.xml.bind.annotation.XmlType;
-
-
 public class Equation implements Serializable{
 	
 	private IdExpression leftpart;

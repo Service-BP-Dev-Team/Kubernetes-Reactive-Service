@@ -5,9 +5,7 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlID;
+
 
 public class Service implements Serializable{
       
@@ -32,7 +30,7 @@ public class Service implements Serializable{
 		outputParameters= new ArrayList<Parameter>();
 		axiom=false;
 	}
-	@XmlAttribute @XmlID
+
 	public String getName() {
 		return name;
 	}
@@ -40,29 +38,28 @@ public class Service implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	@XmlAttribute
+
 	public Boolean isAxiom() {
 		return axiom;
 	}
 	public void setAxiom(Boolean axiom) {
 		this.axiom = axiom;
 	}
-	@XmlElement(name="input")
+
 	public ArrayList<Parameter> getInputParameters() {
 		return inputParameters;
 	}
 	public void setInputParameters(ArrayList<Parameter> inputParameters) {
 		this.inputParameters = inputParameters;
 	}
-	@XmlElement(name="output")
+
 	public ArrayList<Parameter> getOutputParameters() {
 		return outputParameters;
 	}
 	public void setOutputParameters(ArrayList<Parameter> outputParameters) {
 		this.outputParameters = outputParameters;
 	}
-	@XmlElement(name="production")
+	
 	@JsonIgnore
 	public ArrayList<DecompositionRule> getRules() {
 		return rules;
@@ -70,7 +67,7 @@ public class Service implements Serializable{
 	public void setRules(ArrayList<DecompositionRule> rules) {
 		this.rules = rules;
 	}
-	@XmlAttribute
+	
 	public Boolean isRemote() {
 		return remote;
 	}
@@ -81,7 +78,7 @@ public class Service implements Serializable{
 	public String getExampleSignature() {
 		return exampleSignature;
 	}
-	@XmlAttribute(name="exampleSignature")
+	
 	public void setExampleSignature(String exampleSignature) {
 		this.exampleSignature = exampleSignature;
 	}

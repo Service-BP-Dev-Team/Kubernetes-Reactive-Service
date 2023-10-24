@@ -2,10 +2,6 @@ package com.reactive.service.model.specification;
 
 import java.util.ArrayList;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-@XmlRootElement(name="GAG")
 public class GAG {
 
 	private String name;
@@ -14,7 +10,7 @@ public class GAG {
 	public GAG() {
 		services = new ArrayList<Service>();
 	}
-	@XmlAttribute
+
 	public String getName() {
 		return name;
 	}
@@ -22,7 +18,7 @@ public class GAG {
 		this.name = name;
 	}
 	
-	@XmlElement(name="service")
+
 	public ArrayList<Service> getServices() {
 		return services;
 	}

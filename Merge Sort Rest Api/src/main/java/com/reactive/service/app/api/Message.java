@@ -44,7 +44,7 @@ public class Message {
 	public static String sendMessage(Message message) {
 		ObjectMapper objmapper=Configuration.getObjectMapper();
 		String result=null;
-		String sender = InMemoryWorkspace.getHostIp();
+		//String sender = InMemoryWorkspace.getHostIp();
 		String receiver = null;
 		if(message.type.equals(Message.NOTIFICATION_MESSAGE_TYPE)) {
 			receiver=message.notification.getReceiver();

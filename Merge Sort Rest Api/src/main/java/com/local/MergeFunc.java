@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import java.util.LinkedHashMap;
 public class MergeFunc {
 
-	public static final int threshold=10000;
+	public static final int threshold=50000;
 	public Object first(Object array) {
 		ArrayList val = getArrayOfArray(array);
 		return val.get(0);
@@ -28,7 +28,7 @@ public class MergeFunc {
 			return false;
 		}
 		ArrayList val = getArray(array);
-		if(val.size()>=threshold) {
+		if(val.size()>threshold) {
 			return true;
 		}
 		return false;
@@ -60,7 +60,7 @@ public class MergeFunc {
 			return false;
 		}
 		ArrayList<Long> val = getArray(array);
-		if(val.size()<threshold) {
+		if(val.size()<=threshold) {
 			return true;
 		}
 		return false;

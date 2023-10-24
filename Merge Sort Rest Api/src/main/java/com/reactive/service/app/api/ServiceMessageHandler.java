@@ -24,10 +24,11 @@ public class ServiceMessageHandler extends Handler {
 		// TODO Auto-generated method stub
         byte[] response;
         if ("POST".equals(exchange.getRequestMethod())) {
-            ResponseEntity e = doPost(exchange.getRequestBody());
+            ResponseEntity e = doPost(exchange.getRequestBody(),this.retrieveIpAddress(exchange));
             exchange.getResponseHeaders().putAll(e.getHeaders());
             exchange.sendResponseHeaders(e.getStatusCode().getCode(), 0);
             response = super.writeResponse(e.getBody());
+           
         } else {
             throw ApplicationExceptions.methodNotAllowed(
                 "Method " + exchange.getRequestMethod() + " is not allowed for " + exchange.getRequestURI()).get();
@@ -38,7 +39,7 @@ public class ServiceMessageHandler extends Handler {
         os.close();
 	}
 
-	private ResponseEntity doPost(InputStream is) {
+	private ResponseEntity doPost(InputStream is, String clientIp) {
 		// TODO Auto-generated method stub
 		Message request= super.readRequest(is, Message.class);
 		Object response;
@@ -46,6 +47,7 @@ public class ServiceMessageHandler extends Handler {
 			response= new BindResponse();
 			String ip = InMemoryWorkspace.processBindMessage(request.getBind());
 			((BindResponse) response).setIpAddress(ip);
+			((BindResponse) response).setClientIp(clientIp);
 		}
 		else if(request.getType().equals(Message.NOTIFICATION_MESSAGE_TYPE)) {
 			InMemoryWorkspace.processInNotification(request.getNotification());
@@ -59,6 +61,15 @@ public class ServiceMessageHandler extends Handler {
         return new ResponseEntity<>(response,
             getHeaders(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON), StatusCode.OK);
 		
+	}
+	
+	public String retrieveIpAddress(HttpExchange httpExchange) {
+		// Retrieve the client's IP address
+        String clientIP = httpExchange.getRequestHeaders().getFirst("X-Forwarded-For");
+        if (clientIP == null || clientIP.isEmpty()) {
+            clientIP = httpExchange.getRemoteAddress().getAddress().getHostAddress();
+        }
+        return clientIP;
 	}
 	
 	

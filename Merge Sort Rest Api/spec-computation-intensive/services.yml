@@ -1,0 +1,35 @@
+---
+kind : service
+name : Find
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : x }
+ - { name : frames }
+ - { name : knownPosition }
+outputs:
+ - { name : result }
+ - { name : position }
+
+---
+kind : service
+name : Local
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : processId }
+ - { name : frame }
+ - { name : knownPosition }
+outputs:
+ - { name : result }
+ - { name : position }
+ 
+---
+kind : service
+name : Or
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : pos1 }
+ - { name : pos2 }
+ - { name : pos3 }
+outputs:
+ - { name : pos }
+ 

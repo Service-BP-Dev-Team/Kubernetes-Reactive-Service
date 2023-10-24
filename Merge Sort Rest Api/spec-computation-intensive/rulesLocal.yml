@@ -1,0 +1,43 @@
+---
+kind : rule
+name : ProcessFinished
+service : Local
+guard : 
+ classPath: com.local.computation.intensive.LocalFunc
+ method: guardProcessFinish
+functions :
+ - { classPath: com.local.computation.intensive.LocalFunc, method: fetch, label : fetch }
+
+actions :
+ - position = fetch(processId)
+ - result = position
+ 
+---
+kind : rule
+name : KillProcess
+service : Local
+guard : 
+ classPath: com.local.computation.intensive.LocalFunc
+ method: guardKillProcess
+functions:
+ - { classPath: com.local.computation.intensive.LocalFunc, method: kill, label: kill }
+ - { classPath: com.local.computation.intensive.LocalFunc, method: emptyResponse, label: emptyResponse }
+actions:
+ - empty = kill(processId)
+ - result = emptyResponse()
+ - position = result 
+
+---
+kind : rule
+name : NotProcessFinish
+service : Local
+guard : 
+ classPath: com.local.computation.intensive.LocalFunc
+ method: guardNotProcessFinish
+functions:
+ - { classPath: com.local.computation.intensive.LocalFunc, method: waitComputation, label: waitComputation }
+actions:
+ - empty = waitComputation()
+ - (result,position) = Local(processId,frame,KnownPosition)
+
+ 

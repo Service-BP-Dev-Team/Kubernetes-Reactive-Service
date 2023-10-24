@@ -3,8 +3,6 @@ package com.reactive.service.model.specification;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlIDREF;
 
 public class DecompositionRule implements Serializable {
 
@@ -23,7 +21,7 @@ public class DecompositionRule implements Serializable {
 		data = new ArrayList<IdExpression>();
 		semantics = new ArrayList<Equation>();
 	}
-	@XmlAttribute
+
 	public String getName() {
 		return name;
 	}

@@ -4,9 +4,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlTransient;
+
 
 public class Parameter implements Serializable{
 
@@ -15,21 +13,17 @@ public class Parameter implements Serializable{
 	private Service Service; // may be null if the parsing from xml fail
 
 	
-	@XmlTransient
 	@JsonIgnore
 	public Service getService() {
 		return Service;
 	}
 	
-	 public void afterUnmarshal(Unmarshaller u, Object parent) {
-		    this.setService((Service)parent);
-		  }
 
 	public void setService(Service service) {
 		Service = service;
 	}
 
-	@XmlAttribute
+
 	public String getName() {
 		return name;
 	}
@@ -45,7 +39,7 @@ public class Parameter implements Serializable{
 		super();
 		this.name = name;
 	}
-	@XmlAttribute
+	
 	public String getShortName() {
 		return shortName;
 	}

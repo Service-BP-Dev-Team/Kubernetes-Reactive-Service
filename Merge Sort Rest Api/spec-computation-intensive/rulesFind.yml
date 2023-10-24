@@ -1,0 +1,32 @@
+---
+kind : rule
+name : SeveralFrame
+service : Find
+guard : 
+ classPath: com.local.computation.intensive.FrameFunc
+ method: guardSeveralFrame
+functions :
+ - { classPath: com.local.computation.intensive.FrameFunc, method: first, label : first }
+ - { classPath: com.local.computation.intensive.FrameFunc, method: second, label : second }
+ - { classPath: com.local.computation.intensive.FrameFunc, method: divide, label : divide }
+ - { classPath: com.local.computation.intensive.FrameFunc, method: merge, label : merge }
+actions :
+ - (part1,part2) = divide(frames)
+ - (result1,knownPosition1) = Find(x,part1,position)
+ - (result2,knownPosition2) = Find(x,part2,position)
+ - position = Or(KnownPosition,knownPosition1,knownPosition2)
+ - result = merge(result1,result2)
+ 
+---
+kind : rule
+name : UniqueFrame
+service : Find
+guard : 
+ classPath: com.local.computation.intensive.FrameFunc
+ method: guardUniqueFrame
+functions :
+ - { classPath: com.local.computation.intensive.FrameFunc, method: lookup, label : lookup }
+actions :
+ - processId = __thread lookup(x,frame)
+ - (result,position) = Local(processId,frame,knownPosition)
+ 

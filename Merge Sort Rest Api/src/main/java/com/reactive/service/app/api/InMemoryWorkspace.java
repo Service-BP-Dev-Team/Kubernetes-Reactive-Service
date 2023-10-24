@@ -30,6 +30,7 @@ import com.reactive.service.parser.Parser;
 import com.reactive.service.parser.YAMLSpec;
 import com.reactive.service.util.Context;
 import com.reactive.service.util.Executor;
+import com.reactive.service.util.Logger;
 import com.reactive.service.util.Operation;
 
 import static com.consulner.app.Configuration.getObjectMapper;
@@ -38,6 +39,8 @@ public class InMemoryWorkspace {
 	public static final ConcurrentHashMap<String, Executor> inMemoryCalls = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, Pair<String,Data>> inSubscriptions = new ConcurrentHashMap<String, Pair<String,Data>>();
 	public static final ConcurrentHashMap<String, Pair<String,Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String,Data>>();
+	public static final ConcurrentHashMap<Long, Object> threadFunctionProcess = new ConcurrentHashMap<>();
+	public static final String defaultGAGFolder ="spec-merge-sort";
 	private static GAG gag;
 	public static void addCall(ServiceCall sc) {
 		ServiceCall local = new ServiceCall();
@@ -45,6 +48,7 @@ public class InMemoryWorkspace {
 		conf.setRoot(sc.getTask());
 		conf.getRoot().setRemote(false);// transform the task to a local one
 		conf.setId(sc.getId());
+		
 		//bind to local service
 		conf.getRoot().setService(getGag().findByName(sc.getTask().getService().getName()));
 		//create and add subscriptions to undefined input
@@ -68,7 +72,8 @@ public class InMemoryWorkspace {
 		exec.setGag(gag);
 		exec.setContext(ctx);
 		inMemoryCalls.put(local.getId(), exec);
-		
+
+		//Logger.log(sc); we unlog
 		//execute the GAG
 		exec.execute();
 	}
@@ -108,6 +113,7 @@ public class InMemoryWorkspace {
 		// set the service call id on data
 		// and the host to send the data
 		String receiver = bind(sc.getTask().getService().getKubename());
+		//Logger.log(receiver);
 		for(Data d: sc.getTask().getInputs()) {
 			d.setServiceCallId(sc.getId());
 			d.setHost(receiver); 
@@ -125,7 +131,7 @@ public class InMemoryWorkspace {
 		Message m= new Message();
 		m.setType(Message.SERVICECALL_MESSAGE_TYPE);
 		m.setServiceCall(sc);
-		sc.setSender(getHostIp());
+		sc.setSender(getLocalHostIp()); //very important to get the ip local
 		sc.setReceiver(receiver);
 		Message.sendMessage(m);
 	
@@ -180,7 +186,12 @@ public class InMemoryWorkspace {
 
 	public static GAG getGag() {
 		if(gag==null) {
-			getGagWithRootFolder("spec");
+			if(defaultGAGFolder!=null) {
+				getGagWithRootFolder(defaultGAGFolder);
+			}
+			else { getGagWithRootFolder("spec");
+			
+			}
 		}
 		return gag;
 	}
@@ -290,5 +301,11 @@ public class InMemoryWorkspace {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getLocalHostIp() {
+		String result=bind("localhost:8000");
+		//Logger.log(result);
+		return result;
 	}
 }

@@ -1,0 +1,29 @@
+---
+kind : rule
+name : RuleOr1
+service : Or
+guard : 
+ classPath: com.local.computation.intensive.OrFunc
+ method: guardPos1
+actions :
+ - position = position1
+
+---
+kind : rule
+name : RuleOr2
+service : Or
+guard : 
+ classPath: com.local.computation.intensive.OrFunc
+ method: guardPos2
+actions :
+ - position = position2
+ 
+---
+kind : rule
+name : RuleOr3
+service : Or
+guard : 
+ classPath: com.local.computation.intensive.OrFunc
+ method: guardPos3
+actions :
+- position = position3
