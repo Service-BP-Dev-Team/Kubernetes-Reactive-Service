@@ -2,9 +2,14 @@ package com.reactive.service.model.configuration;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.reactive.service.model.specification.Parameter;
 import com.reactive.service.model.specification.Service;
+import com.reactive.service.model.specification.ServiceInstance;
 
 public class Task implements Serializable{
 	private String AppliedRule;
@@ -14,6 +19,7 @@ public class Task implements Serializable{
 	private ArrayList<Data> outputs;
 	private ArrayList<Data> locals;
 	private ArrayList<Task> subTasks;
+	private ArrayList<DataGroup> dataGroups; //for handling array
 	private boolean remote = false;
 	
 	public Task() {
@@ -21,6 +27,7 @@ public class Task implements Serializable{
 		outputs = new ArrayList<Data>();
 		subTasks = new ArrayList<Task>();
 		locals = new ArrayList<Data>();
+		dataGroups = new ArrayList<DataGroup>();
 		open=true;
 	}
 	public String getAppliedRule() {
@@ -67,7 +74,7 @@ public class Task implements Serializable{
 		this.subTasks = subTask;
 	}
 
-	
+	@JsonIgnore
 	public ArrayList<Data> getLocals() {
 		return locals;
 	}
@@ -79,8 +86,99 @@ public class Task implements Serializable{
 	}
 	public void setRemote(boolean remote) {
 		this.remote = remote;
-	} 
+	}
 	
+	public ArrayList<DataGroup> getDataGroups() {
+		return dataGroups;
+	}
+	public void setDataGroups(ArrayList<DataGroup> dataGroups) {
+		this.dataGroups = dataGroups;
+	} 
+	@JsonIgnore
+	public Set<Object> getArguments() {
+		HashSet<Object> result = new HashSet<Object>();
+		for(Data in:inputs) {
+			if(in.getGroup()!=null) {
+				result.add(in.getGroup());
+			}else {
+				result.add(in);
+			}
+		}
+		return result;
+	}
+	
+	
+	@JsonIgnore
+	public ArrayList<Object> getArgumentValues(){
+		Set<Object> set= getArguments();
+		ArrayList<Object> result = new ArrayList();
+		for(Object obj:set) {
+			if(obj instanceof DataGroup) {
+				ArrayList<Object> v=new ArrayList<>();
+				for(Data el:((DataGroup) obj).getCollection()) {
+					v.add(el.getValue());
+				}
+				result.add(v);
+			}else {
+				result.add(((Data)obj).getValue());
+			}
+		}
+		return result;
+	}
+	@JsonIgnore
+	public List<Data> getAllData(){
+		ArrayList<Data> all = new ArrayList<>();
+		all.addAll(inputs);
+		all.addAll(outputs);
+		all.addAll(locals);
+		return all;
+	}
+	
+	@JsonIgnore
+	public List<Data> getAllWithoutLocalData(){
+		ArrayList<Data> all = new ArrayList<>();
+		all.addAll(inputs);
+		all.addAll(outputs);
+		return all;
+	}
+	
+	// this method is necessary because when we send a task to
+	// a remote node we do not completely serialize datagroup
+	// to avoid cyclic issue : a data reference a group while the group itself reference all its data
+	
+	public void buildGroup() {
+		List<Data> alldata = getAllWithoutLocalData();
+		for(Data d:alldata) {
+			if(d.getGroup()!=null) {
+				DataGroup dg = findGroupById(d.getGroup().getId());
+				d.setGroup(dg);
+				ArrayList<Data> col = dg.getCollection();
+				if(col==null) {
+					col= new ArrayList<>();
+				}
+				col.add(d);
+				dg.setCollection(col);
+			}
+		}
+	}
+	
+	public DataGroup findGroupById(String id) {
+		for(DataGroup dg:dataGroups) {
+			if(dg.getId().equals(id)) {
+				return dg;
+			}
+		}
+		return null;
+	}
+	
+	public DataGroup findGroupByParameterName(String parameterName) {
+		for(DataGroup dg:dataGroups) {
+			if(dg.getParameter().getName().equals(parameterName)) {
+				return dg;
+			}
+		}
+		return null;
+	}
 	
 	
 }

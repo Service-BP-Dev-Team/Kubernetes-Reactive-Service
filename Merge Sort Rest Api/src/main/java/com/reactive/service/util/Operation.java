@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import com.reactive.service.model.configuration.Data;
+import com.reactive.service.model.configuration.DataGroup;
 import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.DecompositionRule;
 import com.reactive.service.model.specification.Guard;
@@ -28,9 +29,16 @@ public class Operation {
 		}
 		
 		for(Parameter par: s.getOutputParameters()) {
-			Data d= new Data();
-			d.setParameter(par);
-			t.getOutputs().add(d);
+			if(par.isArray()) {
+				 DataGroup dg=DataGroup.createDataGroupFromParameter(par);
+				// we add all the output data of the group to the task outputs
+				 t.getOutputs().addAll(dg.getCollection());
+				 t.getDataGroups().add(dg);
+			 }else {
+				 Data d= new Data();
+				 d.setParameter(par);
+				 t.getOutputs().add(d); 
+			 }
 		}
 		t.setLocals(new ArrayList<>());
 		return t;
@@ -42,10 +50,7 @@ public class Operation {
 		if(guard==null) {
 			return true;
 		}
-		ArrayList<Object> arguments = new ArrayList<Object>();
-		for(Data d:t.getInputs()) {
-			arguments.add(d.getValue());
-		}
+		ArrayList<Object> arguments = t.getArgumentValues();
 		Object res = executeMethodWithReflexion(guard.getLocation(),guard.getMethod(), arguments);
 		if(res!=null) {result=(Boolean)res;}
 		return result;

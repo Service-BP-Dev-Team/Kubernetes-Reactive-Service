@@ -48,6 +48,8 @@ public class InMemoryWorkspace {
 		conf.setRoot(sc.getTask());
 		conf.getRoot().setRemote(false);// transform the task to a local one
 		conf.setId(sc.getId());
+		// group data. This is necessary to handle array of data
+		conf.getRoot().buildGroup();
 		
 		//bind to local service
 		conf.getRoot().setService(getGag().findByName(sc.getTask().getService().getName()));

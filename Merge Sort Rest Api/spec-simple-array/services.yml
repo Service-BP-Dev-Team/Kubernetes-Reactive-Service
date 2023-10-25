@@ -1,0 +1,23 @@
+---
+kind : service
+name : S
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : a }
+ - { name : b}
+ 
+outputs:
+ - { name : c }
+ - { name : tab, array: true, size: 5}
+ 
+---
+kind : service
+name : S1
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : a }
+ - { name : b}
+ 
+outputs:
+ - { name : c }
+ - { name : tab1, array: true, size: 5}

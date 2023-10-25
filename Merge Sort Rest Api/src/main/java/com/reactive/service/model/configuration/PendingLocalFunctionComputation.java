@@ -71,7 +71,7 @@ public class PendingLocalFunctionComputation {
 			this.setHasBeenExecuted(true);
 			if(isIdFunction) {
 				result = actualParameters.get(0).getValue();
-				//System.out.println(result);
+				System.out.println(result);
 			}
 			else {
 				ArrayList<Object> params= new ArrayList<>();

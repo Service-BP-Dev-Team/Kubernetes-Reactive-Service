@@ -54,12 +54,16 @@ public class Parser {
 			Parameter par = new Parameter();
 			par.setName(param.getName().trim());
 			par.setService(s);
+			par.setArray(param.isArray());
+			par.setSize(param.getSize());
 			s.getInputParameters().add(par);
 		}
 		for(YAMLParameter param : S.getOutputs()) {
 			Parameter par = new Parameter();
 			par.setName(param.getName().trim());
 			par.setService(s);
+			par.setArray(param.isArray());
+			par.setSize(param.getSize());
 			s.getOutputParameters().add(par);
 		}
 		s.setRules(new ArrayList<DecompositionRule>());
@@ -151,11 +155,14 @@ public class Parser {
 		for(String rv : rvariables) {
 			IdExpression idl = new IdExpression();
 			idl.setServiceInstance(si);
-			idl.setParameterName(si.getService().getInputParameters().get(inputCounter).getName());
+			String parameterName = si.getService().getInputParameters().get(inputCounter).getName();
+			idl.setParameterName(parameterName);
 			rule.getData().add(idl);
+			idl.setArray(this.isArrayIdExpression(parameterName, si));
 			inputCounter++;
 			
 			IdExpression idr = getRuleIdExpression(rule, rv.trim());
+			
 			Equation eq = new Equation();
 			eq.setLeftpart(idl);
 			eq.setRightpart(idr);
@@ -167,8 +174,10 @@ public class Parser {
 		for(String lv : lvariables) {
 			IdExpression idr = new IdExpression();
 			idr.setServiceInstance(si);
-			idr.setParameterName(si.getService().getOutputParameters().get(outputCounter).getName());
+			String parameterName = si.getService().getOutputParameters().get(outputCounter).getName();
+			idr.setParameterName(parameterName);
 			rule.getData().add(idr);
+			idr.setArray(this.isArrayIdExpression(parameterName, si));
 			outputCounter++;
 			
 			IdExpression idl = getRuleIdExpression(rule, lv.trim());
@@ -253,20 +262,57 @@ public class Parser {
 	
 	private IdExpression getRuleIdExpression(DecompositionRule rule, String parameterName) {
 		IdExpression id = null;
+		// the novel version of the method
+		id=processIdExpression(rule, parameterName);
+		return id;
+	}
+	
+	private IdExpression processIdExpression(DecompositionRule rule,String parameterName) {
+		IdExpression id = null;
+		// find in existing data
 		for(IdExpression el: rule.getData()) {
 			if(el.getParameterName().equals(parameterName) && el.getServiceInstance()==rule.getCurrentServiceInstance()) {
 				id=el;
 				break;
 			}
 		}
-		if(id==null) {
-			id= new IdExpression();
+		if(id!=null) {
+			return id;
+		}
+		// we didn't find the idexpression
+		// we create a new one
+		String[] parameterSplit = parameterName.split("\\[");
+		// the id expression is an array
+		if (parameterSplit.length>1) {
+			ArrayExpression arr = new ArrayExpression();
+			String indexName = parameterSplit[1].split("\\]")[0].trim();
+			IdExpression index = processIdExpression(rule, indexName);
+			arr.setIndex(index);
+			arr.setParameterName(parameterSplit[0].trim());
+			arr.setServiceInstance(rule.getCurrentServiceInstance());
+			rule.getData().add(arr);
+			return arr;
+		}
+		// the id expression is not an array
+		else {
+			id = new IdExpression();
 			id.setParameterName(parameterName);
 			id.setServiceInstance(rule.getCurrentServiceInstance());
+			id.setArray(this.isArrayIdExpression(parameterName, rule.getCurrentServiceInstance()));
 			rule.getData().add(id);
+			return id;
 		}
-		return id;
 	}
-	//private IdExpression =
+	
+	private boolean isArrayIdExpression(String parameterName, ServiceInstance si) {
+		boolean result = false;
+		System.out.println(parameterName);
+		Parameter parameter = si.getService().getParameterByName(parameterName);
+		if (parameter!=null && parameter.isArray()) {
+			return true;
+		}
+		
+		return result;
+	}
 	
 }

@@ -24,6 +24,8 @@ public class Data implements Serializable{
 	
 	private String host; // use to quickly retrieve the host where to send the data
 	
+	private DataGroup group;
+	private Data index;
 	private OutputWatcher watcher;
 	public Data() {
 		idCounter++;
@@ -64,6 +66,13 @@ public class Data implements Serializable{
 		this.value = value;
 		if(value!=null) {
 			this.defined=true;
+			if(index!=null) {
+			Data match = getMacthedDataDefined();
+				if(!match.isDefined()) {
+					// we define its match when it is not defined
+					match.setValue(value);
+				}
+			}
 			if(watcher!=null) {
 				watcher.setExecutionToEndWithData(this);
 			}
@@ -71,7 +80,34 @@ public class Data implements Serializable{
 	}
 
 	public boolean isDefined() {
-		return defined;
+		// index data are defined if they corresponding data
+		// in a data group is defined
+		if(index==null) {
+			return defined;
+		}else {
+			if(defined)return defined;
+			Data match = getMacthedDataDefined();
+			if(match.isDefined()) {
+				setValue(match.getValue());
+				return true;
+			}
+			return false;
+		}
+	}
+	@JsonIgnore
+	public Data getMacthedDataDefined() {
+		if(index.isDefined()) {
+			Object idx = index.getValue();
+			Integer valIdx=0;
+			if(idx instanceof Integer) {
+				valIdx = (Integer) idx;
+			}else {
+				valIdx=Integer.parseInt((String)idx);
+			}
+			Data realData = group.getCollection().get(valIdx);
+			return realData;
+		}
+		return null;
 	}
 
 	public void setDefined(boolean defined) {
@@ -128,6 +164,35 @@ public class Data implements Serializable{
 	public void setWatcher(OutputWatcher watcher) {
 		this.watcher = watcher;
 	}
+
+
+
+
+	public DataGroup getGroup() {
+		return group;
+	}
+
+
+
+
+	public void setGroup(DataGroup group) {
+		this.group = group;
+	}
+
+
+
+	@JsonIgnore
+	public Data getIndex() {
+		return index;
+	}
+
+
+
+
+	public void setIndex(Data index) {
+		this.index = index;
+	}
+	
 	
 	
 	

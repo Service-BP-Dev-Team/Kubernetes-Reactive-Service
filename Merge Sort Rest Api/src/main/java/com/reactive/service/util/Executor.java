@@ -13,8 +13,10 @@ import com.reactive.service.app.api.Pair;
 import com.reactive.service.app.api.ServiceCall;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.Data;
+import com.reactive.service.model.configuration.DataGroup;
 import com.reactive.service.model.configuration.PendingLocalFunctionComputation;
 import com.reactive.service.model.configuration.Task;
+import com.reactive.service.model.specification.ArrayExpression;
 import com.reactive.service.model.specification.DecompositionRule;
 import com.reactive.service.model.specification.Equation;
 import com.reactive.service.model.specification.FunctionExpression;
@@ -80,15 +82,30 @@ public class Executor {
 			 t.setRemote(si.isRemote());
 			 //create inputs
 			 for( Parameter par: si.getService().getInputParameters()) {
-				 Data d= new Data();
-				 d.setParameter(par);
-				 inputs.add(d);
+				 if(par.isArray()) {
+					 DataGroup dg=DataGroup.createDataGroupFromParameter(par);
+					// we add all the input data of the group to the task inputs
+					 inputs.addAll(dg.getCollection());
+					 
+					 t.getDataGroups().add(dg);
+				 }else {
+					 Data d= new Data();
+					 d.setParameter(par);
+					 inputs.add(d); 
+				 }
 			 }
-			 //create ouputs
+			 //create outputs
 			 for(Parameter par: si.getService().getOutputParameters()) {
-				 Data d= new Data();
-				 d.setParameter(par);
-				 outputs.add(d);
+				 if(par.isArray()) {
+					 DataGroup dg=DataGroup.createDataGroupFromParameter(par);
+					// we add all the output data of the group to the task outputs
+					 outputs.addAll(dg.getCollection());
+					 t.getDataGroups().add(dg);
+				 }else {
+					 Data d= new Data();
+					 d.setParameter(par);
+					 outputs.add(d); 
+				 }
 			 }
 			 t.setService(si.getService());
 			 substasks.add(t);
@@ -109,56 +126,96 @@ public class Executor {
 			IdExpression id = eq.getLeftpart();
 			ServiceInstance si = id.getServiceInstance();
 			Task taskLeft = servicetask.get(si);
-			Data dleft=findDataByParameterNameInTask(taskLeft,id.getParameterName());
-			PendingLocalFunctionComputation pendingComputation= new PendingLocalFunctionComputation();
-			pendingComputation.setDataToCompute(dleft);
-			pendingComputation.setActualParameters(new ArrayList<Data>());
+			List<Data> listLeft = findDataByParameterNameInTask(taskLeft,id.getParameterName(),id);
+			Data dleft=listLeft.get(0);
 			if(eq.getRightpart() instanceof IdExpression) {
 				IdExpression right = (IdExpression) eq.getRightpart();
-				pendingComputation.setIdFunction(true);
 				Task taskRight = servicetask.get(right.getServiceInstance());
-				Data dright = findDataByParameterNameInTask(taskRight, right.getParameterName());
-				pendingComputation.getActualParameters().add(dright);
+				List<Data> listRight = findDataByParameterNameInTask(taskRight, right.getParameterName(),right);
+				for(int i=0;i<listLeft.size();i++) {
+					PendingLocalFunctionComputation pendingComputation = new PendingLocalFunctionComputation();
+					pendingComputation.setIdFunction(true);
+					pendingComputation.setActualParameters(new ArrayList<Data>());
+					pendingComputation.setDataToCompute(listLeft.get(i));
+					pendingComputation.getActualParameters().add(listRight.get(i));
+					configuration.getPendingLocalComputations().add(pendingComputation);
+				}
+				
 			}
 			else {
+				PendingLocalFunctionComputation pendingComputation= new PendingLocalFunctionComputation();
+				pendingComputation.setDataToCompute(dleft);
+				pendingComputation.setActualParameters(new ArrayList<Data>());
 				FunctionExpression funcExpr = (FunctionExpression) eq.getRightpart();
 				pendingComputation.setFunctionDeclaration(funcExpr.getFunction());
 				pendingComputation.setThreadFunction(funcExpr.isThreadFunction());
 				for(IdExpression right: funcExpr.getIdExpressions()) {
 					Task taskRight = servicetask.get(right.getServiceInstance());
-					Data dright = findDataByParameterNameInTask(taskRight, right.getParameterName());
+					Data dright = findDataByParameterNameInTask(taskRight, right.getParameterName(),right).get(0);
 					pendingComputation.getActualParameters().add(dright);
 				}
+				configuration.getPendingLocalComputations().add(pendingComputation);
 			}
-			configuration.getPendingLocalComputations().add(pendingComputation);
+			
 		}
 		//System.out.println("size of pending local computation : "+configuration.getPendingLocalComputations().size());
 	}
 	
-	public Data findDataByParameterNameInTask(Task task,String parameterName) {
-		Data result=null;
+	public List<Data> findDataByParameterNameInTask(Task task,String parameterName, IdExpression idex) {
+		List<Data> result=new ArrayList<>();
+		if(idex.isArray()) {
+			DataGroup dg=task.findGroupByParameterName(parameterName);
+			System.out.println("array found");
+			System.out.println(idex.getServiceInstance().getService().getName());
+			return dg.getCollection();
+		}
+		if(! (idex instanceof ArrayExpression)) {
 		for(Data d : task.getInputs()) {
 			if(d.getParameter().getName().equals(parameterName)) {
-				return d;
+				result.add(d);
+				return result;
 			}
 		}
 		for(Data d : task.getOutputs()) {
 			if(d.getParameter().getName().equals(parameterName)) {
-				return d;
+				result.add(d);
+				return result;
 			}
-		}
+		}}
 		for(Data d : task.getLocals()) {
 			if(d.getParameter().getName().equals(parameterName)) {
-				return d;
+				result.add(d);
+				return result;
 			}
 		}
 		// if the parameter has been not find so far its means that is a local one
 		// we create the data
-		result = new Data();
+		
+		// first we check if the data match an index in data group
+		if(idex instanceof ArrayExpression) {
+			Data d = new Data();
+			DataGroup dg = task.findGroupByParameterName(idex.getParameterName());
+			d.setGroup(dg);
+			ArrayExpression arrayIdex = (ArrayExpression) idex;
+			Data index = findDataByParameterNameInTask(task, arrayIdex.getIndex().getParameterName(), arrayIdex.getIndex()).get(0);
+			d.setIndex(index);
+			task.getLocals().add(d);
+			Parameter par = new Parameter();
+			par.setName(arrayIdex.asString());
+			d.setParameter(par);
+			result.add(d);
+			return result;
+		}
+		else {
+		// it is a local data not corresponding to an array index
+		// we create a simple local data
+		Data d = new Data();
 		Parameter par = new Parameter();
 		par.setName(parameterName);
-		result.setParameter(par);
-		task.getLocals().add(result);
+		d.setParameter(par);
+		task.getLocals().add(d);
+		result.add(d);
+		}
 		return result;
 	}
 	

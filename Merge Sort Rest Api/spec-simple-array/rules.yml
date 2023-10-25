@@ -1,0 +1,15 @@
+---
+kind : rule
+name : R1
+service : S
+actions :
+ - (l,tab) = S1(a,b)
+ - c = b
+---
+kind : rule
+name : R2
+service : S1
+actions :
+ - tab1[a] = a
+ - c = tab1[b]
+ 
