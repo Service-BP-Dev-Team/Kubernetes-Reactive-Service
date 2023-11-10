@@ -8,7 +8,9 @@ inputs :
  
 outputs:
  - { name : c }
+ - { name : d }
  - { name : tab, array: true, size: 5}
+#- tab0, tab1, tab2, ...,tab4
  
 ---
 kind : service
@@ -20,4 +22,15 @@ inputs :
  
 outputs:
  - { name : c }
+ - { name : tab, array: true, size: 5}
+ 
+---
+kind : service
+name : S2
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : a }
  - { name : tab1, array: true, size: 5}
+ 
+outputs:
+ - { name : b }

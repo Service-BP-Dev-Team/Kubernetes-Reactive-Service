@@ -46,6 +46,7 @@ public class Operation {
 	
 	public static boolean isApplicable(Task t,DecompositionRule rule) {
 		boolean result=false;
+		if(!t.isOpen()) return false;
 		Guard guard = rule.getGuard();
 		if(guard==null) {
 			return true;

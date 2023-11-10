@@ -95,11 +95,13 @@ public class Task implements Serializable{
 		this.dataGroups = dataGroups;
 	} 
 	@JsonIgnore
-	public Set<Object> getArguments() {
-		HashSet<Object> result = new HashSet<Object>();
+	public ArrayList<Object> getArguments() {
+		ArrayList<Object> result = new ArrayList<Object>();
 		for(Data in:inputs) {
 			if(in.getGroup()!=null) {
+				if(!result.contains(in.getGroup())) {
 				result.add(in.getGroup());
+				}
 			}else {
 				result.add(in);
 			}
@@ -110,7 +112,7 @@ public class Task implements Serializable{
 	
 	@JsonIgnore
 	public ArrayList<Object> getArgumentValues(){
-		Set<Object> set= getArguments();
+		ArrayList<Object> set= getArguments();
 		ArrayList<Object> result = new ArrayList();
 		for(Object obj:set) {
 			if(obj instanceof DataGroup) {

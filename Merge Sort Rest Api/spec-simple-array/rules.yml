@@ -3,13 +3,24 @@ kind : rule
 name : R1
 service : S
 actions :
- - (l,tab) = S1(a,b)
+ - (c1,tab) = __call S1(a,b)
  - c = b
+ - d = __call S2(a,tab)
 ---
 kind : rule
 name : R2
 service : S1
 actions :
+ - tab[a] = a
+ - c = tab[b]
+
+---
+kind : rule
+name : R3
+service : S2
+guard : 
+ classPath: com.local.Util
+ method: guardArray
+actions :
  - tab1[a] = a
- - c = tab1[b]
- 
+ - b = a

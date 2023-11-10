@@ -66,6 +66,7 @@ public class Executor {
 	private void applyRule(Task task, DecompositionRule rule) {
 		
 		//match current Task;
+		task.setOpen(false); // we lock the task
 		Hashtable<ServiceInstance,Task> serviceTask = new Hashtable<>();
 		serviceTask.put( rule.getCurrentServiceInstance(),task);
 		//create and match sub tasks

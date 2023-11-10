@@ -24,7 +24,7 @@ public class Data implements Serializable{
 	
 	private String host; // use to quickly retrieve the host where to send the data
 	
-	private DataGroup group;
+	private DataGroup group; 
 	private Data index;
 	private OutputWatcher watcher;
 	public Data() {
@@ -68,6 +68,9 @@ public class Data implements Serializable{
 			this.defined=true;
 			if(index!=null) {
 			Data match = getMacthedDataDefined();
+			// if the match is not set/defined because the
+			// index is not yet set/defined 
+			// what should we do ?
 				if(!match.isDefined()) {
 					// we define its match when it is not defined
 					match.setValue(value);
@@ -87,7 +90,7 @@ public class Data implements Serializable{
 		}else {
 			if(defined)return defined;
 			Data match = getMacthedDataDefined();
-			if(match.isDefined()) {
+			if(match!=null && match.isDefined()) {
 				setValue(match.getValue());
 				return true;
 			}
@@ -184,6 +187,20 @@ public class Data implements Serializable{
 	@JsonIgnore
 	public Data getIndex() {
 		return index;
+	}
+	
+	@JsonIgnore
+	public boolean isLocalMatchForArray() {
+		return (index!=null);
+	}
+	
+	@JsonIgnore
+	public boolean isIndexDefined() {
+		if (!isLocalMatchForArray()) return false;
+		if (index.isDefined()) {
+			return true;
+		}
+		return false;
 	}
 
 

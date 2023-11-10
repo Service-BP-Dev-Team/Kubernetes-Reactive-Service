@@ -40,6 +40,7 @@ public class DataGroup {
 			Data d= new Data();
 			d.setParameter(par);
 			col.add(d);
+			d.setGroup(dg);
 		}
 		dg.setCollection(col);
 		return dg;

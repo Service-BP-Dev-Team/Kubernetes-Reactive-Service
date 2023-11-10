@@ -56,6 +56,13 @@ public class PendingLocalFunctionComputation {
 	public boolean isReady() {
 		boolean result = true;
 		if(hasBeenExecuted)return false;
+		if(dataToCompute.isLocalMatchForArray() && !dataToCompute.isIndexDefined()) {
+			return false;
+			// this is really important because when we compute an element of
+			// an array we need to be sure that index referencing the element
+			// has been defined, otherwise we will not know which entry of the table 
+			// to update
+		}
 		for(Data d:actualParameters) {
 			if(!d.isDefined()) {
 				return false;
