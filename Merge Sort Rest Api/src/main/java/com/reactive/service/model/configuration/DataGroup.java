@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.reactive.service.model.specification.IdExpression;
 import com.reactive.service.model.specification.Parameter;
 import com.reactive.service.model.specification.ServiceInstance;
 
@@ -37,6 +38,23 @@ public class DataGroup {
 		dg.setParameter(par);
 		ArrayList<Data> col = new ArrayList<>();
 		for(int i=0;i<par.getSize();i++) {
+			Data d= new Data();
+			d.setParameter(par);
+			col.add(d);
+			d.setGroup(dg);
+		}
+		dg.setCollection(col);
+		return dg;
+	}
+	
+	public static DataGroup createLocalDataGroupFromIdExpression( IdExpression id) {
+		DataGroup dg = new DataGroup();
+		dg.setName(id.getParameterName());
+		Parameter par = new Parameter();
+		par.setName(id.getParameterName());
+		dg.setParameter(par);
+		ArrayList<Data> col = new ArrayList<>();
+		for(int i=0;i<id.getSize();i++) {
 			Data d= new Data();
 			d.setParameter(par);
 			col.add(d);

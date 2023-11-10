@@ -5,6 +5,8 @@ public class IdExpression extends Expression{
 	protected ServiceInstance serviceInstance;
 	protected String parameterName;
 	protected boolean array;
+	protected int size; // this is defined in execution time for local
+						// variable that correspond to array
 	
 	
 	public boolean isArray() {
@@ -28,6 +30,12 @@ public class IdExpression extends Expression{
 	
 	public String asString() {
 		return this.getServiceInstance().getService().getName()+"."+this.getParameterName();
+	}
+	public int getSize() {
+		return size;
+	}
+	public void setSize(int size) {
+		this.size = size;
 	}
 	
 	

@@ -20,6 +20,9 @@ public class Task implements Serializable{
 	private ArrayList<Data> locals;
 	private ArrayList<Task> subTasks;
 	private ArrayList<DataGroup> dataGroups; //for handling array
+	private ArrayList<DataGroup> localGroups; // for handling local array
+											  // not corresponding to an input
+											  // or an output array
 	private boolean remote = false;
 	
 	public Task() {
@@ -28,6 +31,7 @@ public class Task implements Serializable{
 		subTasks = new ArrayList<Task>();
 		locals = new ArrayList<Data>();
 		dataGroups = new ArrayList<DataGroup>();
+		localGroups = new ArrayList<DataGroup>();
 		open=true;
 	}
 	public String getAppliedRule() {
@@ -179,7 +183,19 @@ public class Task implements Serializable{
 				return dg;
 			}
 		}
+		// also research in local groups
+		for(DataGroup dg:localGroups) {
+			if(dg.getParameter().getName().equals(parameterName)) {
+				return dg;
+			}
+		}
 		return null;
+	}
+	public ArrayList<DataGroup> getLocalGroups() {
+		return localGroups;
+	}
+	public void setLocalGroups(ArrayList<DataGroup> localGroups) {
+		this.localGroups = localGroups;
 	}
 	
 	

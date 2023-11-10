@@ -3,16 +3,18 @@ kind : rule
 name : R1
 service : S
 actions :
- - (c1,tab) = __call S1(a,b)
- - c = b
- - d = __call S2(a,tab)
+ - (c1,tab) = __call S1(a,b,c)
+ - tab1 = tab
+ - res = __call S2(a,tab1)
 ---
 kind : rule
 name : R2
 service : S1
 actions :
  - tab[a] = a
- - c = tab[b]
+ - tab[b] = a
+ - tab[c] = a
+ - res = tab[b]
 
 ---
 kind : rule
@@ -22,5 +24,5 @@ guard :
  classPath: com.local.Util
  method: guardArray
 actions :
- - tab1[a] = a
+# - tab1[a] = a
  - b = a

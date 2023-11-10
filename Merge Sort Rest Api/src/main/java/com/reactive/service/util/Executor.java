@@ -127,12 +127,23 @@ public class Executor {
 			IdExpression id = eq.getLeftpart();
 			ServiceInstance si = id.getServiceInstance();
 			Task taskLeft = servicetask.get(si);
-			List<Data> listLeft = findDataByParameterNameInTask(taskLeft,id.getParameterName(),id);
-			Data dleft=listLeft.get(0);
+			
+			
 			if(eq.getRightpart() instanceof IdExpression) {
+				// first we verify if the right part is an array
+				
 				IdExpression right = (IdExpression) eq.getRightpart();
+				List<Data> listLeft;
 				Task taskRight = servicetask.get(right.getServiceInstance());
 				List<Data> listRight = findDataByParameterNameInTask(taskRight, right.getParameterName(),right);
+				if (right.isArray()) {
+					id.setArray(true);
+					id.setSize(listRight.size());
+					listLeft= findDataByParameterNameInTask(taskLeft,id.getParameterName(),id);
+				}
+				else{listLeft = findDataByParameterNameInTask(taskLeft,id.getParameterName(),id);};
+				Data dleft=listLeft.get(0);
+				
 				for(int i=0;i<listLeft.size();i++) {
 					PendingLocalFunctionComputation pendingComputation = new PendingLocalFunctionComputation();
 					pendingComputation.setIdFunction(true);
@@ -144,6 +155,8 @@ public class Executor {
 				
 			}
 			else {
+				List<Data> listLeft = findDataByParameterNameInTask(taskLeft,id.getParameterName(),id);
+				Data dleft=listLeft.get(0);
 				PendingLocalFunctionComputation pendingComputation= new PendingLocalFunctionComputation();
 				pendingComputation.setDataToCompute(dleft);
 				pendingComputation.setActualParameters(new ArrayList<Data>());
@@ -166,6 +179,12 @@ public class Executor {
 		List<Data> result=new ArrayList<>();
 		if(idex.isArray()) {
 			DataGroup dg=task.findGroupByParameterName(parameterName);
+			if(dg==null) {
+				// we create a new local array
+				dg=DataGroup.createLocalDataGroupFromIdExpression(idex);
+				task.getLocalGroups().add(dg);
+				task.getLocals().addAll(dg.getCollection());
+			}
 			System.out.println("array found");
 			System.out.println(idex.getServiceInstance().getService().getName());
 			return dg.getCollection();

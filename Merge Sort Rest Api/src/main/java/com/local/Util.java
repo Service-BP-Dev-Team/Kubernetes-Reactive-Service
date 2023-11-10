@@ -9,7 +9,8 @@ public class Util {
 		if(a!=null && tab!=null) {
 			array=(ArrayList) tab;
 			System.out.println("the guard tab value is a : " +a+" and tab : "+tab);
-			return (array.get(1)==null);
+			//System.out.println(array.get(1)==null);
+			//return (array.get(1)==null);
 		}
 		return false;
 		
