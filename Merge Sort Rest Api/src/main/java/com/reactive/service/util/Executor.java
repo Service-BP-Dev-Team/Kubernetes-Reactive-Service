@@ -148,25 +148,30 @@ public class Executor {
 					PendingLocalFunctionComputation pendingComputation = new PendingLocalFunctionComputation();
 					pendingComputation.setIdFunction(true);
 					pendingComputation.setActualParameters(new ArrayList<Data>());
-					pendingComputation.setDataToCompute(listLeft.get(i));
+					pendingComputation.getDatasToCompute().add(listLeft.get(i));
 					pendingComputation.getActualParameters().add(listRight.get(i));
 					configuration.getPendingLocalComputations().add(pendingComputation);
 				}
 				
 			}
 			else {
+				FunctionExpression funcExpr = (FunctionExpression) eq.getRightpart();
+				if(funcExpr.getFunction().isMultiOutput()) {
+					id.setArray(true);
+					id.setSize(funcExpr.getFunction().getOuputSize());
+				}
 				List<Data> listLeft = findDataByParameterNameInTask(taskLeft,id.getParameterName(),id);
 				Data dleft=listLeft.get(0);
 				PendingLocalFunctionComputation pendingComputation= new PendingLocalFunctionComputation();
-				pendingComputation.setDataToCompute(dleft);
+				pendingComputation.getDatasToCompute().addAll(listLeft);
 				pendingComputation.setActualParameters(new ArrayList<Data>());
-				FunctionExpression funcExpr = (FunctionExpression) eq.getRightpart();
+				
 				pendingComputation.setFunctionDeclaration(funcExpr.getFunction());
 				pendingComputation.setThreadFunction(funcExpr.isThreadFunction());
 				for(IdExpression right: funcExpr.getIdExpressions()) {
 					Task taskRight = servicetask.get(right.getServiceInstance());
-					Data dright = findDataByParameterNameInTask(taskRight, right.getParameterName(),right).get(0);
-					pendingComputation.getActualParameters().add(dright);
+					List<Data> listRight = findDataByParameterNameInTask(taskRight, right.getParameterName(),right);
+					pendingComputation.getActualParameters().addAll(listRight);
 				}
 				configuration.getPendingLocalComputations().add(pendingComputation);
 			}
@@ -185,7 +190,7 @@ public class Executor {
 				task.getLocalGroups().add(dg);
 				task.getLocals().addAll(dg.getCollection());
 			}
-			System.out.println("array found");
+			System.out.println("array found "+ parameterName);
 			System.out.println(idex.getServiceInstance().getService().getName());
 			return dg.getCollection();
 		}

@@ -1,13 +1,14 @@
 package com.reactive.service.model.configuration;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import com.reactive.service.app.api.InMemoryWorkspace;
 import com.reactive.service.model.specification.FunctionDeclaration;
 import com.reactive.service.util.Operation;
 
 public class PendingLocalFunctionComputation {
-	private Data dataToCompute;
+	private ArrayList<Data> datasToCompute;
 	private ArrayList<Data> actualParameters;
 	private FunctionDeclaration functionDeclaration;
 	private boolean isIdFunction=false;
@@ -16,13 +17,14 @@ public class PendingLocalFunctionComputation {
 	private boolean isThreadFunction = false;
 	public PendingLocalFunctionComputation() {
 		actualParameters =new ArrayList<Data>();
+		datasToCompute = new ArrayList<Data>();
 	}
-	public Data getDataToCompute() {
-		return dataToCompute;
+	public ArrayList<Data> getDatasToCompute() {
+		return datasToCompute;
 	}
 
-	public void setDataToCompute(Data dataToCompute) {
-		this.dataToCompute = dataToCompute;
+	public void setDataToCompute(ArrayList<Data> datasToCompute) {
+		this.datasToCompute = datasToCompute;
 	}
 
 	public ArrayList<Data> getActualParameters() {
@@ -56,12 +58,14 @@ public class PendingLocalFunctionComputation {
 	public boolean isReady() {
 		boolean result = true;
 		if(hasBeenExecuted)return false;
+		for(Data dataToCompute: datasToCompute) {
 		if(dataToCompute.isLocalMatchForArray() && !dataToCompute.isIndexDefined()) {
 			return false;
 			// this is really important because when we compute an element of
 			// an array we need to be sure that index referencing the element
 			// has been defined, otherwise we will not know which entry of the table 
 			// to update
+		}
 		}
 		for(Data d:actualParameters) {
 			if(!d.isDefined()) {
@@ -81,10 +85,7 @@ public class PendingLocalFunctionComputation {
 				System.out.println(result);
 			}
 			else {
-				ArrayList<Object> params= new ArrayList<>();
-				for(Data d : actualParameters) {
-					params.add(d.getValue());
-				}
+				ArrayList<Object> params= groupParameters();
 				if(!isThreadFunction) {
 				result = Operation.executeMethodWithReflexion(functionDeclaration.getLocation(), functionDeclaration.getMethod(), params);
 				}else {
@@ -107,9 +108,17 @@ public class PendingLocalFunctionComputation {
 					t.start();
 				}
 			}
-			dataToCompute.setValue(result);
-			dataToCompute.setDefined(true);
-			
+			if(result instanceof ArrayList) {
+				ArrayList results = (ArrayList) result;
+				// this is to handle function that returns an array
+				for(int i=0;i<results.size();i++) {
+					datasToCompute.get(i).setValue(results.get(i));
+					datasToCompute.get(i).setDefined(true);
+				}
+			}else {
+			datasToCompute.get(0).setValue(result);
+			datasToCompute.get(0).setDefined(true);
+			}
 		}
 		return result;
 	}
@@ -124,6 +133,28 @@ public class PendingLocalFunctionComputation {
 	}
 	public void setThreadFunction(boolean isThreadFunction) {
 		this.isThreadFunction = isThreadFunction;
+	}
+	
+	private ArrayList<Object> groupParameters() {
+		ArrayList result = new ArrayList();
+		ArrayList<DataGroup> groups= new ArrayList<>();
+		Hashtable<DataGroup,ArrayList> hash = new Hashtable<DataGroup,ArrayList>();
+		for(Data d: actualParameters) {
+			if(d.getGroup()==null) {
+				result.add(d.getValue());
+			}else {
+				DataGroup dg = d.getGroup();
+				ArrayList array = hash.get(dg);
+				if(array==null) {
+					array= new ArrayList<>();
+					hash.put(dg, array);
+					result.add(array);
+				}
+				array.add(d.getValue());
+			}
+		}
+		return result;
+		
 	}
 	
 	

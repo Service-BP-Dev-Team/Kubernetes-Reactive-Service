@@ -16,5 +16,9 @@ public class Util {
 		
 	}
 	
+	public ArrayList<Object> returnSameArray(Object array){
+		System.out.println("input of return same"+ array);
+		return (ArrayList) array;
+	}
 
 }

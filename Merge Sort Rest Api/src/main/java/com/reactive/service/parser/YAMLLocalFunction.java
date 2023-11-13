@@ -5,6 +5,8 @@ public class YAMLLocalFunction {
 	private String method;
 	private String label;
 	private String endpoint;
+	private boolean multiOutput;
+	private int outputSize;
 	public String getClassPath() {
 		return classPath;
 	}
@@ -28,6 +30,18 @@ public class YAMLLocalFunction {
 	}
 	public void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
+	}
+	public boolean isMultiOutput() {
+		return multiOutput;
+	}
+	public void setMultiOutput(boolean multiOutput) {
+		this.multiOutput = multiOutput;
+	}
+	public int getOutputSize() {
+		return outputSize;
+	}
+	public void setOutputSize(int outputSize) {
+		this.outputSize = outputSize;
 	}
 	
 	

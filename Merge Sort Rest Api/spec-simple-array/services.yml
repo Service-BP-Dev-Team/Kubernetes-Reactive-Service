@@ -9,7 +9,7 @@ inputs :
  
 outputs:
  - { name : res }
-# - { name : tab, array: true, size: 5}
+# - { name : tab1, array: true, size: 3}
 #- tab0, tab1, tab2, ...,tab4
  
 ---

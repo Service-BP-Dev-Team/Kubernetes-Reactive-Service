@@ -2,18 +2,20 @@
 kind : rule
 name : R1
 service : S
+functions :
+ - { classPath: com.local.Util, method: returnSameArray, label: returnSame, multiOutput: true, outputSize: 3 }
 actions :
  - (c1,tab) = __call S1(a,b,c)
- - tab1 = tab
+ - tab1 = returnSame(tab)
  - res = __call S2(a,tab1)
 ---
 kind : rule
 name : R2
 service : S1
 actions :
- - tab[a] = a
- - tab[b] = a
- - tab[c] = a
+ - tab[a] = b
+ - tab[b] = b
+ - tab[c] = b
  - res = tab[b]
 
 ---

@@ -94,6 +94,8 @@ public class Parser {
 			func.setLocation(lf.getClassPath());
 			func.setMethod(lf.getMethod());
 			func.setName(lf.getLabel());
+			func.setMultiOutput(lf.isMultiOutput());
+			func.setOuputSize(lf.getOutputSize());
 			r.getFunctionDeclarations().add(func);
 		}
 	}
