@@ -1,0 +1,32 @@
+---
+kind: service
+name: MainSort
+# Sort list service
+kubename: "127.0.0.1:8000"
+inputs: 
+ - { name: inp_list}
+outputs:
+ - { name : out_list}
+ 
+---
+kind : service
+name : RecSort
+ # Recusive Sort: a quicksort based subservice for MainSort
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : inp_arr, array: true, size: 5 }
+outputs :
+ - { name : out_arr,  array: true, size: 5}
+ 
+---
+---
+kind : service
+name : Merge_S
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : res_left, array: true, size: 5 }
+ - { name : res_left, array: true, size: 5 }
+ - { name : out_result, array: true, size: 5 }
+ - { name : pending_indices }
+outputs :
+ - { name : out_arr, array: true, size: 5 }

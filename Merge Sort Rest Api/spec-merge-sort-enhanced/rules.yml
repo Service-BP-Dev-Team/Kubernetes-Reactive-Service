@@ -1,0 +1,99 @@
+---
+# Service: MainSort --- 2 rules
+# R1 is active when the list is long enough to distribute computation.
+kind : rule
+name : MainSort_remote
+service : MainSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthgr
+ # The guard requires a minimum length l+1 of the input list
+functions :
+ - { classPath: com.local.SortFunc, method: split, label: split, multiOutput: true, outputSize: 5}
+ - { classPath: com.local.SortFunc, method: merge_f, label: merge_f}
+ # update_values replaces some intentional values in out_list.
+actions :
+ - inp_array = split(inp_list)
+ - out_array = RecSort(inp_array)
+ - out_list = merge_f(out_array)
+
+---
+#R2 is active when the list is short enough to sort it locally
+kind : rule
+name : MainSort_local
+service : MainSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthleq
+ # The guard requires a maximum length l of the input list
+functions :
+ - { classPath: com.local.Base, method: sort, label: sort }
+ # function from java.utils
+actions :
+ - out_list = sort(inp_list)
+
+
+
+---
+#R2 is active when the list is short enough to sort it locally
+kind : rule
+name : RecSort_local
+service : RecSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthleq_in_arr
+ # The guard requires a maximum length l-1 of the input list
+functions :
+ - { classPath: com.local.Base, method: sort_array_lists, label: sort_array_lists, multiOutput: true, outputSize: 5  }
+actions :
+ - out_arr = sort_array_lists(inp_arr)
+ 
+---
+#Service: RecSort -- 2 rules:
+# R1 is active when the list is long enough to distribute computation.
+kind : rule
+name : RecSort_remote
+service : RecSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthgr_in_arr
+ # The guard requires a minimum length l of the input list
+functions :
+ - { classPath: com.local.SortFunc, method: divideLeft, label: divideLeft, multiOutput: true, outputSize: 5}
+ - { classPath: com.local.SortFunc, method: divideRight, label: divideRight, multiOutput: true, outputSize: 5}
+ - { classPath: com.local.SortFunc, method: init_indices, label: init_indices}
+actions :
+ - pending_indices = init_indices()
+# - out_result = init_result()
+ - arr_left = divideLeft(inp_arr)
+ - arr_right = divideRight(inp_arr) 
+ - res_left = RecSort (arr_left)
+ - res_right = Recsort(arr_right)
+# - foreach i, out_arr[i] =  Merge_S(res_left, res_right, pending_indices)
+# i
+# vi,i+1,
+
+---
+kind : rule
+name : merge_rule
+service : Merge_S
+guard:
+ classPath: com.local.SortFunc
+ method : has_new_elements
+ bind : 
+  - {name : list1}
+  - {name : list2}
+functions : 
+ - { classPath: com.local.SortFunc, method: merge_defined, label: merge_defined }
+ - { classPath: com.local.SortFunc, method: get_indexes, label: get_indexes}
+ - { classPath: com.local.SortFunc, method: increment, label: increment }
+ - { classPath: com.local.SortFunc, method: first, label: first }
+ - { classPath: com.local.SortFunc, method: second, label: second }
+actions :
+ - out_arr
+ - out_arr = out_result
+ - indexes = get_indexes(res_left,left_right) # this is not possible since a function requires all its parameters to be defined in order to be called
+ - (out_arr[next_index], next_index, pending_indices) = merge_defined(res_left, res_right, pending_indices, next_index)
+ - out_arr = Merge_S(res_left, res_right, pending_indices)
+
+# we need to add a rule to terminate the merge I think

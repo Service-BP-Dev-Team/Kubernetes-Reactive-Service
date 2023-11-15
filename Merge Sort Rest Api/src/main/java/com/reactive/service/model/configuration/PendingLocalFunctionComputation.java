@@ -82,7 +82,7 @@ public class PendingLocalFunctionComputation {
 			this.setHasBeenExecuted(true);
 			if(isIdFunction) {
 				result = actualParameters.get(0).getValue();
-				System.out.println(result);
+				//System.out.println(result);
 			}
 			else {
 				ArrayList<Object> params= groupParameters();
@@ -108,7 +108,7 @@ public class PendingLocalFunctionComputation {
 					t.start();
 				}
 			}
-			if(result instanceof ArrayList) {
+			if(result instanceof ArrayList && functionDeclaration!=null && functionDeclaration.isMultiOutput()) {
 				ArrayList results = (ArrayList) result;
 				// this is to handle function that returns an array
 				for(int i=0;i<results.size();i++) {
