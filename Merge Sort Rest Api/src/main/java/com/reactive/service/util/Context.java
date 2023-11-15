@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import com.reactive.service.app.api.Pair;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.DecompositionRule;
@@ -51,7 +52,7 @@ public class Context {
 		return result;
 	}
 	
-	public Hashtable<Task,List<DecompositionRule>> getReadyTasks(){
+	public Hashtable<Task,List<Pair<DecompositionRule,ArrayList>>> getReadyTasks(){
 
 		// return the task that are ready using reflexion to execute guards.
 		List <Task> tasks = getPendingTasks();
@@ -63,9 +64,9 @@ public class Context {
 				localtasks.add(t);
 			}
 		}
-		Hashtable<Task,List<DecompositionRule>> result = new Hashtable<Task,List<DecompositionRule>>();
+		Hashtable<Task,List<Pair<DecompositionRule,ArrayList>>> result = new Hashtable<Task,List<Pair<DecompositionRule,ArrayList>>>();
 		for(Task t: localtasks) {
-			List<DecompositionRule> list = getReadyRules(t);
+			List<Pair<DecompositionRule,ArrayList>> list = getReadyRules(t);
 			if(list!=null && !list.isEmpty()) {
 				result.put(t, list);
 			}
@@ -93,11 +94,28 @@ public class Context {
 		return openTasks;
 	}
 	
-	public List<DecompositionRule> getReadyRules(Task task){
-		ArrayList<DecompositionRule> result = new ArrayList<>();
+	public List<Pair<DecompositionRule,ArrayList>> getReadyRules(Task task){
+		ArrayList<Pair<DecompositionRule,ArrayList>> result = new ArrayList<>();
 		for(DecompositionRule rule: task.getService().getRules()) {
-			if(Operation.isApplicable(task, rule)) {
-				result.add(rule);
+			Object guardResult= Operation.isApplicable(task, rule);
+			if(guardResult instanceof ArrayList) {
+				// it means the guard have some bindings
+				ArrayList guardArray = (ArrayList) guardResult;
+				if((Boolean)guardArray.get(0)) {
+					ArrayList binding = new ArrayList();
+					int i=1;
+					for(Parameter bind:rule.getGuard().getBinding()) {
+						binding.add(new Pair<Parameter,Object>(bind,guardArray.get(i)));
+						i++;
+					}
+					Pair p= new Pair(rule,binding);
+					result.add(p);
+				}
+			}else {
+				if((Boolean) guardResult) {
+					Pair p= new Pair(rule,new ArrayList<>());
+					result.add(p);
+				}
 			}
 		}
 		return result;

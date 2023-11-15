@@ -10,7 +10,7 @@ public class YAMLSpec {
 	private String Service;
 	private List<String> actions;
 	private List<YAMLLocalFunction> functions;
-	private YAMLLocalFunction guard;
+	private YAMLGuard guard;
 	private boolean remote =false;
 	private String kubename;
 	public String getKind() {
@@ -61,10 +61,10 @@ public class YAMLSpec {
 	public void setRemote(boolean remote) {
 		this.remote = remote;
 	}
-	public YAMLLocalFunction getGuard() {
+	public YAMLGuard getGuard() {
 		return guard;
 	}
-	public void setGuard(YAMLLocalFunction guard) {
+	public void setGuard(YAMLGuard guard) {
 		this.guard = guard;
 	}
 	public String getKubename() {

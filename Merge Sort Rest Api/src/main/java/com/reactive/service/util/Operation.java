@@ -44,8 +44,11 @@ public class Operation {
 		return t;
 	}
 	
-	public static boolean isApplicable(Task t,DecompositionRule rule) {
-		boolean result=false;
+	// we return an object that can be either a boolean 
+	// or a list where the first element is a boolean and the other
+	// elements are the bindings defined by the guard 
+	public static Object isApplicable(Task t,DecompositionRule rule) {
+		Object result=false;
 		if(!t.isOpen()) return false;
 		Guard guard = rule.getGuard();
 		if(guard==null) {
@@ -53,7 +56,7 @@ public class Operation {
 		}
 		ArrayList<Object> arguments = t.getArgumentValues();
 		Object res = executeMethodWithReflexion(guard.getLocation(),guard.getMethod(), arguments);
-		if(res!=null) {result=(Boolean)res;}
+		if(res!=null) {result=res;}
 		return result;
 	}
 	

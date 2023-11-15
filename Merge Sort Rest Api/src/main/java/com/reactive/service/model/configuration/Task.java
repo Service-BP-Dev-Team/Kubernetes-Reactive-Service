@@ -197,6 +197,17 @@ public class Task implements Serializable{
 	public void setLocalGroups(ArrayList<DataGroup> localGroups) {
 		this.localGroups = localGroups;
 	}
+	public Data findDataByParameterName(String name) {
+		// TODO Auto-generated method stub
+		List<Data> allData = getAllData();
+		for(Data d:allData){
+			if(d.getParameter().getName().equals(name)) {
+				return d;
+			}
+		}
+		return null;
+		
+	}
 	
 	
 }

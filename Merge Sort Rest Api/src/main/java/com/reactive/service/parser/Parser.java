@@ -222,8 +222,18 @@ public class Parser {
 	private void processRuleGuard(YAMLSpec R, DecompositionRule rule){
 		if(R.getGuard()!=null) {
 			Guard guard = new Guard();
-			guard.setLocation(R.getGuard().getClassPath());
-			guard.setMethod(R.getGuard().getMethod());
+			YAMLGuard ymlGuard = R.getGuard();
+			guard.setLocation(ymlGuard.getClassPath());
+			guard.setMethod(ymlGuard.getMethod());
+			if (ymlGuard.getBinding()!=null && ymlGuard.getBinding().size() > 0) {
+				for(YAMLParameter ymlPar: ymlGuard.getBinding()) {
+					Parameter par = new Parameter();
+					par.setArray(ymlPar.isArray());
+					par.setName(ymlPar.getName());
+					par.setSize(ymlPar.getSize());
+					guard.getBinding().add(par);
+				}
+			}
 			rule.setGuard(guard);
 		}
 		

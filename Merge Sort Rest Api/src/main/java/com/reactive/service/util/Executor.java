@@ -51,19 +51,19 @@ public class Executor {
 	public void execute() {
 		if(configuration==null) {Task t = context.getStartingTask();}
 		//System.out.println("size of pending local computation : "+configuration.getPendingLocalComputations().size());
-		Hashtable<Task, List<DecompositionRule>> readyTasks= context.getReadyTasks();
+		Hashtable<Task, List<Pair<DecompositionRule,ArrayList>>> readyTasks= context.getReadyTasks();
 		computePendingLocalComputations();
 		while(readyTasks.size()!=0) {
 			for(Task task: readyTasks.keySet()) {
-				//System.out.println(task.getService().getName());
-				applyRule(task,readyTasks.get(task).get(0));
+				Pair<DecompositionRule, ArrayList> firstApplicable = readyTasks.get(task).get(0);
+				applyRule(task,firstApplicable.getFirst(),firstApplicable.getSecond());
 				computePendingLocalComputations();
 			}
 			readyTasks= context.getReadyTasks();
 		}
 		
 	}
-	private void applyRule(Task task, DecompositionRule rule) {
+	private void applyRule(Task task, DecompositionRule rule, ArrayList bindings) {
 		
 		//match current Task;
 		task.setOpen(false); // we lock the task
@@ -115,6 +115,8 @@ public class Executor {
 		}
 		task.setSubTasks(substasks);
 		createDataLink(task, rule, serviceTask);
+		// apply bindings defined by the guard
+		applyBindings(task, bindings);
 		task.setAppliedRule(rule.getName());
 		task.setOpen(false);
 		
@@ -242,6 +244,16 @@ public class Executor {
 		result.add(d);
 		}
 		return result;
+	}
+	
+	// method to apply bindings
+	public void applyBindings(Task task, ArrayList bindings) {
+		for(Object el : bindings) {
+			Pair <Parameter,Object> p = (Pair <Parameter,Object>) el;
+			Data d = task.findDataByParameterName(p.getFirst().getName());
+			d.setValue(p.getSecond());
+		}
+		
 	}
 	
 	// execute pending local computations
