@@ -19,7 +19,7 @@ inputs :
  
 outputs:
  - { name : res }
- - { name : tab, array: true, size: 3}
+ - { name : tab, array: true, size: ${ARRAY_SIZE}}
  
 ---
 kind : service
@@ -27,7 +27,7 @@ name : S2
 kubename : "127.0.0.1:8000"
 inputs : 
  - { name : a }
- - { name : tab1, array: true, size: 3}
+ - { name : tab1, array: true, size: ${ARRAY_SIZE}}
  
 outputs:
  - { name : b }

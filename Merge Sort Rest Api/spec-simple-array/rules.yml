@@ -3,7 +3,7 @@ kind : rule
 name : R1
 service : S
 functions :
- - { classPath: com.local.Util, method: returnSameArray, label: returnSame, multiOutput: true, outputSize: 3 }
+ - { classPath: com.local.Util, method: returnSameArray, label: returnSame, multiOutput: true, outputSize: ${ARRAY_SIZE} }
 actions :
  - (c1,tab) =  S1(a)
  - tab1 = returnSame(tab)
@@ -18,7 +18,7 @@ functions :
 actions :
  - i = zero()
  - sync = zero()
- - tab[i/sync] = [S3(sync,a) for i,inc,3]
+ - tab[i/sync] = [S3(sync,a) for i,inc,${ARRAY_SIZE}]
  - res = tab[i]
 
 ---
