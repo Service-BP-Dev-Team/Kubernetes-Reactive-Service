@@ -50,6 +50,7 @@ public class MainForArray {
 		try (InputStream inputStream = new FileInputStream(fileRule)) {
 			// Read the file content using the InputStream
 			Yaml yaml = new Yaml(new Constructor(YAMLSpec.class));
+		
 			Iterable<Object> specs = yaml.loadAll(inputStream);
 			for (Object object : specs) {
 				myRules.add((YAMLSpec) object);

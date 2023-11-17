@@ -4,8 +4,6 @@ name : S
 kubename : "127.0.0.1:8000"
 inputs : 
  - { name : a }
- - { name : b}
- - { name : c}
  
 outputs:
  - { name : res }
@@ -16,10 +14,8 @@ outputs:
 kind : service
 name : S1
 kubename : "127.0.0.1:8000"
-inputs : 
- - { name : a }
- - { name : b}
- - { name : c}
+inputs :
+- { name : a }
  
 outputs:
  - { name : res }
@@ -35,3 +31,14 @@ inputs :
  
 outputs:
  - { name : b }
+ 
+---
+kind : service
+name : S3
+kubename : "127.0.0.1:8000"
+inputs : 
+ - { name : syncIn }
+ - { name : a }
+outputs:
+ - { name : b }
+ - { name : syncOut }

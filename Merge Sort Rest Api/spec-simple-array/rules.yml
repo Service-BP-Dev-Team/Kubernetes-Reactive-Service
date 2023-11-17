@@ -5,18 +5,21 @@ service : S
 functions :
  - { classPath: com.local.Util, method: returnSameArray, label: returnSame, multiOutput: true, outputSize: 3 }
 actions :
- - (c1,tab) =  S1(a,b,c)
+ - (c1,tab) =  S1(a)
  - tab1 = returnSame(tab)
  - res =  S2(a,tab1)
 ---
 kind : rule
 name : R2
 service : S1
+functions :
+ - { classPath: com.local.Util, method: incrementNumber, label: inc }
+ - { classPath: com.local.Util, method: getZero, label: zero }
 actions :
- - tab[a] = b
- - tab[b] = b
- - tab[c] = b
- - res = tab[b]
+ - i = zero()
+ - sync = zero()
+ - tab[i/sync] = [S3(sync,a) for i,inc,3]
+ - res = tab[i]
 
 ---
 kind : rule
@@ -32,7 +35,18 @@ functions :
  - { classPath: com.local.Util, method: compute, label: compute }
 
 actions :
-# - tab1[a] = a
-# - b = a
  - b = compute(f,g)
 
+---
+kind : rule
+name : R4
+service : S3
+guard : 
+ classPath: com.local.Util
+ method: guardSync
+functions :
+ - { classPath: com.local.Util, method: compute, label: compute }
+
+actions :
+ - syncOut = a
+ - b = a

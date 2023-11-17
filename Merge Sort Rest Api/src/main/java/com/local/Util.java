@@ -30,5 +30,17 @@ public class Util {
 		System.out.println("a is : "+ a + " and b is : "+ b);
 		return (Integer)a + (Integer)b;
 	}
-
+	
+	public boolean guardSync(Object sync, Object a) {
+		return true;
+	}
+	
+	public Integer getZero() {
+		System.out.println("zero has been set");
+		return 0;
+	}
+	public Integer incrementNumber(Object i) {
+		System.out.println("iteration : "+ i);
+		return (Integer)i +1;
+	}
 }

@@ -198,10 +198,12 @@ public class Parser {
 		FunctionExpression fe = new FunctionExpression();
 		fe.setFunction(f);
 		fe.setThreadFunction(threadFunction);
-		for(String v : variables) {
+		if(!(variables.length==1 && variables[0].trim().equals("")) )
+		{// the test above is to handle function 
+			for(String v : variables) {
 			IdExpression idr=getRuleIdExpression(rule, v.trim());
 			fe.getIdExpressions().add(idr);
-		}
+		}}
 		Equation eq = new Equation();
 		eq.setLeftpart(idl);
 		eq.setRightpart(fe);

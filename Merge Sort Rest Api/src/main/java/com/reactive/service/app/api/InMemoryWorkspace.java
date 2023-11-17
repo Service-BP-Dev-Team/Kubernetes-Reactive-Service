@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -21,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.local.ObjectMessage;
+import com.reactive.service.macro.Macro;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.Data;
 import com.reactive.service.model.configuration.Task;
@@ -216,18 +220,26 @@ public class InMemoryWorkspace {
 	        }
 	        //reading rules
 	        ArrayList<YAMLSpec> myRules= new ArrayList<>();
-	        File fileRule = new File(rootFolder+"/rules.yml");
-	        try (InputStream inputStream = new FileInputStream(fileRule)) {
-	            // Read the file content using the InputStream
-	        	 Yaml yaml = new Yaml(new Constructor(YAMLSpec.class));
-	        	 Iterable<Object> specs = yaml.loadAll(inputStream);
-	        	 for (Object object : specs) {
-	        		 myRules.add((YAMLSpec) object);
-	        	 }
-	        	 YAMLSpec spec = myRules.get(0);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
+	     // Create a Path object from the file path
+	        Path path = Paths.get(rootFolder+"/rules.yml");
+
+	        // Read the file content as bytes
+	        byte[] bytes;
+			try {
+				bytes = Files.readAllBytes(path);
+				String allrules = new String(bytes);
+		        String rulesExpanded = Macro.expandAllMacro(allrules);
+		        	 Yaml yaml = new Yaml(new Constructor(YAMLSpec.class));
+		        	 Iterable<Object> specs = yaml.loadAll(rulesExpanded);
+		        	 for (Object object : specs) {
+		        		 myRules.add((YAMLSpec) object);
+		        	 }
+		        
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        
 	        ArrayList<YAMLSpec> allSpecs = new ArrayList<YAMLSpec>();
 	        allSpecs.addAll(myServices);
 	        allSpecs.addAll(myRules);
