@@ -17,16 +17,14 @@ inputs :
  - { name : inp_arr, array: true, size: 5 }
 outputs :
  - { name : out_arr,  array: true, size: 5}
- 
----
 ---
 kind : service
 name : Merge_S
 kubename : "127.0.0.1:8000"
 inputs : 
+ - { name : indices_in }
  - { name : res_left, array: true, size: 5 }
- - { name : res_left, array: true, size: 5 }
- - { name : out_result, array: true, size: 5 }
- - { name : pending_indices }
+ - { name : res_right, array: true, size: 5 }
 outputs :
- - { name : out_arr, array: true, size: 5 }
+ - { name : out}
+ - { name : indices_out}

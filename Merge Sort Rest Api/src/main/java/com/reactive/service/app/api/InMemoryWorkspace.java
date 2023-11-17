@@ -212,6 +212,7 @@ public class InMemoryWorkspace {
 			try {
 				serviceWithEnvVariable = ENV_Manager.replaceEnvVariables(rootFolder + "/services.yml",
 						rootFolder + "/.env");
+				System.out.println(serviceWithEnvVariable);
 				Yaml yamlService = new Yaml(new Constructor(YAMLSpec.class));
 				Iterable<Object> specsService = yamlService.loadAll(serviceWithEnvVariable);
 				for (Object object : specsService) {
@@ -230,6 +231,7 @@ public class InMemoryWorkspace {
 						rootFolder + "/.env");
 
 				String rulesExpanded = Macro.expandAllMacro(allRulesWithEnvVariable);
+				System.out.println(rulesExpanded);
 				Yaml yamlRule = new Yaml(new Constructor(YAMLSpec.class));
 				Iterable<Object> specsRule = yamlRule.loadAll(rulesExpanded);
 				for (Object object : specsRule) {

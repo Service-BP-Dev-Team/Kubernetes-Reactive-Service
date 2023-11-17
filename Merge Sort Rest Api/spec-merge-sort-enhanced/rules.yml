@@ -62,16 +62,17 @@ functions :
  - { classPath: com.local.SortFunc, method: divideLeft, label: divideLeft, multiOutput: true, outputSize: 5}
  - { classPath: com.local.SortFunc, method: divideRight, label: divideRight, multiOutput: true, outputSize: 5}
  - { classPath: com.local.SortFunc, method: init_indices, label: init_indices}
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
 actions :
  - pending_indices = init_indices()
-# - out_result = init_result()
  - arr_left = divideLeft(inp_arr)
  - arr_right = divideRight(inp_arr) 
- - res_left = RecSort (arr_left)
- - res_right = Recsort(arr_right)
-# - foreach i, out_arr[i] =  Merge_S(res_left, res_right, pending_indices)
-# i
-# vi,i+1,
+ - res_left = RecSort(arr_left)
+ - res_right = RecSort(arr_right)
+ - index = getZero()
+ - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,5]
+
 
 ---
 kind : rule
@@ -80,20 +81,14 @@ service : Merge_S
 guard:
  classPath: com.local.SortFunc
  method : has_new_elements
- bind : 
+ binding: 
   - {name : list1}
   - {name : list2}
+  - {name : remainingIndices}
 functions : 
- - { classPath: com.local.SortFunc, method: merge_defined, label: merge_defined }
- - { classPath: com.local.SortFunc, method: get_indexes, label: get_indexes}
- - { classPath: com.local.SortFunc, method: increment, label: increment }
- - { classPath: com.local.SortFunc, method: first, label: first }
- - { classPath: com.local.SortFunc, method: second, label: second }
+ - { classPath: com.local.SortFunc, method: merge_sort, label: merge_two }
 actions :
- - out_arr
- - out_arr = out_result
- - indexes = get_indexes(res_left,left_right) # this is not possible since a function requires all its parameters to be defined in order to be called
- - (out_arr[next_index], next_index, pending_indices) = merge_defined(res_left, res_right, pending_indices, next_index)
- - out_arr = Merge_S(res_left, res_right, pending_indices)
+ - indices_out = remainingIndices
+ - out = merge_two(list1,list2)
 
 # we need to add a rule to terminate the merge I think

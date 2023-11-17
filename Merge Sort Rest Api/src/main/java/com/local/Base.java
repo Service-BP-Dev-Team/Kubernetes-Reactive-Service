@@ -28,4 +28,13 @@ public class Base {
 		return result;
 		
 	}
+	
+	public Integer getZero() {
+		System.out.println("zero has been set");
+		return 0;
+	}
+	public Integer incrementNumber(Object i) {
+		System.out.println("iteration : "+ i);
+		return (Integer)i +1;
+	}
 }

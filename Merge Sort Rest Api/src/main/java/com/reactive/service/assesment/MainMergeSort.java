@@ -13,8 +13,10 @@ import java.util.Hashtable;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import com.consulner.app.Application;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.local.SortFunc;
+import com.reactive.service.app.api.InMemoryWorkspace;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.GAG;
@@ -27,41 +29,17 @@ import com.reactive.service.util.Operation;
 public class MainMergeSort {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		ArrayList<YAMLSpec> myServices = new ArrayList<>();
-		// reading services
-		File fileService = new File("spec-merge-sort-enhanced/services.yml");
-		try (InputStream inputStream = new FileInputStream(fileService)) {
-			// Read the file content using the InputStream
-			Yaml yaml = new Yaml(new Constructor(YAMLSpec.class));
-			Iterable<Object> specs = yaml.loadAll(inputStream);
-			for (Object object : specs) {
-				myServices.add((YAMLSpec) object);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// reading rules
-		ArrayList<YAMLSpec> myRules = new ArrayList<>();
-		File fileRule = new File("spec-merge-sort-enhanced/rules.yml");
-		try (InputStream inputStream = new FileInputStream(fileRule)) {
-			// Read the file content using the InputStream
-			Yaml yaml = new Yaml(new Constructor(YAMLSpec.class));
-			Iterable<Object> specs = yaml.loadAll(inputStream);
-			for (Object object : specs) {
-				myRules.add((YAMLSpec) object);
-			}
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		ArrayList<YAMLSpec> allSpecs = new ArrayList<YAMLSpec>();
-		allSpecs.addAll(myServices);
-		allSpecs.addAll(myRules);
-		Parser parser = new Parser();
-		parser.setSpecs(allSpecs);
-		GAG g = parser.getGAG();
+		// create the server
+				try {
+					Application.main(new String[] {});
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// execute the gag
+				GAG g = InMemoryWorkspace.getGagWithRootFolder("spec-merge-sort-enhanced");
+				// System.out.println(g);
+
 		Context nContext = new Context();
 		Executor exec = new Executor(nContext, g);
 		Configuration conf = new Configuration();

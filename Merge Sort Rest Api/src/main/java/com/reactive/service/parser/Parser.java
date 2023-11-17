@@ -266,6 +266,7 @@ public class Parser {
 	}
 	private ServiceInstance createServiceInstanceByName(DecompositionRule rule, String name) {
 		ServiceInstance res= new ServiceInstance();
+		System.out.println(name);
 		Service s = this.findByName(name);
 		res.setService(s);
 		res.setName(s.getName()+"-"+rule.getInstanceCounter());
