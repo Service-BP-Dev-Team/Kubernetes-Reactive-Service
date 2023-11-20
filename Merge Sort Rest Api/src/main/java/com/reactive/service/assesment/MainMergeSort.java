@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 
@@ -52,7 +53,18 @@ public class MainMergeSort {
 		Task root = Operation.createTask(g.getServices().get(0), inputs);
 		conf.setRoot(root);
 		exec.setConfiguration(conf);
+		long start = System.currentTimeMillis();
 		exec.execute();
+		long end = System.currentTimeMillis();
+		long finish = end-start;
+		System.out.println("finish of the time with service: "+ finish);
+		
+		start= System.currentTimeMillis();
+		Collections.sort(inputTable);
+		end = System.currentTimeMillis();
+		finish=end-start;
+		System.out.println("finish of the time without service: "+ finish);
+		
 		//Configuration conf = exec.getConfiguration();
 		//ObjectMapper objMapper = getObjectMapper();
 	}

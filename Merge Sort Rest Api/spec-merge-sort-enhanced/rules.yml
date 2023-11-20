@@ -9,12 +9,12 @@ guard :
  method: lengthgr
  # The guard requires a minimum length l+1 of the input list
 functions :
- - { classPath: com.local.SortFunc, method: split, label: split, multiOutput: true, outputSize: 5}
+ - { classPath: com.local.SortFunc, method: split, label: split, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
  - { classPath: com.local.SortFunc, method: merge_f, label: merge_f}
  # update_values replaces some intentional values in out_list.
 actions :
  - inp_array = split(inp_list)
- - out_array = RecSort(inp_array)
+ - out_array = __call RecSort(inp_array)
  - out_list = merge_f(out_array)
 
 ---
@@ -44,7 +44,7 @@ guard :
  method: lengthleq_in_arr
  # The guard requires a maximum length l-1 of the input list
 functions :
- - { classPath: com.local.Base, method: sort_array_lists, label: sort_array_lists, multiOutput: true, outputSize: 5  }
+ - { classPath: com.local.Base, method: sort_array_lists, label: sort_array_lists, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}  }
 actions :
  - out_arr = sort_array_lists(inp_arr)
  
@@ -59,8 +59,8 @@ guard :
  method: lengthgr_in_arr
  # The guard requires a minimum length l of the input list
 functions :
- - { classPath: com.local.SortFunc, method: divideLeft, label: divideLeft, multiOutput: true, outputSize: 5}
- - { classPath: com.local.SortFunc, method: divideRight, label: divideRight, multiOutput: true, outputSize: 5}
+ - { classPath: com.local.SortFunc, method: divideLeft, label: divideLeft, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
+ - { classPath: com.local.SortFunc, method: divideRight, label: divideRight, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
  - { classPath: com.local.SortFunc, method: init_indices, label: init_indices}
  - { classPath: com.local.Base, method: getZero, label: getZero}
  - { classPath: com.local.Base, method: incrementNumber, label: inc}
@@ -68,10 +68,10 @@ actions :
  - pending_indices = init_indices()
  - arr_left = divideLeft(inp_arr)
  - arr_right = divideRight(inp_arr) 
- - res_left = RecSort(arr_left)
- - res_right = RecSort(arr_right)
+ - res_left = __call RecSort(arr_left)
+ - res_right = __call RecSort(arr_right)
  - index = getZero()
- - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,5]
+ - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
 
 
 ---

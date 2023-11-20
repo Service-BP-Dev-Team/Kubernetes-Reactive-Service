@@ -14,17 +14,17 @@ name : RecSort
  # Recusive Sort: a quicksort based subservice for MainSort
 kubename : "127.0.0.1:8000"
 inputs : 
- - { name : inp_arr, array: true, size: 5 }
+ - { name : inp_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
 outputs :
- - { name : out_arr,  array: true, size: 5}
+ - { name : out_arr,  array: true, size: ${NUMBER_OF_BLOCKS}}
 ---
 kind : service
 name : Merge_S
 kubename : "127.0.0.1:8000"
 inputs : 
  - { name : indices_in }
- - { name : res_left, array: true, size: 5 }
- - { name : res_right, array: true, size: 5 }
+ - { name : res_left, array: true, size: ${NUMBER_OF_BLOCKS} }
+ - { name : res_right, array: true, size: ${NUMBER_OF_BLOCKS} }
 outputs :
  - { name : out}
  - { name : indices_out}

@@ -37,7 +37,7 @@ public class ENV_Manager {
         return replacedContent;
     }
 
-    private static Map<String, String> readEnvFile(String envFilePath) throws IOException {
+    public static Map<String, String> readEnvFile(String envFilePath) throws IOException {
         Map<String, String> envVariables = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(envFilePath))) {
@@ -58,12 +58,12 @@ public class ENV_Manager {
         return envVariables;
     }
 
-    private static String readFileToString(String filePath) throws IOException {
+    public static String readFileToString(String filePath) throws IOException {
         Path path = Path.of(filePath);
         return Files.readString(path);
     }
 
-    private static String replaceEnvVariablesInYaml(String yamlContent, Map<String, String> envVariables) {
+    public static String replaceEnvVariablesInYaml(String yamlContent, Map<String, String> envVariables) {
         StringBuilder replacedContent = new StringBuilder(yamlContent);
 
         Pattern pattern = Pattern.compile("\\$\\{([a-zA-Z_][a-zA-Z_0-9]*)\\}");

@@ -10,8 +10,11 @@ import java.nio.file.Paths;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -47,6 +50,23 @@ public class InMemoryWorkspace {
 	public static final ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
 	public static final ConcurrentHashMap<Long, Object> threadFunctionProcess = new ConcurrentHashMap<>();
 	public static final String defaultGAGFolder = "spec-merge-sort";
+	public static final Map<String,String> environmentVariables= new HashMap<String,String>();
+	public static final String KEY_READY_TASK_WAIT_TIME="READY_TASK_WAIT_TIME"; // time where each gag process will wait before
+	// checking if they are new rules that can be applied 
+	// to pending service (open tasks)
+	// this time can be modified by the .env file of the yaml spec.
+	public static final int VALUE_READY_TASK_WAIT_TIME=5;
+	// this represent the default value of the precedent key;
+	public static final String KEY_SYNC_IN_NOTIFICATION_TIME="SYNC_IN_NOTIFICATION_TIME"; // sometimes it may happen that a notification happens,
+	// without having being registered. More precisely a configuration receives a notification of a data she is not yet aware of.
+	// This is link to the high level of concurrency : a notification of a input task data is processed
+	// before the service call linked to the task is processed. In this case, the notification process has to wait 
+	// for the linked service call (i.e the service call containing the task that bears the data) to be processed first.
+	// this time will defined the time that the notification process, will be asked to wait, in order for the service call
+	// to be processed first.
+	// this time can be modified by the .env file of the yaml spec.
+	public static final int VALUE_IN_NOTIFICATION_TIME=100;
+	// this represent the default value of the precedent key;
 	private static GAG gag;
 
 	public static void addCall(ServiceCall sc) {
@@ -88,18 +108,39 @@ public class InMemoryWorkspace {
 	}
 
 	public static void processInNotification(Notification nf) {
-		Pair<String, Data> p = inSubscriptions.get(nf.getData().getId());
-		Data d = p.getValue();
-		if (d != null) {
-			d.setValue(nf.getData().getValue());
-			inSubscriptions.remove(nf.getData().getId());
-
-			Executor executor = inMemoryCalls.get(d.getServiceCallId());
-			if (executor != null) {
-				// System.out.println("find the executor");
-				executor.execute();
+		
+		Thread thread = new Thread(() -> {
+			Pair<String, Data> p = null;
+			while (p == null) {
+				p = inSubscriptions.get(nf.getData().getId());
+				if (p == null) {
+					System.out.println(nf.getData().getValue() + " " + nf.getData().getId());
+				} else {
+					System.out.println("p is no more null");
+				}
+				try {
+					Thread.sleep(getSyncInNotificationTime());
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		}
+			Data d = p.getValue();
+			if (d != null) {
+				d.setValue(nf.getData().getValue());
+				inSubscriptions.remove(nf.getData().getId());
+
+				Executor executor = inMemoryCalls.get(d.getServiceCallId());
+				if (executor != null) {
+					// System.out.println("find the executor");
+					// we do not launch the executor anymore
+					// we use now a continous execute function
+					// executor.execute();
+				}
+			}
+
+		});
+		thread.start();
 	}
 
 	public static void processOutNotification(Notification nf, String host) {
@@ -209,9 +250,16 @@ public class InMemoryWorkspace {
 			// reading services
 			// we replace env file in services
 			String serviceWithEnvVariable;
+			Map<String,String> EnvVariables=null;
 			try {
-				serviceWithEnvVariable = ENV_Manager.replaceEnvVariables(rootFolder + "/services.yml",
-						rootFolder + "/.env");
+				EnvVariables= ENV_Manager.readEnvFile(rootFolder + "/.env");
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				String serviceYamlString = ENV_Manager.readFileToString(rootFolder + "/services.yml");
+				serviceWithEnvVariable = ENV_Manager.replaceEnvVariablesInYaml(serviceYamlString, EnvVariables);
 				System.out.println(serviceWithEnvVariable);
 				Yaml yamlService = new Yaml(new Constructor(YAMLSpec.class));
 				Iterable<Object> specsService = yamlService.loadAll(serviceWithEnvVariable);
@@ -227,8 +275,8 @@ public class InMemoryWorkspace {
 			ArrayList<YAMLSpec> myRules = new ArrayList<>();
 			String allRulesWithEnvVariable;
 			try {
-				allRulesWithEnvVariable = ENV_Manager.replaceEnvVariables(rootFolder + "/rules.yml",
-						rootFolder + "/.env");
+				String allRulesYamlSpecString = ENV_Manager.readFileToString(rootFolder + "/rules.yml");
+				allRulesWithEnvVariable = ENV_Manager.replaceEnvVariablesInYaml(allRulesYamlSpecString, EnvVariables);
 
 				String rulesExpanded = Macro.expandAllMacro(allRulesWithEnvVariable);
 				System.out.println(rulesExpanded);
@@ -248,6 +296,10 @@ public class InMemoryWorkspace {
 			Parser parser = new Parser();
 			parser.setSpecs(allSpecs);
 			gag = parser.getGAG();
+			// all all the environmet variables in the workspace memory
+			for(String key: EnvVariables.keySet()) {
+				environmentVariables.put(key, EnvVariables.get(key));
+			}
 			// System.out.println(gag);
 		}
 		return gag;
@@ -322,5 +374,27 @@ public class InMemoryWorkspace {
 		String result = bind("localhost:8000");
 		// Logger.log(result);
 		return result;
+	}
+	
+	public static int getReadyTaskWaitTime() {
+		String val =environmentVariables.get(KEY_READY_TASK_WAIT_TIME);
+		if(val!=null) {
+			return Integer.parseInt(val);
+		}
+		return VALUE_READY_TASK_WAIT_TIME;
+	}
+	
+	public static int getSyncInNotificationTime() {
+		String val= environmentVariables.get(KEY_SYNC_IN_NOTIFICATION_TIME);
+		if(val!=null) {
+			return Integer.parseInt(val);
+		}
+		else {
+			return VALUE_IN_NOTIFICATION_TIME;
+		}
+	}
+	
+	public static String getEnvironmentValue(String key) {
+		return environmentVariables.get(key);
 	}
 }

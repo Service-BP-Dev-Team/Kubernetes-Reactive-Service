@@ -4,32 +4,36 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+
+import com.reactive.service.app.api.InMemoryWorkspace;
+
 import java.util.HashSet;
 
 public class SortFunc {
 
-	public static final int ARRAY_SIZE = 100;
-	public static final int NUMBER_OF_BLOCKS = 5;
-	public static final int MAX_LEN = 5;
-	public static final int ARR_LEN = ARRAY_SIZE / NUMBER_OF_BLOCKS;
+	public static final int ARRAY_SIZE =10000;
 
 	public boolean lengthgr(Object input) {
+		System.out.println("lenght start guard ");
+		if(input==null) return false;
 		ArrayList list = (ArrayList) input;
-		return list.size() > MAX_LEN;
+		System.out.println("lenght start second ");
+		return list.size() > getMAX_LEN();
 	}
 
 	public ArrayList<ArrayList<Integer>> split(Object inputs) {
 		ArrayList<Integer> list = (ArrayList<Integer>) inputs;
-		int cell_len = list.size() / NUMBER_OF_BLOCKS;
+		int cell_len = list.size() / getNUMBER_OF_BLOCKS();
 		ArrayList<ArrayList<Integer>> result = new ArrayList();
-		for (int i = 0; i < NUMBER_OF_BLOCKS - 1; i++) {
+		for (int i = 0; i < getNUMBER_OF_BLOCKS() - 1; i++) {
 			ArrayList<Integer> el = new ArrayList<Integer>();
 			el.addAll(list.subList(cell_len * i, cell_len * (i + 1)));
 			result.add(el);
 		}
 		ArrayList<Integer> el = new ArrayList<Integer>();
-		el.addAll(list.subList(cell_len * (NUMBER_OF_BLOCKS - 1), list.size()));
+		el.addAll(list.subList(cell_len * (getNUMBER_OF_BLOCKS() - 1), list.size()));
 		result.add(el);
+		System.out.println(" inputs after split : " + result);
 		return result;
 	}
 
@@ -38,7 +42,7 @@ public class SortFunc {
 		System.out.println("inputs after split : " + inputs);
 		ArrayList<Integer> result = (ArrayList<Integer>) array.get(0);
 		Integer sizeGlobal = result.size();
-		for (int i = 1; i < NUMBER_OF_BLOCKS; i++) {
+		for (int i = 1; i < getNUMBER_OF_BLOCKS(); i++) {
 			result = merge_sort(result, array.get(i));
 			sizeGlobal += ((ArrayList) array.get(i)).size();
 		}
@@ -79,25 +83,30 @@ public class SortFunc {
 	}
 
 	public boolean lengthleq_in_arr(Object input) {
+		if(input==null) return false;
 		ArrayList<ArrayList> list = (ArrayList<ArrayList>) input;
 		// System.out.println(" I have been executed : "+ list);
-		return list.get(0).size() <= MAX_LEN;
+		if(list.get(0)==null) return false;
+		return list.get(0).size() <= getMAX_LEN();
 	}
 
 	public boolean lengthgr_in_arr(Object input) {
+		if(input==null) return false;
 		ArrayList<ArrayList> array = (ArrayList<ArrayList>) input;
-		return array.get(0).size() > MAX_LEN;
+		if(array.get(0)==null) return false;
+		return array.get(0).size() > getMAX_LEN();
 	}
 
 	public boolean lengthleq(Object input) {
+		if(input==null) return false;
 		ArrayList list = (ArrayList) input;
-		return list.size() <= MAX_LEN;
+		return list.size() <= getMAX_LEN();
 	}
 
 	public ArrayList<ArrayList> divideLeft(Object input) {
 		ArrayList<ArrayList> inp_arr = (ArrayList<ArrayList>) input;
 		ArrayList<ArrayList> left = new ArrayList<ArrayList>();
-		for (int i = 0; i < NUMBER_OF_BLOCKS; i++) {
+		for (int i = 0; i < getNUMBER_OF_BLOCKS(); i++) {
 			int size = inp_arr.get(i).size();
 			ArrayList<Integer> el = new ArrayList<Integer>(inp_arr.get(i).subList(0, size / 2));
 			left.add(el);
@@ -109,7 +118,7 @@ public class SortFunc {
 	public ArrayList<ArrayList> divideRight(Object input) {
 		ArrayList<ArrayList> inp_arr = (ArrayList<ArrayList>) input;
 		ArrayList<ArrayList> right = new ArrayList<ArrayList>();
-		for (int i = 0; i < NUMBER_OF_BLOCKS; i++) {
+		for (int i = 0; i < getNUMBER_OF_BLOCKS(); i++) {
 			int size = inp_arr.get(i).size();
 			ArrayList<Integer> el = new ArrayList<Integer>(inp_arr.get(i).subList(size / 2, size));
 			right.add(el);
@@ -120,7 +129,7 @@ public class SortFunc {
 
 	public HashSet<Integer> init_indices() {
 		HashSet<Integer> result = new HashSet<Integer>();
-		for (int i = 0; i < 2 * NUMBER_OF_BLOCKS; i++) {
+		for (int i = 0; i < 2 * getNUMBER_OF_BLOCKS(); i++) {
 			result.add(i);
 		}
 		return result;
@@ -140,7 +149,7 @@ public class SortFunc {
 		 HashSet<Integer> pending=(HashSet<Integer>)indices;
 		  int count = 0;
 	      for (int i: pending) {
-	         if (i < NUMBER_OF_BLOCKS) {
+	         if (i < getNUMBER_OF_BLOCKS()) {
 	      	    if (left.get(i)!=null) {
 	      	       count++;
 	      	       listToMerge.add(left.get(i));
@@ -151,9 +160,9 @@ public class SortFunc {
 	      	    }
 	      	 }
 	      	 else {
-	      	    if (right.get(i-NUMBER_OF_BLOCKS)!=null){
+	      	    if (right.get(i-getNUMBER_OF_BLOCKS())!=null){
 	      	       count++;
-	      	       listToMerge.add(right.get(i-NUMBER_OF_BLOCKS));
+	      	       listToMerge.add(right.get(i-getNUMBER_OF_BLOCKS()));
 	      	       indicesToRemove.add(i);
 	      	       if (count>1) {
 	      	          break;
@@ -170,5 +179,13 @@ public class SortFunc {
 	      
 	      return result;
 
+	}
+	
+	public static int getNUMBER_OF_BLOCKS() {
+		return Integer.parseInt(InMemoryWorkspace.getEnvironmentValue("NUMBER_OF_BLOCKS"));
+	}
+	
+	public static int getMAX_LEN() {
+		return Integer.parseInt(InMemoryWorkspace.getEnvironmentValue("MAX_LEN"));
 	}
 }

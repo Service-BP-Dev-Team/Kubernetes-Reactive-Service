@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.consulner.app.api.mergesort.BuildRandomInputHandler;
+import com.consulner.app.api.mergesort.MergeSortEnhancedWithAssessmentHandler;
 import com.consulner.app.api.mergesort.SortInputDistributedHandler;
 import com.consulner.app.api.mergesort.SortInputHandler;
 import com.consulner.app.api.mergesort.SortInputWithAssessmentHandler;
@@ -41,6 +42,7 @@ public class Application {
         SortInputHandler sortInputHandler = new SortInputHandler(getObjectMapper(), getErrorHandler());
         SortInputWithAssessmentHandler sortInputWithAssessmentHandler = new SortInputWithAssessmentHandler(getObjectMapper(), getErrorHandler());
         SortInputDistributedHandler sortInputDistributedHandler = new SortInputDistributedHandler(getObjectMapper(), getErrorHandler());
+        MergeSortEnhancedWithAssessmentHandler mergeSortEnhancedWithAssessmentHandler = new MergeSortEnhancedWithAssessmentHandler(getObjectMapper(), getErrorHandler());
         
         ServiceMessageHandler serviceMessageHandler = new ServiceMessageHandler(getObjectMapper(), getErrorHandler());
         ServiceMessageWithAssessmentHandler serviceMessageWithAssessmentHandler = new ServiceMessageWithAssessmentHandler(getObjectMapper(), getErrorHandler());
@@ -51,7 +53,7 @@ public class Application {
         server.createContext("/api/mergesort/sort-array", sortInputDistributedHandler::handle);
         server.createContext("/api/service",serviceMessageHandler::handle);
         server.createContext("/api/service/assessment",serviceMessageWithAssessmentHandler::handle);
-
+        server.createContext("/api/service/merge-sort-enhanced/assesment", mergeSortEnhancedWithAssessmentHandler::handle);
         //server.setExecutor(null); // creates a default executor
         server.start();
     }
