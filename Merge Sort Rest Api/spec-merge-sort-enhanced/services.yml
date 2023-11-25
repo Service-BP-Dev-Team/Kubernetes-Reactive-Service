@@ -2,7 +2,7 @@
 kind: service
 name: MainSort
 # Sort list service
-kubename: "127.0.0.1:8000"
+kubename: ${KUBE_NAME}
 inputs: 
  - { name: inp_list}
 outputs:
@@ -12,7 +12,7 @@ outputs:
 kind : service
 name : RecSort
  # Recusive Sort: a quicksort based subservice for MainSort
-kubename : "127.0.0.1:8000"
+kubename : ${KUBE_NAME}
 inputs : 
  - { name : inp_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
 outputs :
@@ -20,7 +20,7 @@ outputs :
 ---
 kind : service
 name : Merge_S
-kubename : "127.0.0.1:8000"
+kubename : ${KUBE_NAME}
 inputs : 
  - { name : indices_in }
  - { name : res_left, array: true, size: ${NUMBER_OF_BLOCKS} }
