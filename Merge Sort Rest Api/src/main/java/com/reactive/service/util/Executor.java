@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reactive.service.app.api.InMemoryWorkspace;
@@ -60,7 +61,7 @@ public class Executor {
 			while (continuous()) {
 				// System.out.println("continous is true");
 				Hashtable<Task, List<Pair<DecompositionRule, ArrayList>>> readyTasks = context.getReadyTasks();
-				//System.out.println("" + readyTasks);
+				// System.out.println("" + readyTasks);
 				computePendingLocalComputations();
 
 				while (readyTasks.size() != 0) {
@@ -361,14 +362,26 @@ public class Executor {
 			keyArray.add(id);
 		}
 		for (String id : keyArray) {
-			Pair<String, Data> p = InMemoryWorkspace.outSubscriptions.get(id);
-			if (p != null) {
-				Data d = p.getValue();
-				if (d.isDefined()) {
-					Notification nf = new Notification();
-					nf.setData(d);
-					InMemoryWorkspace.processOutNotification(nf, p.getKey());
+			Hashtable<String, Pair<String, Data>> outSubscriptionPerCall = InMemoryWorkspace.outSubscriptions
+					.get(id);
+			if (outSubscriptionPerCall != null) {
+				synchronized (outSubscriptionPerCall) {
+				// key the key in an array list
+					ArrayList<String> currentKeys = new ArrayList<>();
+					currentKeys.addAll(outSubscriptionPerCall.keySet());
+				for (String subId : currentKeys) {
+					Pair<String, Data> p = outSubscriptionPerCall.get(subId);
+					if (p != null) {
+						Data d = p.getValue();
+						if (d.isDefined()) {
+							Notification nf = new Notification();
+							nf.setData(d);
+							outSubscriptionPerCall.remove(nf.getData().getId()); // remove the subscription
+							InMemoryWorkspace.processOutNotification(nf, p.getKey());
 
+						}
+					}
+				}
 				}
 			}
 
