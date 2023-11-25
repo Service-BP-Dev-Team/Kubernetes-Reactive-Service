@@ -14,10 +14,10 @@ public class SortFunc {
 	public static final int ARRAY_SIZE =10000;
 
 	public boolean lengthgr(Object input) {
-		System.out.println("lenght start guard ");
+	//	System.out.println("lenght start guard ");
 		if(input==null) return false;
 		ArrayList list = (ArrayList) input;
-		System.out.println("lenght start second ");
+	//	System.out.println("lenght start second ");
 		return list.size() > getMAX_LEN();
 	}
 
@@ -33,22 +33,22 @@ public class SortFunc {
 		ArrayList<Integer> el = new ArrayList<Integer>();
 		el.addAll(list.subList(cell_len * (getNUMBER_OF_BLOCKS() - 1), list.size()));
 		result.add(el);
-		System.out.println(" inputs after split : " + result);
+		//System.out.println(" inputs after split : " + result);
 		return result;
 	}
 
 	public ArrayList<Integer> merge_f(Object inputs) {
 		ArrayList array = (ArrayList) inputs;
-		System.out.println("inputs after split : " + inputs);
+		//System.out.println("inputs after split : " + inputs);
 		ArrayList<Integer> result = (ArrayList<Integer>) array.get(0);
 		Integer sizeGlobal = result.size();
 		for (int i = 1; i < getNUMBER_OF_BLOCKS(); i++) {
 			result = merge_sort(result, array.get(i));
 			sizeGlobal += ((ArrayList) array.get(i)).size();
 		}
-		System.out.println(" inputs after merges : " + result);
-		System.out.println("the size of result is : " + result.size());
-		System.out.println("the global size is : " + sizeGlobal);
+		//System.out.println(" inputs after merges : " + result);
+		//System.out.println("the size of result is : " + result.size());
+		//System.out.println("the global size is : " + sizeGlobal);
 		return result;
 	}
 

@@ -44,6 +44,7 @@ RUN mvn clean package
 EXPOSE 8000
 COPY ./spec ./target/spec
 COPY ./spec-merge-sort ./target/spec-merge-sort
+COPY ./spec-merge-sort-enhanced ./target/spec-merge-sort-enhanced
 RUN cd target
 #CMD ["/bin/bash"]
 #CMD ["java","-jar", "pure-java-rest-api-1.0-SNAPSHOT-jar-with-dependencies.jar"]

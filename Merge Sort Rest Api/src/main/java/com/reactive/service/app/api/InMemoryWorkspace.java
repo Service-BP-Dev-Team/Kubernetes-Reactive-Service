@@ -49,23 +49,32 @@ public class InMemoryWorkspace {
 	public static final ConcurrentHashMap<String, Pair<String, Data>> inSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
 	public static final ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
 	public static final ConcurrentHashMap<Long, Object> threadFunctionProcess = new ConcurrentHashMap<>();
-	public static final String defaultGAGFolder = "spec-merge-sort";
-	public static final Map<String,String> environmentVariables= new HashMap<String,String>();
-	public static final String KEY_READY_TASK_WAIT_TIME="READY_TASK_WAIT_TIME"; // time where each gag process will wait before
-	// checking if they are new rules that can be applied 
+	public static final ConcurrentHashMap<String, Boolean> discardNotificationsAlreadyDone = new ConcurrentHashMap<>();
+	public static final String defaultGAGFolder = "spec-merge-sort-enhanced";
+	public static final Map<String, String> environmentVariables = new HashMap<String, String>();
+	public static final String KEY_READY_TASK_WAIT_TIME = "READY_TASK_WAIT_TIME"; // time where each gag process will
+																					// wait before
+	// checking if they are new rules that can be applied
 	// to pending service (open tasks)
 	// this time can be modified by the .env file of the yaml spec.
-	public static final int VALUE_READY_TASK_WAIT_TIME=5;
+	public static final int VALUE_READY_TASK_WAIT_TIME = 5;
 	// this represent the default value of the precedent key;
-	public static final String KEY_SYNC_IN_NOTIFICATION_TIME="SYNC_IN_NOTIFICATION_TIME"; // sometimes it may happen that a notification happens,
-	// without having being registered. More precisely a configuration receives a notification of a data she is not yet aware of.
-	// This is link to the high level of concurrency : a notification of a input task data is processed
-	// before the service call linked to the task is processed. In this case, the notification process has to wait 
-	// for the linked service call (i.e the service call containing the task that bears the data) to be processed first.
-	// this time will defined the time that the notification process, will be asked to wait, in order for the service call
+	public static final String KEY_SYNC_IN_NOTIFICATION_TIME = "SYNC_IN_NOTIFICATION_TIME"; // sometimes it may happen
+																							// that a notification
+																							// happens,
+	// without having being registered. More precisely a configuration receives a
+	// notification of a data she is not yet aware of.
+	// This is link to the high level of concurrency : a notification of a input
+	// task data is processed
+	// before the service call linked to the task is processed. In this case, the
+	// notification process has to wait
+	// for the linked service call (i.e the service call containing the task that
+	// bears the data) to be processed first.
+	// this time will defined the time that the notification process, will be asked
+	// to wait, in order for the service call
 	// to be processed first.
 	// this time can be modified by the .env file of the yaml spec.
-	public static final int VALUE_IN_NOTIFICATION_TIME=100;
+	public static final int VALUE_IN_NOTIFICATION_TIME = 3;
 	// this represent the default value of the precedent key;
 	private static GAG gag;
 
@@ -81,18 +90,25 @@ public class InMemoryWorkspace {
 		// bind to local service
 		conf.getRoot().setService(getGag().findByName(sc.getTask().getService().getName()));
 		// create and add subscriptions to undefined input
-		for (Data din : sc.getTask().getInputs()) {
-			if (!din.isDefined()) {
-				din.setServiceCallId(local.getId());
-				inSubscriptions.put(din.getId(), new Pair<>(sc.getSender(), din));
-			}
-		}
-		// create and add subscriptions to all output
-		for (Data dout : sc.getTask().getOutputs()) {
+		//synchronized (inSubscriptions) {
 
-			outSubscriptions.put(dout.getId(), new Pair<>(sc.getSender(), dout));
-			dout.setServiceCallId(sc.getId());
-		}
+			for (Data din : sc.getTask().getInputs()) {
+				if (!din.isDefined()) {
+					din.setServiceCallId(local.getId());
+					inSubscriptions.put(din.getId(), new Pair<>(sc.getSender(), din));
+				}
+			}
+		//}
+		//synchronized (outSubscriptions) {
+			// create and add subscriptions to all output
+			for (Data dout : sc.getTask().getOutputs()) {
+
+				outSubscriptions.put(dout.getId(), new Pair<>(sc.getSender(), dout));
+				dout.setServiceCallId(sc.getId());
+			}
+
+		//}
+
 		// add the configuration
 		Executor exec = new Executor();
 		Context ctx = new Context();
@@ -108,15 +124,23 @@ public class InMemoryWorkspace {
 	}
 
 	public static void processInNotification(Notification nf) {
-		
+
 		Thread thread = new Thread(() -> {
 			Pair<String, Data> p = null;
+			Boolean alreadyNotified = false;
 			while (p == null) {
 				p = inSubscriptions.get(nf.getData().getId());
+				alreadyNotified = discardNotificationsAlreadyDone.get(nf.getData().getId());
+				if (alreadyNotified != null && alreadyNotified) {
+					System.out.println("already notified");
+					break;
+				}else {
+					alreadyNotified=false;
+				}
 				if (p == null) {
-					System.out.println(nf.getData().getValue() + " " + nf.getData().getId());
+					//System.out.println(nf.getData().getValue() + " " + nf.getData().getId());
 				} else {
-					System.out.println("p is no more null");
+					//System.out.println("p is no more null");
 				}
 				try {
 					Thread.sleep(getSyncInNotificationTime());
@@ -125,17 +149,20 @@ public class InMemoryWorkspace {
 					e.printStackTrace();
 				}
 			}
-			Data d = p.getValue();
-			if (d != null) {
-				d.setValue(nf.getData().getValue());
-				inSubscriptions.remove(nf.getData().getId());
+			if (!alreadyNotified) {
+				Data d = p.getValue();
+				if (d != null) {
+					d.setValue(nf.getData().getValue());
+					inSubscriptions.remove(nf.getData().getId());
+					discardNotificationsAlreadyDone.put(nf.getData().getId(), true);
 
-				Executor executor = inMemoryCalls.get(d.getServiceCallId());
-				if (executor != null) {
-					// System.out.println("find the executor");
-					// we do not launch the executor anymore
-					// we use now a continous execute function
-					// executor.execute();
+					Executor executor = inMemoryCalls.get(d.getServiceCallId());
+					if (executor != null) {
+						// System.out.println("find the executor");
+						// we do not launch the executor anymore
+						// we use now a continous execute function
+						// executor.execute();
+					}
 				}
 			}
 
@@ -151,7 +178,9 @@ public class InMemoryWorkspace {
 		m.setNotification(nf);
 		nf.setReceiver(host);
 		nf.setSender(getHostIp());
-		outSubscriptions.remove(nf.getData().getId());
+		//synchronized (outSubscriptions) {
+			outSubscriptions.remove(nf.getData().getId());
+		//}
 		Message.sendMessage(m);
 	}
 
@@ -164,19 +193,24 @@ public class InMemoryWorkspace {
 		// and the host to send the data
 		String receiver = bind(sc.getTask().getService().getKubename());
 		// Logger.log(receiver);
-		for (Data d : sc.getTask().getInputs()) {
-			d.setServiceCallId(sc.getId());
-			d.setHost(receiver);
-			// create subscriptions for undefined data
-			if (!d.isDefined()) {
-				outSubscriptions.put(d.getId(), new Pair<String, Data>(d.getHost(), d));
+		//synchronized (outSubscriptions) {
+			for (Data d : sc.getTask().getInputs()) {
+				d.setServiceCallId(sc.getId());
+				d.setHost(receiver);
+				// create subscriptions for undefined data
+				if (!d.isDefined()) {
+					outSubscriptions.put(d.getId(), new Pair<String, Data>(d.getHost(), d));
+				}
 			}
-		}
-		for (Data d : sc.getTask().getOutputs()) {
-			d.setServiceCallId(sc.getId());
-			// register in subscriptions
-			inSubscriptions.put(d.getId(), new Pair<String, Data>(d.getHost(), d));
-		}
+		//}
+		//synchronized (inSubscriptions) {
+			for (Data d : sc.getTask().getOutputs()) {
+				d.setServiceCallId(sc.getId());
+				// register in subscriptions
+				inSubscriptions.put(d.getId(), new Pair<String, Data>(d.getHost(), d));
+			}
+		//}
+
 		// send the message
 		Message m = new Message();
 		m.setType(Message.SERVICECALL_MESSAGE_TYPE);
@@ -250,9 +284,9 @@ public class InMemoryWorkspace {
 			// reading services
 			// we replace env file in services
 			String serviceWithEnvVariable;
-			Map<String,String> EnvVariables=null;
+			Map<String, String> EnvVariables = null;
 			try {
-				EnvVariables= ENV_Manager.readEnvFile(rootFolder + "/.env");
+				EnvVariables = ENV_Manager.readEnvFile(rootFolder + "/.env");
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -297,7 +331,7 @@ public class InMemoryWorkspace {
 			parser.setSpecs(allSpecs);
 			gag = parser.getGAG();
 			// all all the environmet variables in the workspace memory
-			for(String key: EnvVariables.keySet()) {
+			for (String key : EnvVariables.keySet()) {
 				environmentVariables.put(key, EnvVariables.get(key));
 			}
 			// System.out.println(gag);
@@ -375,25 +409,24 @@ public class InMemoryWorkspace {
 		// Logger.log(result);
 		return result;
 	}
-	
+
 	public static int getReadyTaskWaitTime() {
-		String val =environmentVariables.get(KEY_READY_TASK_WAIT_TIME);
-		if(val!=null) {
+		String val = environmentVariables.get(KEY_READY_TASK_WAIT_TIME);
+		if (val != null) {
 			return Integer.parseInt(val);
 		}
 		return VALUE_READY_TASK_WAIT_TIME;
 	}
-	
+
 	public static int getSyncInNotificationTime() {
-		String val= environmentVariables.get(KEY_SYNC_IN_NOTIFICATION_TIME);
-		if(val!=null) {
+		String val = environmentVariables.get(KEY_SYNC_IN_NOTIFICATION_TIME);
+		if (val != null) {
 			return Integer.parseInt(val);
-		}
-		else {
+		} else {
 			return VALUE_IN_NOTIFICATION_TIME;
 		}
 	}
-	
+
 	public static String getEnvironmentValue(String key) {
 		return environmentVariables.get(key);
 	}

@@ -225,8 +225,8 @@ public class Executor {
 				task.getLocalGroups().add(dg);
 				task.getLocals().addAll(dg.getCollection());
 			}
-			System.out.println("array found " + parameterName);
-			System.out.println(idex.getServiceInstance().getService().getName());
+			//System.out.println("array found " + parameterName);
+			//System.out.println(idex.getServiceInstance().getService().getName());
 			return dg.getCollection();
 		}
 		if (!(idex instanceof ArrayExpression)) {

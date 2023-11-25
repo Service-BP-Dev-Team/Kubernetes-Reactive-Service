@@ -5,7 +5,7 @@ kubectl delete deployment --all
 kubectl apply -f ../Application/deployment.yml 
 kubectl get pods
 
-kubectl exec --stdin --tty java-rest-5dccb9f467-w9mcp -- /bin/bash
+kubectl exec --stdin --tty java-rest-5dccb9f467-4w6vc -- /bin/bash
 
 curl -X POST java-rest-service:8000/api/mergesort/create-input -d '{"size": 10 }'
 curl -X POST java-rest-service:8000/api/mergesort/sort -d '{"size": 9000000 }'
@@ -34,3 +34,5 @@ it takes 18696 miliseconds for 1m and 40342 for 2m
 
 curl -X POST 127.0.0.1:8000/api/service/assessment -d '{"size": 20 }'
 kubectl exec --stdin --tty java-rest-5dccb9f467-nf4zs -- /bin/bash
+
+curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 10000 }'
