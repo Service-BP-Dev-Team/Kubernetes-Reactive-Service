@@ -58,6 +58,7 @@ public class SortFunc {
 		ArrayList<Integer> list = new ArrayList<>();
 		int leftSize = left.size();
 		int rightSize = right.size();
+		if(leftSize==0) {return right;}if(rightSize==0) {return left;}
 		int i = 0; // Index for the left list
 		int j = 0; // Index for the right list
 
@@ -175,6 +176,7 @@ public class SortFunc {
 	    	  result.addAll(listToMerge);
 	    	  pending.removeAll(indicesToRemove);
 	    	  result.add(pending);
+	    	  
 	      }
 	      
 	      return result;
@@ -184,6 +186,8 @@ public class SortFunc {
 	public static int getNUMBER_OF_BLOCKS() {
 		return Integer.parseInt(InMemoryWorkspace.getEnvironmentValue("NUMBER_OF_BLOCKS"));
 	}
+	
+
 	
 	public static int getMAX_LEN() {
 		return Integer.parseInt(InMemoryWorkspace.getEnvironmentValue("MAX_LEN"));

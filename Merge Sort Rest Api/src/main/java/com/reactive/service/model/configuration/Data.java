@@ -78,6 +78,7 @@ public class Data implements Serializable{
 			}
 			if(watcher!=null) {
 				watcher.setExecutionToEndWithData(this);
+				//watcher.setData(this);
 			}
 		}
 	}

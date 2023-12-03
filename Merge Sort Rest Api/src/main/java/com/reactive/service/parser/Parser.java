@@ -286,7 +286,7 @@ public class Parser {
 		IdExpression id = null;
 		// find in existing data
 		for(IdExpression el: rule.getData()) {
-			if(el.getParameterName().equals(parameterName) && el.getServiceInstance()==rule.getCurrentServiceInstance()) {
+			if(!(el instanceof ArrayExpression) && el.getParameterName().equals(parameterName) && el.getServiceInstance()==rule.getCurrentServiceInstance()) {
 				id=el;
 				break;
 			}
@@ -304,6 +304,7 @@ public class Parser {
 			IdExpression index = processIdExpression(rule, indexName);
 			arr.setIndex(index);
 			arr.setParameterName(parameterSplit[0].trim());
+			// there is an issue here
 			arr.setServiceInstance(rule.getCurrentServiceInstance());
 			rule.getData().add(arr);
 			return arr;

@@ -29,7 +29,8 @@ public class IdExpression extends Expression{
 	}
 	
 	public String asString() {
-		return this.getServiceInstance().getService().getName()+"."+this.getParameterName();
+		//return this.getServiceInstance().getService().getName()+"."+this.getParameterName();
+		return this.getServiceInstance().getName()+"."+this.getParameterName();
 	}
 	public int getSize() {
 		return size;

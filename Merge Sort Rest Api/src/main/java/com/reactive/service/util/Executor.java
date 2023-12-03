@@ -169,6 +169,7 @@ public class Executor {
 				List<Data> listLeft;
 				Task taskRight = servicetask.get(right.getServiceInstance());
 				List<Data> listRight = findDataByParameterNameInTask(taskRight, right.getParameterName(), right);
+				//System.out.println(id.asString()+"="+right.asString());
 				if (right.isArray()) {
 					id.setArray(true);
 					id.setSize(listRight.size());

@@ -28,3 +28,27 @@ inputs :
 outputs :
  - { name : out}
  - { name : indices_out}
+ 
+#service used by the main sort to merge incrementally the result
+---
+kind : service
+name : Merge_Main_S
+kubename : ${KUBE_NAME}
+inputs : 
+ - { name : in_length }
+ - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out_length}
+ - { name : out_arr, array: true, size: ${NUMBER_OF_BLOCKS}}
+ - { name : merge_res}
+ 
+---
+kind : service
+name : Merge_Main_It
+kubename : ${KUBE_NAME}
+inputs : 
+ - { name : indices_in }
+ - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out}
+ - { name : indices_out}

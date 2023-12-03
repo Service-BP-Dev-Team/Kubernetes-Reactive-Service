@@ -11,11 +11,80 @@ guard :
 functions :
  - { classPath: com.local.SortFunc, method: split, label: split, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
  - { classPath: com.local.SortFunc, method: merge_f, label: merge_f}
+ - { classPath: com.local.SortFunc, method: getNUMBER_OF_BLOCKS, label: getNUMBER_OF_BLOCKS}
  # update_values replaces some intentional values in out_list.
 actions :
  - inp_array = split(inp_list)
  - out_array = __call RecSort(inp_array)
- - out_list = merge_f(out_array)
+ - length = getNUMBER_OF_BLOCKS()
+ - (size, arr, out_list) = Merge_Main_S(length,out_array) # merge incrementally
+
+#basic case the lenght is 1 
+---
+kind : rule
+name : Merge_Main_Incremental_Base
+service: Merge_Main_S
+guard :
+ classPath: com.local.MergeIncremental
+ method: lenght_is_one
+functions:
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+actions:
+ - i = getZero()
+ - merge_res=in_arr[i]
+
+#the lenght to merge is greater than one
+---
+kind : rule
+name : Merge_Main_Incremental_Greater_Than_One
+service: Merge_Main_S
+guard :
+ classPath: com.local.MergeIncremental
+ method: lenght_is_greater_than_one
+functions:
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+ - { classPath: com.local.MergeIncremental, method: divide_length, label: divide_length}
+ - { classPath: com.local.MergeIncremental, method: init_indices, label: init_indices}
+actions:
+ - i = getZero()
+ - pending_indices = init_indices(in_length)
+ - out_length = divide_length(in_length)
+ - out_arr[i/pending_indices] = [Merge_Main_It(pending_indices,in_arr) for i,inc,${NUMBER_OF_BLOCKS}]
+ - (size,arr,merge_res) = Merge_Main_S(out_length,out_arr)
+
+
+
+---
+kind : rule
+name : Merge_Main_Iterrator
+service: Merge_Main_It
+guard :
+ classPath: com.local.MergeIncremental
+ method: has_new_elements
+ binding:
+  - { name : list1 }
+  - { name : list2 }
+  - { name : next_indices }
+functions:
+ - { classPath: com.local.SortFunc, method: merge_sort, label: merge_two }
+actions:
+ - out = merge_two(list1,list2)
+ - indices_out = next_indices
+
+#when everything has been merged
+---
+kind : rule
+name : Merge_Main_Iterrator_terminate
+service: Merge_Main_It
+guard :
+ classPath: com.local.MergeIncremental
+ method: indices_is_empty
+functions:
+ - { classPath: com.local.MergeIncremental, method: empty_array, label: empty }
+actions:
+ - out = empty()
+ - indices_out = indices_in
 
 ---
 #R2 is active when the list is short enough to sort it locally

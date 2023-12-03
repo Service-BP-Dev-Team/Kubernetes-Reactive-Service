@@ -19,7 +19,8 @@ public class ArrayExpression extends IdExpression{
 	}
 	
 	public String asString() {
-		return this.getServiceInstance().getService().getName()+"."+this.getParameterName() +"["+index.asString()+"]";
+		//return this.getServiceInstance().getService().getName()+"."+this.getParameterName() +"["+index.asString()+"]";
+		return this.getServiceInstance().getName()+"."+this.getParameterName() +"["+index.asString()+"]";
 	}
 	
 	

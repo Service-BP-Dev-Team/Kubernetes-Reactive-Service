@@ -4,6 +4,8 @@ sudo docker push 10.0.0.10:5000/java-rest:v2
 kubectl delete deployment --all
 kubectl apply -f ../Application/deployment.yml 
 kubectl get pods
+kubectl describe pod java-rest-77c8dfdfc-5qvhn
+
 
 kubectl exec --stdin --tty java-rest-5dccb9f467-4w6vc -- /bin/bash
 

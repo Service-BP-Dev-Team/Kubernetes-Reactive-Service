@@ -28,8 +28,20 @@ import com.reactive.service.util.Executor;
 import com.reactive.service.util.Operation;
 
 public class MainMergeSort {
-
+	
+	
 	public static void main(String[] args) {
+		
+		//main1(args);
+		ArrayList<Integer> inputTable = ToolKit.generateArray(500000);
+		long start = System.currentTimeMillis();
+		Collections.sort(inputTable);
+		long end = System.currentTimeMillis();
+		long finish = end-start;
+		System.out.println("finish of the time without service: "+ finish);
+	}
+
+	public static void main1(String[] args) {
 		// create the server
 				try {
 					Application.main(new String[] {});
