@@ -183,6 +183,17 @@ public class SortFunc {
 
 	}
 	
+	public boolean index_basic_defined( Object i, Object arr) {
+		if(i!=null && arr!=null) {
+			Integer index = (Integer)i;
+			ArrayList array = (ArrayList) arr;
+			if(array.get(index)!=null) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static int getNUMBER_OF_BLOCKS() {
 		return Integer.parseInt(InMemoryWorkspace.getEnvironmentValue("NUMBER_OF_BLOCKS"));
 	}
