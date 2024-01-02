@@ -14,7 +14,7 @@ name : RecSort
  # Recusive Sort: a quicksort based subservice for MainSort
 kubename : ${KUBE_NAME}
 inputs : 
- - { name : inp_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+ - { name : inp_arr}
 outputs :
  - { name : out_arr,  array: true, size: ${NUMBER_OF_BLOCKS}}
 ---
@@ -52,3 +52,23 @@ inputs :
 outputs :
  - { name : out}
  - { name : indices_out}
+ 
+---
+kind : service
+name : Sort_Basic_It
+kubename : ${KUBE_NAME}
+inputs : 
+ - { name : index_in }
+ - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out}
+ - { name : index_out}
+ 
+---
+kind : service
+name : BasicSort
+kubename : ${KUBE_NAME}
+inputs : 
+ - { name : in }
+outputs :
+ - { name : out}

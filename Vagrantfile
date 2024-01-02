@@ -56,20 +56,21 @@ Vagrant.configure("2") do |config|
       },
       path: "scripts/master.sh"
   end
+  # Initialize counter variable
+  
+  settings["nodes"]["workers"]["list"].each do |worker|
 
-  (1..NUM_WORKER_NODES).each do |i|
-
-    config.vm.define "node0#{i}" do |node|
-      node.vm.hostname = "worker-node0#{i}"
-      node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
+    config.vm.define "node0#{worker["number"]}" do |node|
+      node.vm.hostname = "worker-node0#{worker["number"]}"
+      node.vm.network "private_network", ip: IP_NW + "#{IP_START + worker["number"]}"
       if settings["shared_folders"]
         settings["shared_folders"].each do |shared_folder|
           node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
         end
       end
       node.vm.provider "virtualbox" do |vb|
-          vb.cpus = settings["nodes"]["workers"]["cpu"]
-          vb.memory = settings["nodes"]["workers"]["memory"]
+          vb.cpus = worker["cpu"]
+          vb.memory = worker["memory"]
           if settings["cluster_name"] and settings["cluster_name"] != ""
             vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
           end

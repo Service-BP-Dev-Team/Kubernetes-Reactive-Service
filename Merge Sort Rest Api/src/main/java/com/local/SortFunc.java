@@ -85,17 +85,14 @@ public class SortFunc {
 
 	public boolean lengthleq_in_arr(Object input) {
 		if(input==null) return false;
-		ArrayList<ArrayList> list = (ArrayList<ArrayList>) input;
-		// System.out.println(" I have been executed : "+ list);
-		if(list.get(0)==null) return false;
-		return list.get(0).size() <= getMAX_LEN();
+		ArrayList list = (ArrayList) input;
+		return list.size()/getNUMBER_OF_BLOCKS() <= getMAX_LEN();
 	}
 
 	public boolean lengthgr_in_arr(Object input) {
 		if(input==null) return false;
-		ArrayList<ArrayList> array = (ArrayList<ArrayList>) input;
-		if(array.get(0)==null) return false;
-		return array.get(0).size() > getMAX_LEN();
+		ArrayList array = (ArrayList) input;
+		return array.size()/getNUMBER_OF_BLOCKS() > getMAX_LEN();
 	}
 
 	public boolean lengthleq(Object input) {
@@ -104,27 +101,17 @@ public class SortFunc {
 		return list.size() <= getMAX_LEN();
 	}
 
-	public ArrayList<ArrayList> divideLeft(Object input) {
-		ArrayList<ArrayList> inp_arr = (ArrayList<ArrayList>) input;
-		ArrayList<ArrayList> left = new ArrayList<ArrayList>();
-		for (int i = 0; i < getNUMBER_OF_BLOCKS(); i++) {
-			int size = inp_arr.get(i).size();
-			ArrayList<Integer> el = new ArrayList<Integer>(inp_arr.get(i).subList(0, size / 2));
-			left.add(el);
-		}
-
+	public ArrayList divideLeft(Object input) {
+		ArrayList inp_arr = (ArrayList) input;
+		int size = inp_arr.size();
+		ArrayList left  = new ArrayList<Integer>(inp_arr.subList(0, size / 2));
 		return left;
 	}
 
 	public ArrayList<ArrayList> divideRight(Object input) {
-		ArrayList<ArrayList> inp_arr = (ArrayList<ArrayList>) input;
-		ArrayList<ArrayList> right = new ArrayList<ArrayList>();
-		for (int i = 0; i < getNUMBER_OF_BLOCKS(); i++) {
-			int size = inp_arr.get(i).size();
-			ArrayList<Integer> el = new ArrayList<Integer>(inp_arr.get(i).subList(size / 2, size));
-			right.add(el);
-		}
-
+		ArrayList inp_arr = (ArrayList) input;
+		int size = inp_arr.size();
+		ArrayList right  = new ArrayList<Integer>(inp_arr.subList(size / 2, size));
 		return right;
 	}
 
@@ -192,6 +179,10 @@ public class SortFunc {
 			}
 		}
 		return false;
+	}
+	
+	public boolean base_sort_input_defined(Object input) {
+		return (input!=null);
 	}
 	
 	public static int getNUMBER_OF_BLOCKS() {

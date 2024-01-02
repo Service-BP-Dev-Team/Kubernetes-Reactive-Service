@@ -9,13 +9,11 @@ guard :
  method: lengthgr
  # The guard requires a minimum length l+1 of the input list
 functions :
- - { classPath: com.local.SortFunc, method: split, label: split, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
  - { classPath: com.local.SortFunc, method: merge_f, label: merge_f}
  - { classPath: com.local.SortFunc, method: getNUMBER_OF_BLOCKS, label: getNUMBER_OF_BLOCKS}
  # update_values replaces some intentional values in out_list.
 actions :
- - inp_array = split(inp_list)
- - out_array = __call RecSort(inp_array)
+ - out_array = __call RecSort(inp_list)
  - length = getNUMBER_OF_BLOCKS()
  - (size, arr, out_list) = Merge_Main_S(length,out_array) # merge incrementally
 
@@ -113,10 +111,45 @@ guard :
  method: lengthleq_in_arr
  # The guard requires a maximum length l-1 of the input list
 functions :
- - { classPath: com.local.Base, method: sort_array_lists, label: sort_array_lists, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}  }
+ - { classPath: com.local.SortFunc, method: split, label: split, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
 actions :
- - out_arr = sort_array_lists(inp_arr)
+ - cells_of_array=split(inp_arr)
+ - i = getZero()
+ - sync = i
+ - out_arr[i/sync] = [Sort_Basic_It(pending_indices,cells_of_array) for i,inc,${NUMBER_OF_BLOCKS}]
  
+---
+#basic sort iterration 
+kind : rule
+name : Sort_Basic_It_Rule
+service : Sort_Basic_It
+guard : 
+ classPath: com.local.SortFunc
+ method: index_basic_defined
+ # The guard requires a maximum length l-1 of the input list
+functions :
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+actions :
+# - out_arr = sort_array_lists(inp_arr)
+ - index_out = inc(index_in)
+ - out = __call BasicSort(in_arr[index_in])
+
+---
+#basic sort work 
+kind : rule
+name : Sort_Basic_Rule
+service : BasicSort
+guard : 
+ classPath: com.local.SortFunc
+ method: base_sort_input_defined
+functions :
+ - { classPath: com.local.Base, method: sort, label: sort}
+actions :
+ - out = sort(in) 
+
 ---
 #Service: RecSort -- 2 rules:
 # R1 is active when the list is long enough to distribute computation.
@@ -128,8 +161,8 @@ guard :
  method: lengthgr_in_arr
  # The guard requires a minimum length l of the input list
 functions :
- - { classPath: com.local.SortFunc, method: divideLeft, label: divideLeft, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
- - { classPath: com.local.SortFunc, method: divideRight, label: divideRight, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
+ - { classPath: com.local.SortFunc, method: divideLeft, label: divideLeft}
+ - { classPath: com.local.SortFunc, method: divideRight, label: divideRight}
  - { classPath: com.local.SortFunc, method: init_indices, label: init_indices}
  - { classPath: com.local.Base, method: getZero, label: getZero}
  - { classPath: com.local.Base, method: incrementNumber, label: inc}

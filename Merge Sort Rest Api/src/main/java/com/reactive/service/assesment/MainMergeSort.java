@@ -33,7 +33,7 @@ public class MainMergeSort {
 	public static void main(String[] args) {
 		
 		//main1(args);
-		ArrayList<Integer> inputTable = ToolKit.generateArray(5000000);
+		ArrayList<Integer> inputTable = ToolKit.generateArray(8000000);
 		long start = System.currentTimeMillis();
 		Collections.sort(inputTable);
 		long end = System.currentTimeMillis();
