@@ -96,7 +96,7 @@ public class PendingLocalFunctionComputation {
 				ArrayList<Object> params = groupParameters();
 				if (!isThreadFunction) {
 					// execute in an anonymous thread
-					Thread t = new Thread(() -> {
+					//Thread t = new Thread(() -> {
 						Object output = Operation.executeMethodWithReflexion(functionDeclaration.getLocation(),
 								functionDeclaration.getMethod(), params);
 						if (output instanceof ArrayList && functionDeclaration != null
@@ -111,8 +111,8 @@ public class PendingLocalFunctionComputation {
 							datasToCompute.get(0).setValue(output);
 							datasToCompute.get(0).setDefined(true);
 						}
-					});
-					t.start();
+					//});
+					//t.start();
 				} else {
 					// execute in the thread and make thread available in the
 					// function as first argument
@@ -127,7 +127,7 @@ public class PendingLocalFunctionComputation {
 							// we place the result in a hashtable with the process key when it will be
 							// defined
 							InMemoryWorkspace.threadFunctionProcess.put(processId.get(0), output);
-
+							
 						}
 					});
 					result = t.getId();

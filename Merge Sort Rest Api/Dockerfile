@@ -48,6 +48,6 @@ COPY ./spec-merge-sort-enhanced ./target/spec-merge-sort-enhanced
 RUN cd target
 #CMD ["/bin/bash"]
 #CMD ["java","-jar", "pure-java-rest-api-1.0-SNAPSHOT-jar-with-dependencies.jar"]
-CMD ["/bin/bash","-c", "cd target;java -jar pure-java-rest-api-1.0-SNAPSHOT-jar-with-dependencies.jar "]
+CMD ["/bin/bash","-c", "cd target;java -jar pure-java-rest-api-1.0-SNAPSHOT-jar-with-dependencies.jar > /tmp/output.txt 2> /tmp/error.txt "]
 #CMD ["/bin/bash","-c", "java -version; mvn --version"]
 

@@ -7,9 +7,13 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reactive.service.model.specification.Parameter;
 import com.reactive.service.model.specification.Service;
 import com.reactive.service.model.specification.ServiceInstance;
+
+import static com.consulner.app.Configuration.getObjectMapper;
 
 public class Task implements Serializable{
 	private String AppliedRule;
@@ -208,6 +212,19 @@ public class Task implements Serializable{
 		return null;
 		
 	}
+	@JsonIgnore
+	public String getJsonRepresentation() {
+		String result = "";
+		ObjectMapper mapper = getObjectMapper();
+		try {
+			result=mapper.writeValueAsString(this);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 	
 	
 }

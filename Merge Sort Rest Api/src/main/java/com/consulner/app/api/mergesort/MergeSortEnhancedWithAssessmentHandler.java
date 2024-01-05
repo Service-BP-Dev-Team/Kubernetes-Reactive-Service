@@ -15,6 +15,7 @@ import com.consulner.app.errors.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.local.SortFunc;
 import com.reactive.service.app.api.InMemoryWorkspace;
+import com.reactive.service.app.api.Pair;
 import com.reactive.service.assesment.ToolKit;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.OutputWatcher;
@@ -22,6 +23,7 @@ import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.GAG;
 import com.reactive.service.util.Context;
 import com.reactive.service.util.Executor;
+import com.reactive.service.util.FileWriting;
 import com.reactive.service.util.Operation;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -56,10 +58,21 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		// TODO Auto-generated method stub
 		RandomInputRequest rq= super.readRequest(is, RandomInputRequest.class);
 		int size =rq.getSize();
-		OutputWatcher watcher = createTheTask(size);
+		System.out.println("start data execution");
+		Pair<OutputWatcher,Task> p=createTheTask(size);
+		OutputWatcher watcher = p.getFirst();
+		int timeElapsed = 0;
 		while(!watcher.isEnded()) {
 			try {
+				
 				Thread.sleep(1000);
+				timeElapsed+=1000;
+				if(timeElapsed >= 100000) { // stop after 100 seconds
+					String log = p.getSecond().getJsonRepresentation();
+					// write log on a file
+					FileWriting.writeStringToFile(log,"./spec-merge-sort-enhanced/log.txt");
+					break;
+				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -72,7 +85,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		
 	}
 	
-	public OutputWatcher createTheTask(int size) {
+	public Pair<OutputWatcher,Task> createTheTask(int size) {
 		GAG g = InMemoryWorkspace.getGagWithRootFolder("spec-merge-sort-enhanced");
 		// System.out.println(g);
 
@@ -91,7 +104,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		OutputWatcher watcher = new OutputWatcher();
 		root.getOutputs().get(0).setWatcher(watcher);
 		exec.execute();
-		return watcher;
+		return new Pair(watcher,root);
 	}
 
 	

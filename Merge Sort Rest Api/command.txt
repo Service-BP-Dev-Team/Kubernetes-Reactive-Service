@@ -7,7 +7,11 @@ kubectl get pods
 kubectl describe pod java-rest-77c8dfdfc-5qvhn
 
 
-kubectl exec --stdin --tty java-rest-5dccb9f467-4w6vc -- /bin/bash
+kubectl exec --stdin --tty java-rest-bb8c5f8bd-57dww -- /bin/bash
+kubectl exec --stdin --tty java-rest-bb8c5f8bd-kgtfx -- /bin/bash
+kubectl exec --stdin --tty java-rest-bb8c5f8bd-z8hvm -- /bin/bash
+kubectl exec --stdin --tty java-rest-bb8c5f8bd-xzkzd -- /bin/bash
+
 
 curl -X POST java-rest-service:8000/api/mergesort/create-input -d '{"size": 10 }'
 curl -X POST java-rest-service:8000/api/mergesort/sort -d '{"size": 9000000 }'
@@ -38,3 +42,5 @@ curl -X POST 127.0.0.1:8000/api/service/assessment -d '{"size": 20 }'
 kubectl exec --stdin --tty java-rest-5dccb9f467-nf4zs -- /bin/bash
 
 curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 10000 }'
+curl -X POST localhost:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 10000 }'
+curl -X POST localhost:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 300 }'

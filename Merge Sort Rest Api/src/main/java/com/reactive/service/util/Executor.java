@@ -14,6 +14,7 @@ import com.reactive.service.app.api.ServiceCall;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.Data;
 import com.reactive.service.model.configuration.DataGroup;
+import com.reactive.service.model.configuration.OutputWatcher;
 import com.reactive.service.model.configuration.PendingLocalFunctionComputation;
 import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.ArrayExpression;
@@ -295,9 +296,11 @@ public class Executor {
 	public void computePendingLocalComputations() {
 
 		List<PendingLocalFunctionComputation> readyFunctions = getReadyLocalComputations();
+		
 		while (readyFunctions.size() != 0) {
 			// execute the functions
 			for (PendingLocalFunctionComputation func : readyFunctions) {
+				
 				func.execute();
 				configuration.getPendingLocalComputations().remove(func);// we remove after execution
 			}
@@ -305,6 +308,24 @@ public class Executor {
 		}
 
 		// notify the subscriber that some data has been produced
+		
+		//wait for all local function to end first
+		/*boolean canNotify = false;
+		while (!canNotify) {
+			canNotify=true;
+			for(OutputWatcher wt:watchers) {
+				if(!wt.isEnded()) {
+					canNotify=false;
+					break;
+				}
+			}
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}*/
 		notifySubscribers();
 
 	}
