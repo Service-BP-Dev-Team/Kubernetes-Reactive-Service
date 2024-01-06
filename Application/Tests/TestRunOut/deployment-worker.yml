@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-worker
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: java-worker
+  replicas: 6 
+  template:
+    metadata:
+      labels:
+        app: java-worker
+    spec:
+      containers:
+      - image: 10.0.0.10:5000/java-rest:v2
+        imagePullPolicy: Always
+        name: java-worker
+        ports:
+        - containerPort: 8000
+#        resources:
+#          limits:
+#            cpu: "1000m"  # 500 milliCPU (0.5 CPU)
+        volumeMounts:
+        - name: hostpath-volume
+          mountPath: /app/target/spec-merge-sort-enhanced
+      volumes:
+      - name: hostpath-volume
+        hostPath:
+          path: /vagrant/Application/Tests/TestRunOut
+          type: Directory  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-worker-service
+spec:
+  selector:
+    app: java-worker
+  type: LoadBalancer
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 31001
+

@@ -88,7 +88,9 @@ public class Executor {
 	public boolean continuous() {
 		Boolean result = false;
 		for (Data output : configuration.getRoot().getOutputs()) {
-			if (!output.isDefined()) {
+			if (!output.isDefined() || InMemoryWorkspace.outSubscriptions.get(output.getId())!=null) {
+				// when a data is not defined or
+				// has been defined but not yet notified to subscribers
 				result = true;
 				break;
 			}

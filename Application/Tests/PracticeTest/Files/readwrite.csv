@@ -1,0 +1,4 @@
+root:*:0:0::0:0:System Administrator:/var/root:/bin/sh
+daemon:*:1:1::0:0:System Services:/var/root:/usr/bin/false
+# I am a comment line
+_ftp:*:98:-2::0:0:FTP Daemon:/var/empty:/usr/bin/false
