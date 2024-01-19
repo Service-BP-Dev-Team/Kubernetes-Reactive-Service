@@ -194,4 +194,11 @@ public class SortFunc {
 	public static int getMAX_LEN() {
 		return Integer.parseInt(InMemoryWorkspace.getEnvironmentValue("MAX_LEN"));
 	}
+	
+	public ArrayList<Object> syncValue(Object array) {
+		//System.out.println("I'm executed");
+		//System.out.println(array);
+		
+		return (ArrayList)array;
+	}
 }

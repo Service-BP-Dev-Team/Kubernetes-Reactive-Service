@@ -4,6 +4,8 @@ import time
 from changeenv import buildEnvironment
 
 rootPathIn ="/vagrant/Application/Tests/TestRunIn"
+rootPathSpecGAGIncremental="/vagrant/Application/Tests/TestRunIn/incremental"
+rootPathSpecGAGNOIncremental="/vagrant/Application/Tests/TestRunIn/no-incremental"
 rootPathOut ="/vagrant/Application/Tests/TestRunOut"
 deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
@@ -16,7 +18,8 @@ env_variables = {
     'NUMBER_OF_CONTROLLER_PODS': '3',
     'NUMBER_OF_WORKER_PODS': '6',
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': '50000'
+    'MAX_LEN': '50000',
+    'INCREMENTAL_EXECUTION':True
 }
 inputSize=800000
 initSize=300000
@@ -64,7 +67,10 @@ commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
 
 # Run the command that assess the execution time 
 try:
-    output = subprocess.check_output(commantToInit, shell=True, universal_newlines=True)
+    # execute init 4 times
+    for i in range(4):
+        output = subprocess.check_output(commantToInit, shell=True, universal_newlines=True)
+    # the engine is warn : we now execute the desired command
     output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
     # Process the output lines
     #print(output)

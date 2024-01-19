@@ -22,8 +22,9 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
 
             # Replace environment variable placeholders with their corresponding values
             for key, value in env_variables.items():
-                placeholder = f'${{{key}}}'
-                file_contents = file_contents.replace(placeholder, value)
+                if not type(value)==bool :
+                    placeholder = f'${{{key}}}'
+                    file_contents = file_contents.replace(placeholder, value)
 
             # Write the modified contents to the destination file
             with open(destination_path, 'w') as file:
@@ -44,5 +45,17 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
         source_path = os.path.join(source_directory, filename)
         destination_path = os.path.join(destination_directory, filename)
 
-        if not filename.endswith('.yml') or filename.endswith("services.yml") or filename.endswith("rules.yml"):
+        if not (os.path.isdir(source_path) or filename.endswith('.yml') ):
             shutil.copy2(source_path, destination_path)
+
+    # Copy services and rules files in the destination directory
+    specdir_name = "incremental" if (env_variables.get("INCREMENTAL_EXECUTION",False)) else "no-incremental"
+    specdir=os.path.join(source_directory,specdir_name)
+    for filename in os.listdir(specdir):
+        source_path = os.path.join(specdir, filename)
+        destination_path = os.path.join(destination_directory, filename)
+
+        if filename.endswith('.yml'):
+            shutil.copy2(source_path, destination_path)
+    
+    
