@@ -11,17 +11,18 @@ deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
 # List of environment variables and their corresponding values
 env_variables = {
-    'NUMBER_OF_BLOCKS': '8',
+    'NUMBER_OF_BLOCKS': '64',
+#    'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
     'NUMBER_OF_CONTROLLER_PODS': '3',
     'NUMBER_OF_WORKER_PODS': '6',
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': '50000',
-    'INCREMENTAL_EXECUTION':True
+    'MAX_LEN': '20000',
+    'INCREMENTAL_EXECUTION':False
 }
-inputSize=800000
+inputSize=3000000
 initSize=300000
 # Directory containing the text files to modify
 source_directory = rootPathIn

@@ -201,4 +201,70 @@ public class SortFunc {
 		
 		return (ArrayList)array;
 	}
+	
+	// has new elements with sync 
+	public ArrayList has_new_elements_sync(Object indices,Object input1,Object input2) {
+		 ArrayList left = (ArrayList)input1;
+		 ArrayList right = (ArrayList)input2;
+		 ArrayList listToMerge = new ArrayList<>(); 
+		 ArrayList indicesToRemove = new ArrayList();
+		 ArrayList result = new ArrayList<>();
+		 result.add(false);//by default we return false
+		 if(indices==null) {
+			 // the indices to consider are required to detect
+			 // new elements
+			 return result;
+		 }
+		 
+		 HashSet<Integer> pending=(HashSet<Integer>)indices;
+		//when we are at the first iteration we verify that all values have been received
+		 if(pending.size()==left.size()) {
+			 for(Object el :left) {
+				 if (el==null ) {
+					 return result;
+				 }					 
+			 }
+			 for(Object el :right) {
+				 if (el==null ) {
+					 return result;
+				 }					 
+			 }
+			 // we return false in each cases above since we don't want the service to be incremental
+			 
+		 }
+		  int count = 0;
+	      for (int i: pending) {
+	         if (i < getNUMBER_OF_BLOCKS()) {
+	      	    if (left.get(i)!=null) {
+	      	       count++;
+	      	       listToMerge.add(left.get(i));
+	      	       indicesToRemove.add(i);
+	      	       if (count>1) {
+	      	          break;
+	      	       }
+	      	    }
+	      	 }
+	      	 else {
+	      	    if (right.get(i-getNUMBER_OF_BLOCKS())!=null){
+	      	       count++;
+	      	       listToMerge.add(right.get(i-getNUMBER_OF_BLOCKS()));
+	      	       indicesToRemove.add(i);
+	      	       if (count>1) {
+	      	          break;
+	      	       }
+	      	    }
+	         }
+	      }
+	      if(count>1) {
+	    	  result.set(0,true);
+	    	  result.addAll(listToMerge);
+	    	  pending.removeAll(indicesToRemove);
+	    	  result.add(pending);
+	    	  
+	      }
+	      
+	      return result;
+
+	}
+
 }
