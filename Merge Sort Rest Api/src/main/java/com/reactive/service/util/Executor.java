@@ -32,6 +32,7 @@ public class Executor {
 	private GAG gag;
 	private Context context;
 	private Configuration configuration;
+	private String serviceCallId="";
 
 	public Executor() {
 
@@ -50,6 +51,14 @@ public class Executor {
 	public void setGag(GAG gag) {
 		this.gag = gag;
 	}
+    
+	public String getServiceCallId() {
+		return serviceCallId;
+	}
+
+	public void setServiceCallId(String serviceCallId) {
+		this.serviceCallId = serviceCallId;
+	}
 
 	public void execute() {
 		if (configuration == null) {
@@ -61,7 +70,7 @@ public class Executor {
 			while (continuous()) {
 				// System.out.println("continous is true");
 				Hashtable<Task, List<Pair<DecompositionRule, ArrayList>>> readyTasks = context.getReadyTasks();
-				//System.out.println("" + readyTasks);
+				// System.out.println("" + readyTasks);
 				computePendingLocalComputations();
 
 				while (readyTasks.size() != 0) {
@@ -72,14 +81,19 @@ public class Executor {
 					}
 					readyTasks = context.getReadyTasks();
 				}
+				// we do not sleep anymore, we terminate tasks can be terminated instead
+				/*
 				try {
 					Thread.sleep(InMemoryWorkspace.getReadyTaskWaitTime());
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+				}*/
+				terminateTasks();
 
 			}
+			// we clear all data
+			clearAllData();
 		});
 		thread.start();
 
@@ -88,7 +102,7 @@ public class Executor {
 	public boolean continuous() {
 		Boolean result = false;
 		for (Data output : configuration.getRoot().getOutputs()) {
-			if (!output.isDefined() || InMemoryWorkspace.outSubscriptions.get(output.getId())!=null) {
+			if (!output.isDefined() || InMemoryWorkspace.outSubscriptions.get(output.getId()) != null) {
 				// when a data is not defined or
 				// has been defined but not yet notified to subscribers
 				result = true;
@@ -172,7 +186,7 @@ public class Executor {
 				List<Data> listLeft;
 				Task taskRight = servicetask.get(right.getServiceInstance());
 				List<Data> listRight = findDataByParameterNameInTask(taskRight, right.getParameterName(), right);
-				//System.out.println(id.asString()+"="+right.asString());
+				// System.out.println(id.asString()+"="+right.asString());
 				if (right.isArray()) {
 					id.setArray(true);
 					id.setSize(listRight.size());
@@ -229,8 +243,8 @@ public class Executor {
 				task.getLocalGroups().add(dg);
 				task.getLocals().addAll(dg.getCollection());
 			}
-			//System.out.println("array found " + parameterName);
-			//System.out.println(idex.getServiceInstance().getService().getName());
+			// System.out.println("array found " + parameterName);
+			// System.out.println(idex.getServiceInstance().getService().getName());
 			return dg.getCollection();
 		}
 		if (!(idex instanceof ArrayExpression)) {
@@ -298,11 +312,11 @@ public class Executor {
 	public void computePendingLocalComputations() {
 
 		List<PendingLocalFunctionComputation> readyFunctions = getReadyLocalComputations();
-		
+
 		while (readyFunctions.size() != 0) {
 			// execute the functions
 			for (PendingLocalFunctionComputation func : readyFunctions) {
-				
+
 				func.execute();
 				configuration.getPendingLocalComputations().remove(func);// we remove after execution
 			}
@@ -310,24 +324,14 @@ public class Executor {
 		}
 
 		// notify the subscriber that some data has been produced
-		
-		//wait for all local function to end first
-		/*boolean canNotify = false;
-		while (!canNotify) {
-			canNotify=true;
-			for(OutputWatcher wt:watchers) {
-				if(!wt.isEnded()) {
-					canNotify=false;
-					break;
-				}
-			}
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}*/
+
+		// wait for all local function to end first
+		/*
+		 * boolean canNotify = false; while (!canNotify) { canNotify=true;
+		 * for(OutputWatcher wt:watchers) { if(!wt.isEnded()) { canNotify=false; break;
+		 * } } try { Thread.sleep(5); } catch (InterruptedException e) { // TODO
+		 * Auto-generated catch block e.printStackTrace(); } }
+		 */
 		notifySubscribers();
 
 	}
@@ -360,20 +364,51 @@ public class Executor {
 
 	public void invokeRemote(List<Task> tasks) {
 		for (Task t : tasks) {
-			if (t.isRemote()) {
-				ServiceCall sc = new ServiceCall();
-				sc.setTask(t);
-				Service emptyService = new Service();
-				emptyService.setName(t.getService().getName());
-				emptyService.setKubename(t.getService().getKubename());
-				t.setService(emptyService);
-				/*
-				 * try { System.out.println(getObjectMapper().writeValueAsString(t)); } catch
-				 * (JsonProcessingException e) { // TODO Auto-generated catch block
-				 * e.printStackTrace(); }
-				 */
-				InMemoryWorkspace.processOutServiceCall(sc, this);
-			}
+			// invoke now remote service in separate threads
+			Thread thread = new Thread(() -> {
+				if (t.isRemote()) {
+					String receiver = InMemoryWorkspace.bind(t.getService().getKubename());
+					if (receiver.equals(InMemoryWorkspace.getLocalHostIp())
+							&& !InMemoryWorkspace.isForcedTCPOnLocalhost()) {
+
+						// we do not use tcp when the call is local
+
+						Task newTask = new Task();
+						newTask.setDataGroups(t.getDataGroups());
+						newTask.setInputs(t.getInputs());
+						newTask.setLocals(t.getLocals());
+						newTask.setOutputs(t.getOutputs());
+						newTask.setService(t.getService());
+						ServiceCall sc = new ServiceCall();
+						sc.setTask(newTask);
+						Configuration conf = new Configuration();
+						conf.setRoot(sc.getTask());
+						conf.getRoot().setRemote(false);// transform the task to a local one
+						conf.setId(sc.getId());
+						// add the configuration
+						Executor exec = new Executor();
+						Context ctx = new Context();
+						ctx.setExecutor(exec);
+						exec.setConfiguration(conf);
+						exec.setGag(gag);
+						exec.setContext(ctx);
+						exec.setServiceCallId(sc.getId());
+						InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
+						// execute the task
+						exec.execute();
+					} else {
+						ServiceCall sc = new ServiceCall();
+						sc.setTask(t);
+						Service emptyService = new Service();
+						emptyService.setName(t.getService().getName());
+						emptyService.setKubename(t.getService().getKubename());
+						t.setService(emptyService);
+
+						InMemoryWorkspace.processOutServiceCall(sc, receiver, this);
+					}
+				}
+			});
+			thread.start();
 		}
 	}
 
@@ -391,13 +426,80 @@ public class Executor {
 				if (d.isDefined()) {
 					Notification nf = new Notification();
 					nf.setData(d);
+					// now notify in separate thread
+					Thread thread = new Thread(()->{
 					InMemoryWorkspace.processOutNotification(nf, p.getKey());
-
+					});
+					thread.start();
 				}
 			}
 
 		}
 
+	}
+	
+	private void terminateTasks() {
+		Task t= configuration.getRoot();
+		terminateIfPossible(t);
+	}
+	private void clearAllData() {
+		terminateTasks();
+		// clear all data recursively
+		clearTaskData(configuration.getRoot());
+		// remove the service call in the memory
+		InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
+		System.out.println("the memory call size is : "+ InMemoryWorkspace.inMemoryCalls.size());
+		System.out.println("the memory in subscription size is : "+ InMemoryWorkspace.inSubscriptions.size());
+		System.out.println("the memory out subscription size is : "+ InMemoryWorkspace.outSubscriptions.size());
+		System.out.println("the memory discard already subscription size is  : "+ InMemoryWorkspace.discardNotificationsAlreadyDone.size());
+		
+	}
+	
+	private void clearTaskData(Task t) {
+		for (Data ind : t.getInputs()) {
+			InMemoryWorkspace.discardNotificationsAlreadyDone.remove(ind.getId());
+		}
+		for (Task st : t.getSubTasks()) {
+			clearTaskData(st);
+		}
+		
+	}
+	
+	private void checkTerminated(Task t) {
+		for (Task st: t.getSubTasks()) {
+			if (!st.isTerminated()) {
+				return ;
+			}
+		}
+		// here we see that all the substask are terminated
+		// now we check if all the data are terminated
+		for (Data d : t.getAllWithoutLocalData()) {
+			//check if the data is terminated
+			if(!d.isTerminated()) {
+				// try to terminate the data
+				if (InMemoryWorkspace.inSubscriptions.get(d.getId())!=null ||
+						InMemoryWorkspace.outSubscriptions.get(d.getId())!=null) {
+					return ;
+				}
+				d.setTerminated(true);
+			}
+			
+		}
+		// here it means that all the data has been terminated
+		// we terminate the task
+		t.setTerminated(true);
+		
+	}
+	private void terminateIfPossible(Task t) {
+		if(!t.isTerminated()) {
+			for(Task st: t.getSubTasks()) {
+				terminateIfPossible(st);
+			}
+			checkTerminated(t);
+		}else {
+			// we do nothing
+		}
+		
 	}
 
 }

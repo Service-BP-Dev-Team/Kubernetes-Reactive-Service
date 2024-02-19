@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.local.SortFunc;
 import com.reactive.service.app.api.InMemoryWorkspace;
 import com.reactive.service.app.api.Pair;
+import com.reactive.service.app.api.ServiceCall;
 import com.reactive.service.assesment.ToolKit;
 import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.OutputWatcher;
@@ -101,6 +102,10 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		Task root = Operation.createTask(g.getServices().get(0), inputs);
 		conf.setRoot(root);
 		exec.setConfiguration(conf);
+		ServiceCall sc = new ServiceCall();
+		sc.setTask(root);
+		exec.setServiceCallId(sc.getId());
+		InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
 		OutputWatcher watcher = new OutputWatcher();
 		root.getOutputs().get(0).setWatcher(watcher);
 		exec.execute();

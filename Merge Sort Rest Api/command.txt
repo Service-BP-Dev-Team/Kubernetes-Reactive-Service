@@ -7,7 +7,7 @@ kubectl get pods
 kubectl describe pod java-rest-77c8dfdfc-5qvhn
 
 
-kubectl exec --stdin --tty java-rest-565877864c-cpskd -- /bin/bash
+kubectl exec --stdin --tty java-rest-565877864c-24rf9 -- /bin/bash
 kubectl exec --stdin --tty java-rest-bb8c5f8bd-kgtfx -- /bin/bash
 kubectl exec --stdin --tty java-rest-bb8c5f8bd-z8hvm -- /bin/bash
 kubectl exec --stdin --tty java-rest-bb8c5f8bd-xzkzd -- /bin/bash

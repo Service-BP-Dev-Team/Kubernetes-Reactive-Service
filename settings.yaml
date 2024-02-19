@@ -17,7 +17,7 @@ nodes:
       - cpu: 2
         memory: 4096
         number: 1
-      - cpu: 2
+      - cpu: 1
         memory: 4096
         number: 2
 software:

@@ -76,7 +76,16 @@ public class InMemoryWorkspace {
 	// this time can be modified by the .env file of the yaml spec.
 	public static final int VALUE_IN_NOTIFICATION_TIME = 3;
 	// this represent the default value of the precedent key;
+	
+	public  static final String KEY_TCP_ON_LOCALHOST="DO_TCP_FOR_CALL_TO_LOCALHOST";
+	//the above key is used to check if we have use tcp on the localhost when calling
+	// a remote service, if set to false the execution is enhanced
+	// since tcp communication are avoided when a component sen a message to itself
+	public static final int VALUE_TCP_ON_LOCALHOST=0;
+	// by default we force to have tcp on localhost
 	private static GAG gag;
+	
+	private static String localHostIP;
 
 	public static void addCall(ServiceCall sc) {
 		ServiceCall local = new ServiceCall();
@@ -117,7 +126,8 @@ public class InMemoryWorkspace {
 		exec.setGag(gag);
 		exec.setContext(ctx);
 		inMemoryCalls.put(local.getId(), exec);
-
+		exec.setServiceCallId(local.getId());// we register the service call id
+		// so that we can cleared them later
 		// Logger.log(sc); we unlog
 		// execute the GAG
 		exec.execute();
@@ -132,7 +142,7 @@ public class InMemoryWorkspace {
 				p = inSubscriptions.get(nf.getData().getId());
 				alreadyNotified = discardNotificationsAlreadyDone.get(nf.getData().getId());
 				if (alreadyNotified != null && alreadyNotified) {
-					System.out.println("already notified");
+					//System.out.println("already notified");
 					break;
 				}else {
 					alreadyNotified=false;
@@ -154,6 +164,7 @@ public class InMemoryWorkspace {
 				if (d != null) {
 					d.setValue(nf.getData().getValue());
 					inSubscriptions.remove(nf.getData().getId());
+					
 					discardNotificationsAlreadyDone.put(nf.getData().getId(), true);
 
 					Executor executor = inMemoryCalls.get(d.getServiceCallId());
@@ -181,17 +192,30 @@ public class InMemoryWorkspace {
 		//synchronized (outSubscriptions) {
 			outSubscriptions.remove(nf.getData().getId());
 		//}
-		Message.sendMessage(m);
+		if (host.equals(getLocalHostIp()) && !isForcedTCPOnLocalhost()) {
+			// we do not perform the call through tcp when it is localhost
+			// we clone the notification
+			String nfText;
+			try {
+				nfText = getObjectMapper().writeValueAsString(nf);
+				Notification nfCopy = getObjectMapper().readValue(nfText,Notification.class); 
+				processInNotification(nfCopy);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};
+		}
+		else { Message.sendMessage(m);}
 	}
 
-	public static void processOutServiceCall(ServiceCall sc, Executor exec) {
+	public static void processOutServiceCall(ServiceCall sc,String receiver, Executor exec) {
 		// configure the task of add service call
 		inMemoryCalls.put(sc.getId(), exec);
 		// set the task to remote
 		sc.getTask().setRemote(true);
 		// set the service call id on data
 		// and the host to send the data
-		String receiver = bind(sc.getTask().getService().getKubename());
+		//String receiver = bind(sc.getTask().getService().getKubename());
 		// Logger.log(receiver);
 		//synchronized (outSubscriptions) {
 			for (Data d : sc.getTask().getInputs()) {
@@ -217,7 +241,27 @@ public class InMemoryWorkspace {
 		m.setServiceCall(sc);
 		sc.setSender(getLocalHostIp()); // very important to get the ip local
 		sc.setReceiver(receiver);
-		Message.sendMessage(m);
+		/*
+		if (receiver.equals(getLocalHostIp()) && !isForcedTCPOnLocalhost()) {
+			// we do not perform the call through tcp when it is localhost
+			// clone the service call through serialization
+			try {
+				String scValueString = getObjectMapper().writeValueAsString(sc);
+				ServiceCall scCopy = getObjectMapper().readValue(scValueString, ServiceCall.class);
+				// unclone the service call
+				System.out.println("local call");
+				addCall(scCopy);
+			
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		*/
+		
+		//else { 
+			Message.sendMessage(m);
+		//	}
 
 	}
 
@@ -255,6 +299,7 @@ public class InMemoryWorkspace {
 	}
 
 	public static String getHostIp() {
+		
 		String result = "";
 		try {
 			InetAddress ipAddr = InetAddress.getLocalHost();
@@ -264,6 +309,7 @@ public class InMemoryWorkspace {
 		}
 		return result + ":8000";
 	}
+	
 
 	public static GAG getGag() {
 		if (gag == null) {
@@ -405,7 +451,11 @@ public class InMemoryWorkspace {
 	}
 
 	public static String getLocalHostIp() {
+		if (localHostIP !=null) {
+			return localHostIP;
+		}
 		String result = bind("localhost:8000");
+		localHostIP = result;
 		// Logger.log(result);
 		return result;
 	}
@@ -424,6 +474,15 @@ public class InMemoryWorkspace {
 			return Integer.parseInt(val);
 		} else {
 			return VALUE_IN_NOTIFICATION_TIME;
+		}
+	}
+	
+	public static Boolean isForcedTCPOnLocalhost() {
+		String val = environmentVariables.get(KEY_TCP_ON_LOCALHOST);
+		if (val != null) {
+			return val.equals("True");
+		} else {
+			return VALUE_TCP_ON_LOCALHOST==1;
 		}
 	}
 

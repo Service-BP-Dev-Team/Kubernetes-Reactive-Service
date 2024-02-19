@@ -28,6 +28,7 @@ public class Task implements Serializable{
 											  // not corresponding to an input
 											  // or an output array
 	private boolean remote = false;
+	private boolean terminated = false; //when the task has been exploited and destroyed
 	
 	public Task() {
 		inputs = new ArrayList<Data>();
@@ -223,6 +224,14 @@ public class Task implements Serializable{
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	@JsonIgnore
+	public boolean isTerminated() {
+		return terminated;
+	}
+	public void setTerminated(boolean terminated) {
+		this.terminated = terminated;
 	}
 	
 	

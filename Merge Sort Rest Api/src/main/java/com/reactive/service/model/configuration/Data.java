@@ -27,6 +27,7 @@ public class Data implements Serializable{
 	private DataGroup group; 
 	private Data index;
 	private OutputWatcher watcher;
+	private boolean terminated; //when the data has been exploited and destroyed
 	public Data() {
 		idCounter++;
 	    id = UUID.randomUUID().toString();
@@ -210,6 +211,22 @@ public class Data implements Serializable{
 	public void setIndex(Data index) {
 		this.index = index;
 	}
+
+
+
+	@JsonIgnore
+	public boolean isTerminated() {
+		return terminated;
+	}
+
+
+
+
+	public void setTerminated(boolean terminated) {
+		this.terminated = terminated;
+	}
+	
+	
 	
 	
 	

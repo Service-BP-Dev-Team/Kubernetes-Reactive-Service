@@ -24,7 +24,7 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
             for key, value in env_variables.items():
                 if not type(value)==bool :
                     placeholder = f'${{{key}}}'
-                    file_contents = file_contents.replace(placeholder, value)
+                    file_contents = file_contents.replace(placeholder, str(value))
 
             # Write the modified contents to the destination file
             with open(destination_path, 'w') as file:

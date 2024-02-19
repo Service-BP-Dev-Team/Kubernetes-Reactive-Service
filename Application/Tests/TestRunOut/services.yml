@@ -72,14 +72,3 @@ inputs :
  - { name : in }
 outputs :
  - { name : out}
-
-
-#service for synchronous wait
----
-kind : service
-name : SyncValue
-kubename : ${KUBE_CONTROLLER_NAME}
-inputs : 
- - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
-outputs :
- - { name : out_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
