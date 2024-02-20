@@ -1,6 +1,7 @@
 package com.reactive.service.model.configuration;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -226,7 +227,19 @@ public class Data implements Serializable{
 		this.terminated = terminated;
 	}
 	
-	
+	public void clear() {
+		this.defined=false;
+		this.parameter=null;
+		this.group=null;
+		this.id=null;
+		this.index=null;
+		if(this.value instanceof ArrayList) {
+			ArrayList array = (ArrayList)this.value;
+			array.clear();
+		}
+		this.value=null;
+				
+	}
 	
 	
 	

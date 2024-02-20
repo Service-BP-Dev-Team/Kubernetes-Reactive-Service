@@ -11,16 +11,16 @@ deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
 # List of environment variables and their corresponding values
 env_variables = {
-    'NUMBER_OF_BLOCKS': 8,
+    'NUMBER_OF_BLOCKS': 1,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
     'NUMBER_OF_CONTROLLER_PODS': 1,
-    'NUMBER_OF_WORKER_PODS': 8,
-    'WORKER_POD_CAPACITY':100,
+    'NUMBER_OF_WORKER_PODS': 64,
+    'WORKER_POD_CAPACITY':500,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 100000,
+    'MAX_LEN': 20000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'INCREMENTAL_EXECUTION':True,
@@ -29,10 +29,13 @@ env_variables = {
 
 }
 inputSize=1000000
-initSize=200000
+#inputSize=5001
+initSize=min(500000,env_variables.get("MAX_LEN")*env_variables.get("NUMBER_OF_WORKER_PODS"))
 def runtest(input,init,env):
 
-    number_of_iteration = 10
+    number_of_iteration = 50
+
+    number_of_warming = 10
     # Directory containing the text files to modify
     source_directory = rootPathIn
 
@@ -78,8 +81,9 @@ def runtest(input,init,env):
     # Run the command that assess the execution time 
     try:
         # execute init 4 times
-        for i in range(2):
+        for i in range(number_of_warming):
             output = subprocess.check_output(commantToInit, shell=True, universal_newlines=True)
+            print(f"warming {(i+1)}/{number_of_warming}")
         # the engine is warn : we now execute the desired command
         sumResult=0
         for i in range(number_of_iteration):
@@ -88,7 +92,10 @@ def runtest(input,init,env):
             #print(output)
             output_dict = json.loads(output)
             # Access and manipulate the dictionary as needed
-            sumResult+=output_dict["duration"]
+            duration = output_dict["duration"]
+            #time.sleep(10)
+            print(f"{(i+1)} / {number_of_iteration} -> {duration}")
+            sumResult+=duration
         return sumResult/number_of_iteration
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")

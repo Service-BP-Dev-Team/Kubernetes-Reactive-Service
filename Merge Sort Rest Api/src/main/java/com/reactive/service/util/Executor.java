@@ -33,6 +33,7 @@ public class Executor {
 	private Context context;
 	private Configuration configuration;
 	private String serviceCallId="";
+	private boolean subExecutor=false;
 
 	public Executor() {
 
@@ -59,6 +60,15 @@ public class Executor {
 	public void setServiceCallId(String serviceCallId) {
 		this.serviceCallId = serviceCallId;
 	}
+	
+
+	public boolean isSubExecutor() {
+		return subExecutor;
+	}
+
+	public void setSubExecutor(boolean subExecutor) {
+		this.subExecutor = subExecutor;
+	}
 
 	public void execute() {
 		if (configuration == null) {
@@ -81,15 +91,15 @@ public class Executor {
 					}
 					readyTasks = context.getReadyTasks();
 				}
-				// we do not sleep anymore, we terminate tasks can be terminated instead
-				/*
+				//terminateTasks();
+				// we sleeping after freeing some memory with terminateTasks()
 				try {
 					Thread.sleep(InMemoryWorkspace.getReadyTaskWaitTime());
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}*/
-				terminateTasks();
+				}
+				
 
 			}
 			// we clear all data
@@ -393,6 +403,7 @@ public class Executor {
 						exec.setGag(gag);
 						exec.setContext(ctx);
 						exec.setServiceCallId(sc.getId());
+						exec.setSubExecutor(true);
 						InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
 						// execute the task
 						exec.execute();
@@ -438,16 +449,46 @@ public class Executor {
 
 	}
 	
-	private void terminateTasks() {
-		Task t= configuration.getRoot();
+	private void terminateTasks(Task t) {
+		
 		terminateIfPossible(t);
 	}
 	private void clearAllData() {
-		terminateTasks();
-		// clear all data recursively
-		clearTaskData(configuration.getRoot());
+		
+		if(!isSubExecutor()) {
+		//when it is a subs executor the task to terminate tasks 
+		// and data is left to the parent executor
+		// wit some time for the notification to be performed before clearing
+		// everything
+		final Task root=configuration.getRoot();
+		Thread clear = new Thread(()->{
+			
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			terminateTasks(root);
+			// clear all data recursively
+			clearTaskData(root);
+		});	
+		clear.start();
+		}
 		// remove the service call in the memory
 		InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
+		// we suggest the garbage collector to pass
+		// Suggest garbage collection
+        //System.gc();
+		
+		//clear configuration
+		configuration.clearData();
+		configuration=null;
+		this.gag=null;
+		this.context=null;
+		this.serviceCallId=null;
+
+		
 		System.out.println("the memory call size is : "+ InMemoryWorkspace.inMemoryCalls.size());
 		System.out.println("the memory in subscription size is : "+ InMemoryWorkspace.inSubscriptions.size());
 		System.out.println("the memory out subscription size is : "+ InMemoryWorkspace.outSubscriptions.size());
@@ -462,6 +503,7 @@ public class Executor {
 		for (Task st : t.getSubTasks()) {
 			clearTaskData(st);
 		}
+		t.clearData();
 		
 	}
 	
@@ -488,6 +530,7 @@ public class Executor {
 		// here it means that all the data has been terminated
 		// we terminate the task
 		t.setTerminated(true);
+		
 		
 	}
 	private void terminateIfPossible(Task t) {

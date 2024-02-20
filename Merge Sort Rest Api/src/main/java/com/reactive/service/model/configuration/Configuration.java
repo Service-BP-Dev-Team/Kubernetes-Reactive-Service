@@ -33,6 +33,13 @@ public class Configuration extends RuntimeData{
 		this.id = id;
 	}
 	
+	public void clearData() {
+		this.root=null;
+		this.pendingLocalComputations.clear();
+		this.pendingLocalComputations=null;
+		this.id=null;
+	}
+	
     
     
 }

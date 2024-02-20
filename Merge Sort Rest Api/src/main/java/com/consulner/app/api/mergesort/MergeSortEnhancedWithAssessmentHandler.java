@@ -22,6 +22,7 @@ import com.reactive.service.model.configuration.Configuration;
 import com.reactive.service.model.configuration.OutputWatcher;
 import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.GAG;
+import com.reactive.service.util.Console;
 import com.reactive.service.util.Context;
 import com.reactive.service.util.Executor;
 import com.reactive.service.util.FileWriting;
@@ -81,6 +82,8 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		}
         
         System.out.println("finished to create data");
+        System.gc();
+        //Console.printMemory();
         return new ResponseEntity<>(watcher,
             getHeaders(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON), StatusCode.OK);
 		

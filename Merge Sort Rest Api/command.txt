@@ -39,7 +39,7 @@ it takes 18696 miliseconds for 1m and 40342 for 2m
 9 millions for 12 pods
 
 curl -X POST 127.0.0.1:8000/api/service/assessment -d '{"size": 20 }'
-kubectl exec --stdin --tty java-rest-5dccb9f467-nf4zs -- /bin/bash
+kubectl exec --stdin --tty java-rest-565877864c-kh9f9  -- /bin/bash
 
 curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 10000 }'
 curl -X POST localhost:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 10000 }'

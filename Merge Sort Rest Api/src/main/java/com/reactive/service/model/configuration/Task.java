@@ -234,6 +234,25 @@ public class Task implements Serializable{
 		this.terminated = terminated;
 	}
 	
-	
+	public void clearData() {
+		this.AppliedRule=null;
+		for(Data d:getAllData()) {
+			d.clear();
+		}
+		this.dataGroups.clear();
+		this.dataGroups=null;
+		this.inputs.clear();
+		this.inputs=null;
+		this.locals.clear();
+		this.locals=null;
+		this.localGroups.clear();
+		this.localGroups=null;
+		this.subTasks.clear();
+		this.subTasks=null;
+		this.outputs.clear();
+		this.outputs=null;
+		this.service=null;
+		
+	}
 	
 }

@@ -9,7 +9,7 @@ network:
   service_cidr: 172.17.1.0/18
 nodes:
   control:
-    cpu: 2
+    cpu: 3
     memory: 4096
   workers:
     count: 2
@@ -17,7 +17,7 @@ nodes:
       - cpu: 2
         memory: 4096
         number: 1
-      - cpu: 1
+      - cpu: 2
         memory: 4096
         number: 2
 software:
