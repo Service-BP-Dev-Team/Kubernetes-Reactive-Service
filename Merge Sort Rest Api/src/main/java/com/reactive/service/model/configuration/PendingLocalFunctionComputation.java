@@ -2,6 +2,7 @@ package com.reactive.service.model.configuration;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.reactive.service.app.api.InMemoryWorkspace;
 import com.reactive.service.model.specification.FunctionDeclaration;
@@ -99,17 +100,23 @@ public class PendingLocalFunctionComputation {
 					Thread t = new Thread(() -> {
 						Object output = Operation.executeMethodWithReflexion(functionDeclaration.getLocation(),
 								functionDeclaration.getMethod(), params);
+						
 						if (output instanceof ArrayList && functionDeclaration != null
 								&& functionDeclaration.isMultiOutput()) {
 							ArrayList results = (ArrayList) output;
 							// this is to handle function that returns an array
+							
 							for (int i = 0; i < results.size(); i++) {
-								datasToCompute.get(i).setValue(results.get(i));
-								datasToCompute.get(i).setDefined(true);
+								Data current = datasToCompute.get(i);
+								current.setValue(results.get(i));
+								current.setDefined(true);
+								
 							}
 						} else {
-							datasToCompute.get(0).setValue(output);
-							datasToCompute.get(0).setDefined(true);
+							Data current = datasToCompute.get(0);
+							current.setValue(output);
+							current.setDefined(true);
+							
 						}
 					});
 					t.start();

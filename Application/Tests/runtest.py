@@ -11,16 +11,16 @@ deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
 # List of environment variables and their corresponding values
 env_variables = {
-    'NUMBER_OF_BLOCKS': 1,
+    'NUMBER_OF_BLOCKS': 124,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
     'NUMBER_OF_CONTROLLER_PODS': 1,
-    'NUMBER_OF_WORKER_PODS': 64,
-    'WORKER_POD_CAPACITY':500,
+    'NUMBER_OF_WORKER_PODS': 4,
+    'WORKER_POD_CAPACITY':1000,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 20000,
+    'MAX_LEN': 5000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'INCREMENTAL_EXECUTION':True,
@@ -33,7 +33,7 @@ inputSize=1000000
 initSize=min(500000,env_variables.get("MAX_LEN")*env_variables.get("NUMBER_OF_WORKER_PODS"))
 def runtest(input,init,env):
 
-    number_of_iteration = 50
+    number_of_iteration = 20
 
     number_of_warming = 10
     # Directory containing the text files to modify
@@ -66,14 +66,16 @@ def runtest(input,init,env):
         # Process the output lines
         podId=output.split("\n")[1].split(" ")[0]
         # Access and manipulate the dictionary as needed
-        print(podId)
+        if __name__ == "__main__":
+            print(podId)
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
 
     podCommand="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":";
     podInitCommand=podCommand+f"{initSize}"+"}\'\"";
     podCommand=podCommand+f"{inputSize}"+"}\'\""
-    #print(podCommand)
+    #if __name__ == "__main__":
+        #print(podCommand)
     commantToInit=f"kubectl exec -it {podId} -- /bin/bash -c {podInitCommand}"
     commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
     #print(commantToRun)
@@ -83,7 +85,8 @@ def runtest(input,init,env):
         # execute init 4 times
         for i in range(number_of_warming):
             output = subprocess.check_output(commantToInit, shell=True, universal_newlines=True)
-            print(f"warming {(i+1)}/{number_of_warming}")
+            if __name__ == "__main__":
+                print(f"warming {(i+1)}/{number_of_warming}")
         # the engine is warn : we now execute the desired command
         sumResult=0
         for i in range(number_of_iteration):
@@ -93,8 +96,9 @@ def runtest(input,init,env):
             output_dict = json.loads(output)
             # Access and manipulate the dictionary as needed
             duration = output_dict["duration"]
-            #time.sleep(10)
-            print(f"{(i+1)} / {number_of_iteration} -> {duration}")
+            time.sleep(2)
+            if __name__ == "__main__":
+                print(f"{(i+1)} / {number_of_iteration} -> {duration}")
             sumResult+=duration
         return sumResult/number_of_iteration
     except subprocess.CalledProcessError as e:

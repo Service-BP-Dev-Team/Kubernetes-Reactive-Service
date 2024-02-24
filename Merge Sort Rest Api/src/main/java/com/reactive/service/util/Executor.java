@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reactive.service.app.api.InMemoryWorkspace;
@@ -34,6 +36,7 @@ public class Executor {
 	private Configuration configuration;
 	private String serviceCallId="";
 	private boolean subExecutor=false;
+	private ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
 
 	public Executor() {
 
@@ -69,14 +72,24 @@ public class Executor {
 	public void setSubExecutor(boolean subExecutor) {
 		this.subExecutor = subExecutor;
 	}
+	
+	
+
+	public ConcurrentHashMap<String, Pair<String, Data>> getOutSubscriptions() {
+		return outSubscriptions;
+	}
+
+	public void setOutSubscriptions(ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions) {
+		this.outSubscriptions = outSubscriptions;
+	}
 
 	public void execute() {
 		if (configuration == null) {
 			Task t = context.getStartingTask();
 		}
-		// System.out.println("size of pending local computation :
-		// "+configuration.getPendingLocalComputations().size());
+	
 		Thread thread = new Thread(() -> {
+			// initialization
 			while (continuous()) {
 				// System.out.println("continous is true");
 				Hashtable<Task, List<Pair<DecompositionRule, ArrayList>>> readyTasks = context.getReadyTasks();
@@ -112,7 +125,7 @@ public class Executor {
 	public boolean continuous() {
 		Boolean result = false;
 		for (Data output : configuration.getRoot().getOutputs()) {
-			if (!output.isDefined() || InMemoryWorkspace.outSubscriptions.get(output.getId()) != null) {
+			if (!output.isDefined() || outSubscriptions.get(output.getId()) != null) {
 				// when a data is not defined or
 				// has been defined but not yet notified to subscribers
 				result = true;
@@ -424,20 +437,23 @@ public class Executor {
 	}
 
 	public void notifySubscribers() {
-		Set<String> keys = InMemoryWorkspace.outSubscriptions.keySet();
+		
+		Set<String> keys = outSubscriptions.keySet();
 		// transfom to static array to handle concurency
 		ArrayList<String> keyArray = new ArrayList<String>();
 		for (String id : keys) {
 			keyArray.add(id);
 		}
 		for (String id : keyArray) {
-			Pair<String, Data> p = InMemoryWorkspace.outSubscriptions.get(id);
+			Pair<String, Data> p = outSubscriptions.get(id);
 			if (p != null) {
 				Data d = p.getValue();
 				if (d.isDefined()) {
 					Notification nf = new Notification();
 					nf.setData(d);
 					// now notify in separate thread
+
+					outSubscriptions.remove(nf.getData().getId());
 					Thread thread = new Thread(()->{
 					InMemoryWorkspace.processOutNotification(nf, p.getKey());
 					});
@@ -483,17 +499,19 @@ public class Executor {
 		
 		//clear configuration
 		configuration.clearData();
+		//outSubscriptions.clear();
+		//outSubscriptions=null;
 		configuration=null;
 		this.gag=null;
 		this.context=null;
 		this.serviceCallId=null;
 
-		
+		/*
 		System.out.println("the memory call size is : "+ InMemoryWorkspace.inMemoryCalls.size());
 		System.out.println("the memory in subscription size is : "+ InMemoryWorkspace.inSubscriptions.size());
-		System.out.println("the memory out subscription size is : "+ InMemoryWorkspace.outSubscriptions.size());
+		System.out.println("the memory out subscription size is : "+ outSubscriptions.size());
 		System.out.println("the memory discard already subscription size is  : "+ InMemoryWorkspace.discardNotificationsAlreadyDone.size());
-		
+		*/
 	}
 	
 	private void clearTaskData(Task t) {
@@ -520,7 +538,7 @@ public class Executor {
 			if(!d.isTerminated()) {
 				// try to terminate the data
 				if (InMemoryWorkspace.inSubscriptions.get(d.getId())!=null ||
-						InMemoryWorkspace.outSubscriptions.get(d.getId())!=null) {
+						outSubscriptions.get(d.getId())!=null) {
 					return ;
 				}
 				d.setTerminated(true);

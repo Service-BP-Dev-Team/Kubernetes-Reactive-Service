@@ -102,6 +102,7 @@ public class Data implements Serializable{
 	}
 	@JsonIgnore
 	public Data getMacthedDataDefined() {
+		if (index==null) return null;
 		if(index.isDefined()) {
 			Object idx = index.getValue();
 			Integer valIdx=0;

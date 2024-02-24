@@ -30,7 +30,7 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
             with open(destination_path, 'w') as file:
                 file.write(file_contents)
 
-            print(f"Modified file: {destination_path}")
+            #print(f"Modified file: {destination_path}")
 
     #store the env used in an environment file
     with open(os.path.join(destination_directory,".env"), 'w') as fenv:

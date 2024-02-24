@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: java-worker
-  replicas: 64 
+  replicas: 4 
   template:
     metadata:
       labels:
@@ -22,7 +22,7 @@ spec:
         - containerPort: 8000
         resources:
           limits:
-            cpu: "500m"  # 500 milliCPU (0.5 CPU)
+            cpu: "1000m"  # 500 milliCPU (0.5 CPU)
         volumeMounts:
         - name: hostpath-volume
           mountPath: /app/target/spec-merge-sort-enhanced

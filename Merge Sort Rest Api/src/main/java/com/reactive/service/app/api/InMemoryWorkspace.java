@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 
 import org.yaml.snakeyaml.Yaml;
@@ -47,7 +48,9 @@ public class InMemoryWorkspace {
 
 	public static final ConcurrentHashMap<String, Executor> inMemoryCalls = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, Pair<String, Data>> inSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
-	public static final ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
+	//public static final ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
+	//map service call to defined data
+	
 	public static final ConcurrentHashMap<Long, Object> threadFunctionProcess = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, Boolean> discardNotificationsAlreadyDone = new ConcurrentHashMap<>();
 	public static final String defaultGAGFolder = "spec-merge-sort-enhanced";
@@ -107,19 +110,17 @@ public class InMemoryWorkspace {
 					inSubscriptions.put(din.getId(), new Pair<>(sc.getSender(), din));
 				}
 			}
-		//}
-		//synchronized (outSubscriptions) {
-			// create and add subscriptions to all output
+
+			Executor exec = new Executor();
 			for (Data dout : sc.getTask().getOutputs()) {
 
-				outSubscriptions.put(dout.getId(), new Pair<>(sc.getSender(), dout));
+				exec.getOutSubscriptions().put(dout.getId(), new Pair<>(sc.getSender(), dout));
 				dout.setServiceCallId(sc.getId());
 			}
 
 		//}
 
 		// add the configuration
-		Executor exec = new Executor();
 		Context ctx = new Context();
 		ctx.setExecutor(exec);
 		exec.setConfiguration(conf);
@@ -142,7 +143,7 @@ public class InMemoryWorkspace {
 				p = inSubscriptions.get(nf.getData().getId());
 				alreadyNotified = discardNotificationsAlreadyDone.get(nf.getData().getId());
 				if (alreadyNotified != null && alreadyNotified) {
-					//System.out.println("already notified");
+					System.out.println("already notified");
 					break;
 				}else {
 					alreadyNotified=false;
@@ -190,7 +191,7 @@ public class InMemoryWorkspace {
 		nf.setReceiver(host);
 		nf.setSender(getHostIp());
 		//synchronized (outSubscriptions) {
-			outSubscriptions.remove(nf.getData().getId());
+		//	outSubscriptions.remove(nf.getData().getId());
 		//}
 		if (host.equals(getLocalHostIp()) && !isForcedTCPOnLocalhost()) {
 			// we do not perform the call through tcp when it is localhost
@@ -223,7 +224,7 @@ public class InMemoryWorkspace {
 				d.setHost(receiver);
 				// create subscriptions for undefined data
 				if (!d.isDefined()) {
-					outSubscriptions.put(d.getId(), new Pair<String, Data>(d.getHost(), d));
+					exec.getOutSubscriptions().put(d.getId(), new Pair<String, Data>(d.getHost(), d));
 				}
 			}
 		//}
