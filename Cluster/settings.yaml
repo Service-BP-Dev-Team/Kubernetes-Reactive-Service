@@ -1,0 +1,33 @@
+---
+cluster_name: Kubernetes Cluster
+network:
+  control_ip: 10.0.0.10
+  dns_servers:
+    - 8.8.8.8
+    - 1.1.1.1
+  pod_cidr: 172.16.1.0/16
+  service_cidr: 172.17.1.0/18
+nodes:
+  control:
+    cpu: 3
+    memory: 4096
+  workers:
+    count: 2
+    list:
+      - cpu: 2
+        memory: 4096
+        number: 1
+      - cpu: 2
+        memory: 4096
+        number: 2
+#shared_folders:
+#  - host_path: "../GAG Service Engine/"
+#    vm_path: "/GAG Service Engine/"
+#  - host_path: "../Specification/"
+#    vm_path: "/Specification/"
+
+software:
+  box: bento/ubuntu-22.04
+  calico: 3.25.0
+  kubernetes: 1.26.1-00
+  os: xUbuntu_22.04

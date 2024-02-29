@@ -1,0 +1,11 @@
+INDEX VERSION 1.134+/home/tagueu/Desktop/Coordination/.metadata/.plugins/org.eclipse.jdt.core
+3661306916.index
+770363940.index
+156722954.index
+900586112.index
+3941443106.index
+2989389383.index
+377844251.index
+4095645263.index
+1865797976.index
+943598736.index

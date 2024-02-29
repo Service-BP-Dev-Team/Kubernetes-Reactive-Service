@@ -1,0 +1,85 @@
+---
+kind: service
+name: MainSort
+# Sort list service
+kubename: ${KUBE_CONTROLLER_NAME}
+inputs: 
+ - { name: inp_list}
+outputs:
+ - { name : out_list}
+ 
+---
+kind : service
+name : RecSort
+ # Recusive Sort: a quicksort based subservice for MainSort
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : inp_arr}
+outputs :
+ - { name : out_arr,  array: true, size: ${NUMBER_OF_BLOCKS}}
+---
+kind : service
+name : Merge_S
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : indices_in }
+ - { name : res_left, array: true, size: ${NUMBER_OF_BLOCKS} }
+ - { name : res_right, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out}
+ - { name : indices_out}
+ 
+#service used by the main sort to merge incrementally the result
+---
+kind : service
+name : Merge_Main_S
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : in_length }
+ - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out_length}
+ - { name : out_arr, array: true, size: ${NUMBER_OF_BLOCKS}}
+ - { name : merge_res}
+ 
+---
+kind : service
+name : Merge_Main_It
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : indices_in }
+ - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out}
+ - { name : indices_out}
+ 
+---
+kind : service
+name : Sort_Basic_It
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : index_in }
+ - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out}
+ - { name : index_out}
+ 
+---
+kind : service
+name : BasicSort
+kubename : ${KUBE_WORKER_NAME}
+inputs : 
+ - { name : in }
+outputs :
+ - { name : out}
+
+
+#service for synchronous wait
+---
+kind : service
+name : SyncValue
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+outputs :
+ - { name : out_arr, array: true, size: ${NUMBER_OF_BLOCKS} }

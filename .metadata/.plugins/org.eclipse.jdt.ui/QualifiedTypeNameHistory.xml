@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="java.lang.Thread"/>
+    <fullyQualifiedTypeName name="java.lang.Exception"/>
+    <fullyQualifiedTypeName name="java.lang.RuntimeException"/>
+    <fullyQualifiedTypeName name="main.uds.E2"/>
+    <fullyQualifiedTypeName name="main.uds.ClasseX"/>
+    <fullyQualifiedTypeName name="main.uds.ClasseY"/>
+    <fullyQualifiedTypeName name="com.reactive.service.app.api.GzipCompressor"/>
+    <fullyQualifiedTypeName name="com.reactive.service.app.api.InMemoryWorkspace"/>
+    <fullyQualifiedTypeName name="com.consulner.app.api.mergesort.RandomInputRequest"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+    <fullyQualifiedTypeName name="java.util.Collections"/>
+</qualifiedTypeNameHistroy>

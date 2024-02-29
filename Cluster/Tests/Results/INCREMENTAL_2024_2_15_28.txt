@@ -1,0 +1,11 @@
+Test results of non incremental execution 2024_2_15_28                   
+ inputSize=3000000, initSize=8, number of worker pods = 4                    worker pod capacity = 250 
+K=1, R=6362.6 
+K=2, R=5878.9 
+K=3, R=6308.7 
+K=4, R=4283.9 
+K=5, R=4843.2 
+K=6, R=7306.9 
+K=7, R=7127.4 
+K=8, R=7942.4 
+K=9, R=3717.1 

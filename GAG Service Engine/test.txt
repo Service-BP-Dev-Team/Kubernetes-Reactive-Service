@@ -1,0 +1,10 @@
+curl -X POST localhost:8000/api/mergesort/create-input -d '{"size": 10 }'
+curl -X POST localhost:8000/api/mergesort/sort -d '{"size": 10 }'
+
+kubectl exec --stdin --tty java-rest-67f8465f8f-4gwgh -- /bin/bash
+
+test of merge sort enhanced
+
+curl -X POST localhost:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 10000 }'
+curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d '{"size": 10000 }'
+

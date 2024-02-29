@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-rest
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: java-rest
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: java-rest
+    spec:
+      containers:
+      - image: 10.0.0.10:5000/java-rest:v2
+        imagePullPolicy: Always
+        name: java-rest
+        resources:
+#          limits:
+#            cpu: "1000m"  # 500 milliCPU (0.5 CPU)
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: hostpath-volume
+          mountPath: /app/target/spec-merge-sort-enhanced
+      volumes:
+      - name: hostpath-volume
+        hostPath:
+          path: /vagrant/Application/Tests/TestRunOut
+          type: Directory 
+      nodeSelector:
+        dedicated: master
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-rest-service
+spec:
+  selector:
+    app: java-rest
+  type: LoadBalancer
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 31000
+

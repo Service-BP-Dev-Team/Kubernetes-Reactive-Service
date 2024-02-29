@@ -1,0 +1,209 @@
+---
+# Service: MainSort --- 2 rules
+# R1 is active when the list is long enough to distribute computation.
+kind : rule
+name : MainSort_remote
+service : MainSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthgr
+ # The guard requires a minimum length l+1 of the input list
+functions :
+ - { classPath: com.local.SortFunc, method: merge_f, label: merge_f}
+ - { classPath: com.local.SortFunc, method: getNUMBER_OF_BLOCKS, label: getNUMBER_OF_BLOCKS}
+ # update_values replaces some intentional values in out_list.
+actions :
+ - out_array = __call RecSort(inp_list)
+ - length = getNUMBER_OF_BLOCKS()
+ #adding synchronization
+ - sync_out_array = SyncValue(out_array)
+ - (size, arr, out_list) = Merge_Main_S(length,sync_out_array) # merge incrementally
+
+#basic case the lenght is 1 
+---
+kind : rule
+name : Merge_Main_Incremental_Base
+service: Merge_Main_S
+guard :
+ classPath: com.local.MergeIncremental
+ method: lenght_is_one
+functions:
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+actions:
+ - i = getZero()
+ - merge_res=in_arr[i]
+
+#the lenght to merge is greater than one
+---
+kind : rule
+name : Merge_Main_Incremental_Greater_Than_One
+service: Merge_Main_S
+guard :
+ classPath: com.local.MergeIncremental
+ method: lenght_is_greater_than_one
+functions:
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+ - { classPath: com.local.MergeIncremental, method: divide_length, label: divide_length}
+ - { classPath: com.local.MergeIncremental, method: init_indices, label: init_indices}
+actions:
+ - i = getZero()
+ - pending_indices = init_indices(in_length)
+ - out_length = divide_length(in_length)
+ - out_arr[i/pending_indices] = [Merge_Main_It(pending_indices,in_arr) for i,inc,${NUMBER_OF_BLOCKS}]
+ - (size,arr,merge_res) = Merge_Main_S(out_length,out_arr)
+
+
+
+---
+kind : rule
+name : Merge_Main_Iterrator
+service: Merge_Main_It
+guard :
+ classPath: com.local.MergeIncremental
+ method: has_new_elements
+ binding:
+  - { name : list1 }
+  - { name : list2 }
+  - { name : next_indices }
+functions:
+ - { classPath: com.local.SortFunc, method: merge_sort, label: merge_two }
+actions:
+ - out = merge_two(list1,list2)
+ - indices_out = next_indices
+
+#when everything has been merged
+---
+kind : rule
+name : Merge_Main_Iterrator_terminate
+service: Merge_Main_It
+guard :
+ classPath: com.local.MergeIncremental
+ method: indices_is_empty
+functions:
+ - { classPath: com.local.MergeIncremental, method: empty_array, label: empty }
+actions:
+ - out = empty()
+ - indices_out = indices_in
+
+---
+#R2 is active when the list is short enough to sort it locally
+kind : rule
+name : MainSort_local
+service : MainSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthleq
+ # The guard requires a maximum length l of the input list
+functions :
+ - { classPath: com.local.Base, method: sort, label: sort }
+ # function from java.utils
+actions :
+ - out_list = sort(inp_list)
+
+
+
+---
+#R2 is active when the list is short enough to sort it locally
+kind : rule
+name : RecSort_local
+service : RecSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthleq_in_arr
+ # The guard requires a maximum length l-1 of the input list
+functions :
+ - { classPath: com.local.SortFunc, method: split, label: split, multiOutput: true, outputSize: ${NUMBER_OF_BLOCKS}}
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+actions :
+ - cells_of_array=split(inp_arr)
+ - i = getZero()
+ - sync = i
+ - out_arr[i/sync] = [Sort_Basic_It(pending_indices,cells_of_array) for i,inc,${NUMBER_OF_BLOCKS}]
+ 
+---
+#basic sort iterration 
+kind : rule
+name : Sort_Basic_It_Rule
+service : Sort_Basic_It
+guard : 
+ classPath: com.local.SortFunc
+ method: index_basic_defined
+ # The guard requires a maximum length l-1 of the input list
+functions :
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+actions :
+# - out_arr = sort_array_lists(inp_arr)
+ - index_out = inc(index_in)
+ - out = __call BasicSort(in_arr[index_in])
+
+---
+#basic sort work 
+kind : rule
+name : Sort_Basic_Rule
+service : BasicSort
+guard : 
+ classPath: com.local.SortFunc
+ method: base_sort_input_defined
+functions :
+ - { classPath: com.local.Base, method: sort, label: sort}
+actions :
+ - out = sort(in) 
+
+---
+#Service: RecSort -- 2 rules:
+# R1 is active when the list is long enough to distribute computation.
+kind : rule
+name : RecSort_remote
+service : RecSort
+guard : 
+ classPath: com.local.SortFunc
+ method: lengthgr_in_arr
+ # The guard requires a minimum length l of the input list
+functions :
+ - { classPath: com.local.SortFunc, method: divideLeft, label: divideLeft}
+ - { classPath: com.local.SortFunc, method: divideRight, label: divideRight}
+ - { classPath: com.local.SortFunc, method: init_indices, label: init_indices}
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+actions :
+ - pending_indices = init_indices()
+ - arr_left = divideLeft(inp_arr)
+ - arr_right = divideRight(inp_arr) 
+ - res_left = __call RecSort(arr_left)
+ - res_right = __call RecSort(arr_right)
+ #adding synchronization
+ - sync_res_left = SyncValue(res_left)
+ - sync_res_right = SyncValue(res_right)
+ - index = getZero()
+ - out_arr[index/pending_indices] = [Merge_S(pending_indices,sync_res_left,sync_res_right) for index,inc,${NUMBER_OF_BLOCKS}]
+
+
+---
+kind : rule
+name : merge_rule
+service : Merge_S
+guard:
+ classPath: com.local.SortFunc
+ method : has_new_elements
+ binding: 
+  - {name : list1}
+  - {name : list2}
+  - {name : remainingIndices}
+functions : 
+ - { classPath: com.local.SortFunc, method: merge_sort, label: merge_two }
+actions :
+ - indices_out = remainingIndices
+ - out = merge_two(list1,list2)
+
+# rule for the service that makes sync
+---
+kind : rule
+name : Sync_Value_Rule
+service: SyncValue
+functions:
+ - { classPath: com.local.SortFunc, method: syncValue, label: sync, multiOutput : true, outputSize: ${NUMBER_OF_BLOCKS} }
+actions:
+ - out_arr = sync(in_arr)
