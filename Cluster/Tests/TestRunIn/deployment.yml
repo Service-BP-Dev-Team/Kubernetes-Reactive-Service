@@ -31,12 +31,15 @@ spec:
         hostPath:
           path: /vagrant/Tests/TestRunOut
           type: Directory 
-      nodeSelector:
-        dedicated: master
+#      nodeSelector:
+#        dedicated: master
+#      nodeSelector:
+#        node-role.kubernetes.io/master: ""
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
+      nodeName: master-node
 ---
 apiVersion: v1
 kind: Service
