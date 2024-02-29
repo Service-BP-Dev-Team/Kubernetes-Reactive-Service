@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Command 1: Build Docker image
 sudo docker build . -t java-rest
 

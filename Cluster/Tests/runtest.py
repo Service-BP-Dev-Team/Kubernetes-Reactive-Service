@@ -3,15 +3,15 @@ import json
 import time
 from changeenv import buildEnvironment
 
-rootPathIn ="/vagrant/Application/Tests/TestRunIn"
-rootPathSpecGAGIncremental="/vagrant/Application/Tests/TestRunIn/incremental"
-rootPathSpecGAGNOIncremental="/vagrant/Application/Tests/TestRunIn/no-incremental"
+rootPathIn ="/vagrant/Tests/TestRunIn"
+rootPathSpecGAGIncremental="/vagrant/Tests/TestRunIn/incremental"
+rootPathSpecGAGNOIncremental="/vagrant/Tests/TestRunIn/no-incremental"
 rootPathOut ="/vagrant/Application/Tests/TestRunOut"
 deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
 # List of environment variables and their corresponding values
 env_variables = {
-    'NUMBER_OF_BLOCKS': 124,
+    'NUMBER_OF_BLOCKS': 8,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
@@ -20,7 +20,7 @@ env_variables = {
     'NUMBER_OF_WORKER_PODS': 4,
     'WORKER_POD_CAPACITY':1000,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 5000,
+    'MAX_LEN': 50000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'INCREMENTAL_EXECUTION':True,
@@ -59,7 +59,7 @@ def runtest(input,init,env):
             print(f"Error executing command: {e}")
 
     #wait for the deployment to finish
-    time.sleep(60)
+    time.sleep(120)
     # Run the command to get one pod id 
     try:
         output = subprocess.check_output(get_pod_command, shell=True, universal_newlines=True)
