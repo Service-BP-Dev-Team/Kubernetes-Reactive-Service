@@ -92,7 +92,24 @@ public class InMemoryWorkspace {
 	public  static final String KEY_NETWORK_DATA_COMPRESSION_THRESHOLD="NETWORK_DATA_COMPRESSION_THRESHOLD";
 	
 	// the value of the key above by default
-	public  static final int VALUE_NETWORK_DATA_COMPRESSION_THRESHOLD=5000000;
+	public  static final int VALUE_NETWORK_DATA_COMPRESSION_THRESHOLD=5000000; // I placed a too high value to avoid compression
+	
+	// the key bellow is used to know the maximum of concurrent incoming thread that a engine can handle
+	public static final String KEY_MAXIMUM_THREAD_POOL = "MAXIMUM_THREAD_POOL";
+	// the value here represent the default value of this key.
+	public static final int VALUE_MAXIMUM_THREAD_POOL = 3;
+	
+	// the key below inform if virtual thead are used instead of fixed thread pool
+	public static final String KEY_USE_VIRTUAL_THREAD="USE_VIRTUAL_THREAD";
+	
+	// by default the value is set to false
+	public static final int VALUE_USE_VIRTUAL_THREAD=1;
+	
+	// the key below informs if cached thread pool are to use instead of fixed thread pool
+	public static final String KEY_USE_CACHED_THREAD_POOL="USE_CACHED_THREAD_POOL";
+		
+	// by default the value is set to false
+	public static final int VALUE_USE_CACHED_THREAD_POOL=0;
 	
 	
 	private static GAG gag;
@@ -443,6 +460,33 @@ public class InMemoryWorkspace {
 			return Integer.parseInt(val);
 		} else {
 			return VALUE_NETWORK_DATA_COMPRESSION_THRESHOLD;
+		}
+	}
+	
+	public static int getMaximumThreadPool() {
+		String val = environmentVariables.get(KEY_MAXIMUM_THREAD_POOL);
+		if (val != null) {
+			return Integer.parseInt(val);
+		} else {
+			return VALUE_MAXIMUM_THREAD_POOL;
+		}
+	}
+	
+	public static Boolean isVirtualThreadToUse() {
+		String val = environmentVariables.get(KEY_USE_VIRTUAL_THREAD);
+		if (val != null) {
+			return val.equals("True");
+		} else {
+			return VALUE_USE_VIRTUAL_THREAD==1;
+		}
+	}
+	
+	public static Boolean isCachedThreadPoolToUse() {
+		String val = environmentVariables.get(KEY_USE_CACHED_THREAD_POOL);
+		if (val != null) {
+			return val.equals("True");
+		} else {
+			return VALUE_USE_CACHED_THREAD_POOL==1;
 		}
 	}
 

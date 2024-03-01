@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.consulner.app.api.mergesort.MergeSortEnhancedWithAssessmentHandler;
-
+import com.reactive.service.app.api.InMemoryWorkspace;
 import com.reactive.service.app.api.ServiceMessageHandler;
 import com.sun.net.httpserver.BasicAuthenticator;
 import com.sun.net.httpserver.HttpContext;
@@ -24,10 +24,20 @@ public class Application {
 
     public static void main(String[] args) throws IOException {
     	// Create an ExecutorService with a fixed number of threads
-        int numThreads = 3000; // Number of threads for parallel processing
+        int numThreads = InMemoryWorkspace.getMaximumThreadPool(); // Number of threads for parallel processing
         int port = 8000;
-        //ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-        ExecutorService executor = Executors.newCachedThreadPool();
+        Boolean virtualThread = InMemoryWorkspace.isVirtualThreadToUse();
+        Boolean cachedThreadPool = InMemoryWorkspace.isCachedThreadPoolToUse();
+        ExecutorService executor=null;
+        if (virtualThread) {
+        	executor = Executors.newVirtualThreadPerTaskExecutor();
+        }
+        else if (cachedThreadPool) {
+        	executor =  Executors.newCachedThreadPool();
+        }
+        else { executor = Executors.newFixedThreadPool(numThreads);}
+       //ExecutorService executor = Executors.newCachedThreadPool();
+        //ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         // Create an HttpServer instance
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         

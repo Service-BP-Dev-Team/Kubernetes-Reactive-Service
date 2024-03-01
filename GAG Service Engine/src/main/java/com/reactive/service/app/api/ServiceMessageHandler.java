@@ -43,6 +43,7 @@ public class ServiceMessageHandler extends Handler {
 	private ResponseEntity doPost(InputStream is, String clientIp) {
 		// TODO Auto-generated method stub
 		byte[] bytesMessage;
+		/*
 		Message request = new Message();
 		try {
 			bytesMessage = is.readAllBytes();
@@ -51,8 +52,8 @@ public class ServiceMessageHandler extends Handler {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		//Message request= super.readRequest(is, Message.class);
+		}*/
+		Message request= super.readRequest(is, Message.class);
 		Object response;
 		if(request.getType().equals(Message.BIND_MESSAGE_TYPE)) {
 			response= new BindResponse();

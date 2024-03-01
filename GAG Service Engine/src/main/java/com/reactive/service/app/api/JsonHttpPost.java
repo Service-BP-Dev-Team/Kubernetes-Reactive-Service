@@ -1,11 +1,13 @@
 package com.reactive.service.app.api;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,12 +52,17 @@ public static InputStream postRequest(String jsonData,String urlString) {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
             
+            
             // Write the JSON data to the request body
             OutputStream outputStream = connection.getOutputStream();
-            byte[] bytesToSend = GzipCompressor.compress(jsonData);
-            //outputStream.write(jsonData.getBytes());
-            outputStream.write(bytesToSend);
-            outputStream.flush();
+            //byte[] bytesToSend = GzipCompressor.compress(jsonData);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+
+            writer.write(jsonData);
+            writer.flush();
+            //outputStream.write(jsonData.get);
+            //outputStream.write(bytesToSend);
+           // outputStream.flush();
             
             // Get the response from the server
             int responseCode = connection.getResponseCode();
