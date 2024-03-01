@@ -6,21 +6,21 @@ from changeenv import buildEnvironment
 rootPathIn ="/vagrant/Tests/TestRunIn"
 rootPathSpecGAGIncremental="/vagrant/Tests/TestRunIn/incremental"
 rootPathSpecGAGNOIncremental="/vagrant/Tests/TestRunIn/no-incremental"
-rootPathOut ="/vagrant/Application/Tests/TestRunOut"
+rootPathOut ="/vagrant/Tests/TestRunOut"
 deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
 # List of environment variables and their corresponding values
 env_variables = {
-    'NUMBER_OF_BLOCKS': 8,
+    'NUMBER_OF_BLOCKS': 100,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
     'NUMBER_OF_CONTROLLER_PODS': 1,
-    'NUMBER_OF_WORKER_PODS': 4,
-    'WORKER_POD_CAPACITY':1000,
+    'NUMBER_OF_WORKER_PODS': 6,
+    'WORKER_POD_CAPACITY':500,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 50000,
+    'MAX_LEN': 10000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'INCREMENTAL_EXECUTION':True,
@@ -31,6 +31,7 @@ env_variables = {
 inputSize=1000000
 #inputSize=5001
 initSize=min(500000,env_variables.get("MAX_LEN")*env_variables.get("NUMBER_OF_WORKER_PODS"))
+initSize = max(inputSize//4,initSize)
 def runtest(input,init,env):
 
     number_of_iteration = 20

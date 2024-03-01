@@ -18,7 +18,7 @@ spec:
       - image: 10.0.0.10:5000/java-rest:v2
         imagePullPolicy: Always
         name: java-rest
-        resources:
+#        resources:
 #          limits:
 #            cpu: "1000m"  # 500 milliCPU (0.5 CPU)
         ports:
@@ -29,14 +29,17 @@ spec:
       volumes:
       - name: hostpath-volume
         hostPath:
-          path: /vagrant/Application/Tests/TestRunOut
+          path: /vagrant/Tests/TestRunOut
           type: Directory 
-      nodeSelector:
-        dedicated: master
+#      nodeSelector:
+#        dedicated: master
+#      nodeSelector:
+#        node-role.kubernetes.io/master: ""
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
+      nodeName: master-node
 ---
 apiVersion: v1
 kind: Service

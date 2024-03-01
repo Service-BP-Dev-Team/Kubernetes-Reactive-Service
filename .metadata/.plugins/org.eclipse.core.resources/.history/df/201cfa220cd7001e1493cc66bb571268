@@ -92,7 +92,7 @@ public class InMemoryWorkspace {
 	public  static final String KEY_NETWORK_DATA_COMPRESSION_THRESHOLD="NETWORK_DATA_COMPRESSION_THRESHOLD";
 	
 	// the value of the key above by default
-	public  static final int VALUE_NETWORK_DATA_COMPRESSION_THRESHOLD=5000000;
+	public  static final int VALUE_NETWORK_DATA_COMPRESSION_THRESHOLD=1000;
 	
 	
 	private static GAG gag;

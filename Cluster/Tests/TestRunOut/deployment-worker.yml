@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: java-worker
-  replicas: 4 
+  replicas: 6 
   template:
     metadata:
       labels:
@@ -22,14 +22,14 @@ spec:
         - containerPort: 8000
         resources:
           limits:
-            cpu: "1000m"  # 500 milliCPU (0.5 CPU)
+            cpu: "500m"  # 500 milliCPU (0.5 CPU)
         volumeMounts:
         - name: hostpath-volume
           mountPath: /app/target/spec-merge-sort-enhanced
       volumes:
       - name: hostpath-volume
         hostPath:
-          path: /vagrant/Application/Tests/TestRunOut
+          path: /vagrant/Tests/TestRunOut
           type: Directory  
 ---
 apiVersion: v1
