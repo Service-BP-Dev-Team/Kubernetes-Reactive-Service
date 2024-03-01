@@ -59,7 +59,7 @@ public class InMemoryWorkspace {
 	// checking if they are new rules that can be applied
 	// to pending service (open tasks)
 	// this time can be modified by the .env file of the yaml spec.
-	public static final int VALUE_READY_TASK_WAIT_TIME = 1;
+	public static final int VALUE_READY_TASK_WAIT_TIME = 5;
 	// this represent the default value of the precedent key;
 	public static final String KEY_SYNC_IN_NOTIFICATION_TIME = "SYNC_IN_NOTIFICATION_TIME"; // sometimes it may happen
 																							// that a notification

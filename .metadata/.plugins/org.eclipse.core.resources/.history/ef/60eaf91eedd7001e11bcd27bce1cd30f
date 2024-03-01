@@ -54,13 +54,15 @@ public class Message {
 			receiver = message.bind.getReceiver();
 		}
 		try {
-			//String content =objmapper.writeValueAsString(message);
-			
+			String content =objmapper.writeValueAsString(message);
 			//System.out.println(content);
-			//result = JsonHttpPost.postRequestAndReturnString(content, "http://"+receiver+"/api/service");
-			result = JsonHttpPost.postRequestAndReturnStringWithObject(message,"http://"+receiver+"/api/service");
+			result = JsonHttpPost.postRequestAndReturnString(content, "http://"+receiver+"/api/service");
+
 			//objmapper.readValue(result, Message.class);
-		} catch (Exception e) {
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

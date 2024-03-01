@@ -62,7 +62,7 @@ public class JsonHttpPost {
         return "{}"; //return an empty json string in case of errors
     }
     
-public static String postRequestAndReturnStringWithObject(Message message,String urlString) {
+public static String postRequestAndReturnString(Message message,String urlString) {
         
         try {
             // Set the URL to send the JSON data to

@@ -11,7 +11,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.consulner.app.Configuration;
 
 public class JsonHttpPost {
 
@@ -62,7 +61,7 @@ public class JsonHttpPost {
         return "{}"; //return an empty json string in case of errors
     }
     
-public static String postRequestAndReturnStringWithObject(Message message,String urlString) {
+public static String postRequestAndReturnString(Message message,String urlString) {
         
         try {
             // Set the URL to send the JSON data to
@@ -76,11 +75,14 @@ public static String postRequestAndReturnStringWithObject(Message message,String
             
             // Write the JSON data to the request body
             OutputStream outputStream = connection.getOutputStream();
-            ObjectMapper objmapper=Configuration.getObjectMapper();
+            //byte[] bytesToSend = GzipCompressor.compress(jsonData);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+
+            writer.write(jsonData);
+            writer.flush();
             //outputStream.write(jsonData.get);
             //outputStream.write(bytesToSend);
-            objmapper.writeValue(outputStream, message);
-           outputStream.flush();
+           // outputStream.flush();
             
             // Get the response from the server
             int responseCode = connection.getResponseCode();
