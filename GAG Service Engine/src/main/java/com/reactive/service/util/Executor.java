@@ -29,14 +29,21 @@ import com.reactive.service.model.specification.Parameter;
 import com.reactive.service.model.specification.Service;
 import com.reactive.service.model.specification.ServiceInstance;
 import static com.consulner.app.Configuration.getObjectMapper;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Executor {
 	private GAG gag;
 	private Context context;
 	private Configuration configuration;
-	private String serviceCallId="";
-	private boolean subExecutor=false;
+	private String serviceCallId = "";
+	private boolean subExecutor = false;
 	private ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
+	private boolean running = false;
+	private Lock lock = new ReentrantLock();
+	private Lock lockFastAccess = new ReentrantLock();
+	private Boolean terminated = false;
+	private ArrayList <Data> inputs = new ArrayList<Data>();
 
 	public Executor() {
 
@@ -55,7 +62,7 @@ public class Executor {
 	public void setGag(GAG gag) {
 		this.gag = gag;
 	}
-    
+
 	public String getServiceCallId() {
 		return serviceCallId;
 	}
@@ -63,7 +70,6 @@ public class Executor {
 	public void setServiceCallId(String serviceCallId) {
 		this.serviceCallId = serviceCallId;
 	}
-	
 
 	public boolean isSubExecutor() {
 		return subExecutor;
@@ -72,8 +78,6 @@ public class Executor {
 	public void setSubExecutor(boolean subExecutor) {
 		this.subExecutor = subExecutor;
 	}
-	
-	
 
 	public ConcurrentHashMap<String, Pair<String, Data>> getOutSubscriptions() {
 		return outSubscriptions;
@@ -83,18 +87,30 @@ public class Executor {
 		this.outSubscriptions = outSubscriptions;
 	}
 
-	public void execute() {
-		if (configuration == null) {
-			Task t = context.getStartingTask();
-		}
-	
+	public void lightExecute(Data d) {
+		// if(running) return ; //when it is already running we do nothing
+		
 		Runnable runner = () -> {
-			// initialization
-			while (continuous()) {
-				// System.out.println("continous is true");
+			lock.lock();
+			if (terminated) {
+				lock.unlock();
+				return;
+			}
+			if (d!=null && !inputs.contains(d)) {
+				// the inputs has already been treated
+				lock.unlock();
+				return;
+			}
+			try {
+				
+				running = true;
+				removeAlreadyTreatedInputs();
+				computePendingLocalComputations();
+				// Really important is mandatory to compute pending local computations before
+				// looking for ready task
 				Hashtable<Task, List<Pair<DecompositionRule, ArrayList>>> readyTasks = context.getReadyTasks();
 				// System.out.println("" + readyTasks);
-				computePendingLocalComputations();
+				
 
 				while (readyTasks.size() != 0) {
 					for (Task task : readyTasks.keySet()) {
@@ -104,19 +120,38 @@ public class Executor {
 					}
 					readyTasks = context.getReadyTasks();
 				}
-				//terminateTasks();
-				// we sleeping after freeing some memory with terminateTasks()
-				try {
-					Thread.sleep(InMemoryWorkspace.getReadyTaskWaitTime());
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				
-
+				running = false;
+				if (!continuous()) {
+					clearAllData();
+				}
+			} finally {
+				lock.unlock();
 			}
-			// we clear all data
-			clearAllData();
+		};
+		Thread.startVirtualThread(runner);
+	}
+
+	public void execute() {
+		if (configuration == null) {
+			Task t = context.getStartingTask();
+		}
+		//System.out.println("execute large");
+		Runnable runner = () -> {
+			// initialization
+			lightExecute(null);
+
+			/*
+			 * while (continuous()) { // System.out.println("continous is true");
+			 * 
+			 * // terminateTasks(); // we sleeping after freeing some memory with
+			 * terminateTasks() try {
+			 * Thread.sleep(InMemoryWorkspace.getReadyTaskWaitTime()); } catch
+			 * (InterruptedException e) { // TODO Auto-generated catch block
+			 * e.printStackTrace(); }
+			 * 
+			 * } // we clear all data clearAllData();
+			 */
 		};
 		Thread.startVirtualThread(runner);
 
@@ -185,7 +220,7 @@ public class Executor {
 				serviceTask.put(si, t);
 			}
 		}
-		task.setSubTasks(substasks);
+		task.getSubTasks().addAll(substasks);
 		createDataLink(task, rule, serviceTask);
 		// apply bindings defined by the guard
 		applyBindings(task, bindings);
@@ -383,6 +418,8 @@ public class Executor {
 
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
+		if (configuration != null)
+			makeFastAccess(configuration.getRoot().getInputs());
 	}
 
 	public void invokeRemote(List<Task> tasks) {
@@ -402,6 +439,7 @@ public class Executor {
 						newTask.setLocals(t.getLocals());
 						newTask.setOutputs(t.getOutputs());
 						newTask.setService(t.getService());
+						newTask.setSubTasks(t.getSubTasks());
 						ServiceCall sc = new ServiceCall();
 						sc.setTask(newTask);
 						Configuration conf = new Configuration();
@@ -413,6 +451,8 @@ public class Executor {
 						Context ctx = new Context();
 						ctx.setExecutor(exec);
 						exec.setConfiguration(conf);
+						//make fast access
+						makeFastAccess(newTask.getOutputs());
 						exec.setGag(gag);
 						exec.setContext(ctx);
 						exec.setServiceCallId(sc.getId());
@@ -421,6 +461,8 @@ public class Executor {
 						// execute the task
 						exec.execute();
 					} else {
+						//make fast access
+						makeFastAccess(t.getOutputs());
 						ServiceCall sc = new ServiceCall();
 						sc.setTask(t);
 						Service emptyService = new Service();
@@ -431,13 +473,16 @@ public class Executor {
 						InMemoryWorkspace.processOutServiceCall(sc, receiver, this);
 					}
 				}
+				// else {
+				// makeFastAccess(t);
+				// }
 			};
 			Thread.startVirtualThread(runner);
 		}
 	}
 
 	public void notifySubscribers() {
-		
+
 		Set<String> keys = outSubscriptions.keySet();
 		// transfom to static array to handle concurency
 		ArrayList<String> keyArray = new ArrayList<String>();
@@ -454,8 +499,8 @@ public class Executor {
 					// now notify in separate thread
 
 					outSubscriptions.remove(nf.getData().getId());
-					Runnable runner = ()->{
-					InMemoryWorkspace.processOutNotification(nf, p.getKey());
+					Runnable runner = () -> {
+						InMemoryWorkspace.processOutNotification(nf, p.getKey());
 					};
 					Thread.startVirtualThread(runner);
 				}
@@ -464,56 +509,61 @@ public class Executor {
 		}
 
 	}
-	
+
 	private void terminateTasks(Task t) {
-		
+
 		terminateIfPossible(t);
 	}
+
 	private void clearAllData() {
-		
-		if(!isSubExecutor()) {
-		//when it is a subs executor the task to terminate tasks 
-		// and data is left to the parent executor
-		// wit some time for the notification to be performed before clearing
-		// everything
-		final Task root=configuration.getRoot();
-		Thread clear = new Thread(()->{
-			
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			terminateTasks(root);
-			// clear all data recursively
-			clearTaskData(root);
-		});	
-		clear.start();
+		terminated=true;
+		if (!isSubExecutor()) {
+			// when it is a subs executor the task to terminate tasks
+			// and data is left to the parent executor
+			// wit some time for the notification to be performed before clearing
+			// everything
+			final Task root = configuration.getRoot();
+			Thread clear = new Thread(() -> {
+
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				terminateTasks(root);
+				// clear all data recursively
+				clearTaskData(root);
+			});
+			clear.start();
 		}
 		// remove the service call in the memory
 		InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
 		// we suggest the garbage collector to pass
 		// Suggest garbage collection
-        //System.gc();
-		
-		//clear configuration
+		// System.gc();
+
+		// clear configuration
 		configuration.clearData();
-		//outSubscriptions.clear();
-		//outSubscriptions=null;
-		configuration=null;
-		this.gag=null;
-		this.context=null;
-		this.serviceCallId=null;
+		// outSubscriptions.clear();
+		// outSubscriptions=null;
+		configuration = null;
+		this.gag = null;
+		this.context = null;
+		this.serviceCallId = null;
 
 		/*
-		System.out.println("the memory call size is : "+ InMemoryWorkspace.inMemoryCalls.size());
-		System.out.println("the memory in subscription size is : "+ InMemoryWorkspace.inSubscriptions.size());
-		System.out.println("the memory out subscription size is : "+ outSubscriptions.size());
-		System.out.println("the memory discard already subscription size is  : "+ InMemoryWorkspace.discardNotificationsAlreadyDone.size());
-		*/
+		 * System.out.println("the memory call size is : "+
+		 * InMemoryWorkspace.inMemoryCalls.size());
+		 * System.out.println("the memory in subscription size is : "+
+		 * InMemoryWorkspace.inSubscriptions.size());
+		 * System.out.println("the memory out subscription size is : "+
+		 * outSubscriptions.size());
+		 * System.out.println("the memory discard already subscription size is  : "+
+		 * InMemoryWorkspace.discardNotificationsAlreadyDone.size());
+		 */
 	}
-	
+
 	private void clearTaskData(Task t) {
 		for (Data ind : t.getInputs()) {
 			InMemoryWorkspace.discardNotificationsAlreadyDone.remove(ind.getId());
@@ -522,45 +572,70 @@ public class Executor {
 			clearTaskData(st);
 		}
 		t.clearData();
-		
+
 	}
-	
+
 	private void checkTerminated(Task t) {
-		for (Task st: t.getSubTasks()) {
+		for (Task st : t.getSubTasks()) {
 			if (!st.isTerminated()) {
-				return ;
+				return;
 			}
 		}
 		// here we see that all the substask are terminated
 		// now we check if all the data are terminated
 		for (Data d : t.getAllWithoutLocalData()) {
-			//check if the data is terminated
-			if(!d.isTerminated()) {
+			// check if the data is terminated
+			if (!d.isTerminated()) {
 				// try to terminate the data
-				if (InMemoryWorkspace.inSubscriptions.get(d.getId())!=null ||
-						outSubscriptions.get(d.getId())!=null) {
-					return ;
+				if (InMemoryWorkspace.inSubscriptions.get(d.getId()) != null
+						|| outSubscriptions.get(d.getId()) != null) {
+					return;
 				}
 				d.setTerminated(true);
 			}
-			
+
 		}
 		// here it means that all the data has been terminated
 		// we terminate the task
 		t.setTerminated(true);
-		
-		
+
 	}
+
 	private void terminateIfPossible(Task t) {
-		if(!t.isTerminated()) {
-			for(Task st: t.getSubTasks()) {
+		if (!t.isTerminated()) {
+			for (Task st : t.getSubTasks()) {
 				terminateIfPossible(st);
 			}
 			checkTerminated(t);
-		}else {
+		} else {
 			// we do nothing
 		}
-		
+
+	}
+
+	private void makeFastAccess(List<Data> datas) {
+		//System.out.println("make fast access");
+		lockFastAccess.lock();
+		;
+		try {
+			for (Data d : datas) {
+				InMemoryWorkspace.fastTaskAndCallAccess.put(d.getId(), this);
+			}
+			inputs.addAll(datas);
+		} finally {
+			lockFastAccess.unlock();
+		}
+	}
+	
+	// this method is used to take into account all inputs
+	public void removeAlreadyTreatedInputs() {
+		ArrayList<Data> toRemove = new ArrayList<Data>();
+		for(Data d : inputs) {
+			if (d.isDefined()){
+				toRemove.add(d);
+			}
+		}
+		inputs.removeAll(toRemove);
 	}
 
 }

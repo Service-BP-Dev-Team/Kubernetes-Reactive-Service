@@ -1,0 +1,1611 @@
+{
+    "open": false,
+    "service": {
+        "name": "MainSort",
+        "axiom": false,
+        "inputParameters": [
+            {
+                "name": "inp_list",
+                "shortName": null,
+                "array": false,
+                "size": 0
+            }
+        ],
+        "outputParameters": [
+            {
+                "name": "out_list",
+                "shortName": null,
+                "array": false,
+                "size": 0
+            }
+        ],
+        "remote": false,
+        "kubename": "localhost:8000",
+        "exampleSignature": ""
+    },
+    "inputs": [
+        {
+            "parameter": {
+                "name": "inp_list",
+                "shortName": null,
+                "array": false,
+                "size": 0
+            },
+            "value": [
+                1,
+                1,
+                2
+            ],
+            "defined": true,
+            "id": "dba0d680-8c38-4ca9-a46a-7ed4259df7e0",
+            "serviceCallId": null,
+            "host": null,
+            "group": null
+        }
+    ],
+    "outputs": [
+        {
+            "parameter": {
+                "name": "out_list",
+                "shortName": null,
+                "array": false,
+                "size": 0
+            },
+            "value": null,
+            "defined": false,
+            "id": "30f08787-9294-4f2e-8a57-e447e80dc945",
+            "serviceCallId": null,
+            "host": null,
+            "group": null
+        }
+    ],
+    "subTasks": [
+        {
+            "open": true,
+            "service": {
+                "name": "RecSort",
+                "axiom": false,
+                "inputParameters": [
+                    {
+                        "name": "inp_arr",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    }
+                ],
+                "outputParameters": [
+                    {
+                        "name": "out_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    }
+                ],
+                "remote": false,
+                "kubename": "localhost:8000",
+                "exampleSignature": ""
+            },
+            "inputs": [
+                {
+                    "parameter": {
+                        "name": "inp_arr",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    },
+                    "value": [
+                        1,
+                        1,
+                        2
+                    ],
+                    "defined": true,
+                    "id": "a6c66c07-e350-4662-a120-a6a31744bc3c",
+                    "serviceCallId": null,
+                    "host": null,
+                    "group": null
+                }
+            ],
+            "outputs": [
+                {
+                    "parameter": {
+                        "name": "out_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    },
+                    "value": null,
+                    "defined": false,
+                    "id": "cc09fc16-2e91-4019-84c0-81327fa9fcb7",
+                    "serviceCallId": null,
+                    "host": null,
+                    "group": {
+                        "name": "out_arr",
+                        "parameter": {
+                            "name": "out_arr",
+                            "shortName": null,
+                            "array": true,
+                            "size": 1
+                        },
+                        "id": "137267e5-7ebd-4b49-aa44-fda943dd7c45"
+                    }
+                }
+            ],
+            "subTasks": [
+                {
+                    "open": true,
+                    "service": {
+                        "name": "RecSort",
+                        "axiom": false,
+                        "inputParameters": [
+                            {
+                                "name": "inp_arr",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            }
+                        ],
+                        "outputParameters": [
+                            {
+                                "name": "out_arr",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            }
+                        ],
+                        "remote": false,
+                        "kubename": "localhost:8000",
+                        "exampleSignature": ""
+                    },
+                    "inputs": [
+                        {
+                            "parameter": {
+                                "name": "inp_arr",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            },
+                            "value": [
+                                1
+                            ],
+                            "defined": true,
+                            "id": "72c64815-8fe8-46d4-be30-9838d34ef650",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": null
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "parameter": {
+                                "name": "out_arr",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "value": [
+                                1
+                            ],
+                            "defined": true,
+                            "id": "3389a25d-00fc-4c9a-92e4-9c8b3be05a22",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": {
+                                "name": "out_arr",
+                                "parameter": {
+                                    "name": "out_arr",
+                                    "shortName": null,
+                                    "array": true,
+                                    "size": 1
+                                },
+                                "id": "23c4724e-1c1d-440f-824a-958fd978b507"
+                            }
+                        }
+                    ],
+                    "subTasks": [
+                        {
+                            "open": false,
+                            "service": {
+                                "name": "Sort_Basic_It",
+                                "axiom": false,
+                                "inputParameters": [
+                                    {
+                                        "name": "index_in",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    {
+                                        "name": "in_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    }
+                                ],
+                                "outputParameters": [
+                                    {
+                                        "name": "out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    {
+                                        "name": "index_out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    }
+                                ],
+                                "remote": false,
+                                "kubename": "localhost:8000",
+                                "exampleSignature": ""
+                            },
+                            "inputs": [
+                                {
+                                    "parameter": {
+                                        "name": "index_in",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": 0,
+                                    "defined": true,
+                                    "id": "87f43f87-3022-448d-b427-567aae0a0bff",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                },
+                                {
+                                    "parameter": {
+                                        "name": "in_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "value": [
+                                        1
+                                    ],
+                                    "defined": true,
+                                    "id": "4463a5a7-e084-4bb0-b3f3-93b9f692156d",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": {
+                                        "name": "in_arr",
+                                        "parameter": {
+                                            "name": "in_arr",
+                                            "shortName": null,
+                                            "array": true,
+                                            "size": 1
+                                        },
+                                        "id": "f70352d5-1383-46d9-97d4-f3261bc86ad4"
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "parameter": {
+                                        "name": "out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": [
+                                        1
+                                    ],
+                                    "defined": true,
+                                    "id": "051c6345-8a5c-4d29-b9d9-b8b98bde6ba7",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                },
+                                {
+                                    "parameter": {
+                                        "name": "index_out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": 1,
+                                    "defined": true,
+                                    "id": "c1b2d05d-40be-4729-ba33-eb8bcf3f1f54",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                }
+                            ],
+                            "subTasks": [
+                                {
+                                    "open": true,
+                                    "service": {
+                                        "name": "BasicSort",
+                                        "axiom": false,
+                                        "inputParameters": [
+                                            {
+                                                "name": "in",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            }
+                                        ],
+                                        "outputParameters": [
+                                            {
+                                                "name": "out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            }
+                                        ],
+                                        "remote": false,
+                                        "kubename": "localhost:8000",
+                                        "exampleSignature": ""
+                                    },
+                                    "inputs": [
+                                        {
+                                            "parameter": {
+                                                "name": "in",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": [
+                                                1
+                                            ],
+                                            "defined": true,
+                                            "id": "9aaed956-492c-4a48-a732-81a35204db82",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "parameter": {
+                                                "name": "out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": [
+                                                1
+                                            ],
+                                            "defined": true,
+                                            "id": "ab4d3bd2-fa03-4b71-849b-dc6eebb267f4",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        }
+                                    ],
+                                    "subTasks": [],
+                                    "dataGroups": [],
+                                    "localGroups": [],
+                                    "remote": true,
+                                    "appliedRule": null
+                                }
+                            ],
+                            "dataGroups": [
+                                {
+                                    "name": "in_arr",
+                                    "parameter": {
+                                        "name": "in_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "id": "f70352d5-1383-46d9-97d4-f3261bc86ad4"
+                                }
+                            ],
+                            "localGroups": [],
+                            "remote": false,
+                            "appliedRule": "Sort_Basic_It_Rule"
+                        }
+                    ],
+                    "dataGroups": [
+                        {
+                            "name": "out_arr",
+                            "parameter": {
+                                "name": "out_arr",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "id": "23c4724e-1c1d-440f-824a-958fd978b507"
+                        }
+                    ],
+                    "localGroups": [],
+                    "remote": true,
+                    "appliedRule": null
+                },
+                {
+                    "open": true,
+                    "service": {
+                        "name": "RecSort",
+                        "axiom": false,
+                        "inputParameters": [
+                            {
+                                "name": "inp_arr",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            }
+                        ],
+                        "outputParameters": [
+                            {
+                                "name": "out_arr",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            }
+                        ],
+                        "remote": false,
+                        "kubename": "localhost:8000",
+                        "exampleSignature": ""
+                    },
+                    "inputs": [
+                        {
+                            "parameter": {
+                                "name": "inp_arr",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            },
+                            "value": [
+                                1,
+                                2
+                            ],
+                            "defined": true,
+                            "id": "d37dc411-d76c-4d5c-be36-9b8e9e7b66a1",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": null
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "parameter": {
+                                "name": "out_arr",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "value": null,
+                            "defined": false,
+                            "id": "30bb09b3-40d4-4676-9a28-2e6c9dffd121",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": {
+                                "name": "out_arr",
+                                "parameter": {
+                                    "name": "out_arr",
+                                    "shortName": null,
+                                    "array": true,
+                                    "size": 1
+                                },
+                                "id": "21618ae9-9599-4f51-b572-37d6e3194c20"
+                            }
+                        }
+                    ],
+                    "subTasks": [
+                        {
+                            "open": true,
+                            "service": {
+                                "name": "RecSort",
+                                "axiom": false,
+                                "inputParameters": [
+                                    {
+                                        "name": "inp_arr",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    }
+                                ],
+                                "outputParameters": [
+                                    {
+                                        "name": "out_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    }
+                                ],
+                                "remote": false,
+                                "kubename": "localhost:8000",
+                                "exampleSignature": ""
+                            },
+                            "inputs": [
+                                {
+                                    "parameter": {
+                                        "name": "inp_arr",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": [
+                                        1
+                                    ],
+                                    "defined": true,
+                                    "id": "65e28f84-bdb5-4cf4-81e8-9c703a5984bb",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "parameter": {
+                                        "name": "out_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "value": [
+                                        1
+                                    ],
+                                    "defined": true,
+                                    "id": "06f6837a-c73c-42ef-b0a1-ac2bd90d3c4c",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": {
+                                        "name": "out_arr",
+                                        "parameter": {
+                                            "name": "out_arr",
+                                            "shortName": null,
+                                            "array": true,
+                                            "size": 1
+                                        },
+                                        "id": "c9f1e76a-2b9d-449e-b544-2b4194d6df87"
+                                    }
+                                }
+                            ],
+                            "subTasks": [
+                                {
+                                    "open": false,
+                                    "service": {
+                                        "name": "Sort_Basic_It",
+                                        "axiom": false,
+                                        "inputParameters": [
+                                            {
+                                                "name": "index_in",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            {
+                                                "name": "in_arr",
+                                                "shortName": null,
+                                                "array": true,
+                                                "size": 1
+                                            }
+                                        ],
+                                        "outputParameters": [
+                                            {
+                                                "name": "out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            {
+                                                "name": "index_out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            }
+                                        ],
+                                        "remote": false,
+                                        "kubename": "localhost:8000",
+                                        "exampleSignature": ""
+                                    },
+                                    "inputs": [
+                                        {
+                                            "parameter": {
+                                                "name": "index_in",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": 0,
+                                            "defined": true,
+                                            "id": "c7de0101-7bd0-4ceb-8434-79b54d6e0ce8",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        },
+                                        {
+                                            "parameter": {
+                                                "name": "in_arr",
+                                                "shortName": null,
+                                                "array": true,
+                                                "size": 1
+                                            },
+                                            "value": [
+                                                1
+                                            ],
+                                            "defined": true,
+                                            "id": "619777f0-7dc4-470b-ac57-3059b83845a4",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": {
+                                                "name": "in_arr",
+                                                "parameter": {
+                                                    "name": "in_arr",
+                                                    "shortName": null,
+                                                    "array": true,
+                                                    "size": 1
+                                                },
+                                                "id": "fb262399-16c1-49de-8b0f-9ef31bd30565"
+                                            }
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "parameter": {
+                                                "name": "out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": [
+                                                1
+                                            ],
+                                            "defined": true,
+                                            "id": "478b1ee8-93db-491b-8dd7-0a850d3100bf",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        },
+                                        {
+                                            "parameter": {
+                                                "name": "index_out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": 1,
+                                            "defined": true,
+                                            "id": "242d3ef3-f336-4cdb-bc33-2bddd166e949",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        }
+                                    ],
+                                    "subTasks": [
+                                        {
+                                            "open": true,
+                                            "service": {
+                                                "name": "BasicSort",
+                                                "axiom": false,
+                                                "inputParameters": [
+                                                    {
+                                                        "name": "in",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    }
+                                                ],
+                                                "outputParameters": [
+                                                    {
+                                                        "name": "out",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    }
+                                                ],
+                                                "remote": false,
+                                                "kubename": "localhost:8000",
+                                                "exampleSignature": ""
+                                            },
+                                            "inputs": [
+                                                {
+                                                    "parameter": {
+                                                        "name": "in",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    },
+                                                    "value": [
+                                                        1
+                                                    ],
+                                                    "defined": true,
+                                                    "id": "0d432469-0767-4b97-a0a9-746e403b1506",
+                                                    "serviceCallId": null,
+                                                    "host": null,
+                                                    "group": null
+                                                }
+                                            ],
+                                            "outputs": [
+                                                {
+                                                    "parameter": {
+                                                        "name": "out",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    },
+                                                    "value": [
+                                                        1
+                                                    ],
+                                                    "defined": true,
+                                                    "id": "4252ec21-27e7-43a1-a13f-21020a781607",
+                                                    "serviceCallId": null,
+                                                    "host": null,
+                                                    "group": null
+                                                }
+                                            ],
+                                            "subTasks": [],
+                                            "dataGroups": [],
+                                            "localGroups": [],
+                                            "remote": true,
+                                            "appliedRule": null
+                                        }
+                                    ],
+                                    "dataGroups": [
+                                        {
+                                            "name": "in_arr",
+                                            "parameter": {
+                                                "name": "in_arr",
+                                                "shortName": null,
+                                                "array": true,
+                                                "size": 1
+                                            },
+                                            "id": "fb262399-16c1-49de-8b0f-9ef31bd30565"
+                                        }
+                                    ],
+                                    "localGroups": [],
+                                    "remote": false,
+                                    "appliedRule": "Sort_Basic_It_Rule"
+                                }
+                            ],
+                            "dataGroups": [
+                                {
+                                    "name": "out_arr",
+                                    "parameter": {
+                                        "name": "out_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "id": "c9f1e76a-2b9d-449e-b544-2b4194d6df87"
+                                }
+                            ],
+                            "localGroups": [],
+                            "remote": true,
+                            "appliedRule": null
+                        },
+                        {
+                            "open": true,
+                            "service": {
+                                "name": "RecSort",
+                                "axiom": false,
+                                "inputParameters": [
+                                    {
+                                        "name": "inp_arr",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    }
+                                ],
+                                "outputParameters": [
+                                    {
+                                        "name": "out_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    }
+                                ],
+                                "remote": false,
+                                "kubename": "localhost:8000",
+                                "exampleSignature": ""
+                            },
+                            "inputs": [
+                                {
+                                    "parameter": {
+                                        "name": "inp_arr",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": [
+                                        2
+                                    ],
+                                    "defined": true,
+                                    "id": "c8edb254-6a58-4ac3-bb35-9fb29c7d3599",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "parameter": {
+                                        "name": "out_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "value": [
+                                        2
+                                    ],
+                                    "defined": true,
+                                    "id": "392a0363-f6d7-48a1-9fa8-d6af71fc8a3d",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": {
+                                        "name": "out_arr",
+                                        "parameter": {
+                                            "name": "out_arr",
+                                            "shortName": null,
+                                            "array": true,
+                                            "size": 1
+                                        },
+                                        "id": "25b4ce14-5eed-4200-9134-7d5d246daba2"
+                                    }
+                                }
+                            ],
+                            "subTasks": [
+                                {
+                                    "open": false,
+                                    "service": {
+                                        "name": "Sort_Basic_It",
+                                        "axiom": false,
+                                        "inputParameters": [
+                                            {
+                                                "name": "index_in",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            {
+                                                "name": "in_arr",
+                                                "shortName": null,
+                                                "array": true,
+                                                "size": 1
+                                            }
+                                        ],
+                                        "outputParameters": [
+                                            {
+                                                "name": "out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            {
+                                                "name": "index_out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            }
+                                        ],
+                                        "remote": false,
+                                        "kubename": "localhost:8000",
+                                        "exampleSignature": ""
+                                    },
+                                    "inputs": [
+                                        {
+                                            "parameter": {
+                                                "name": "index_in",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": 0,
+                                            "defined": true,
+                                            "id": "ae7a35fc-a1dd-4e31-80f3-efa0fb5f83c4",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        },
+                                        {
+                                            "parameter": {
+                                                "name": "in_arr",
+                                                "shortName": null,
+                                                "array": true,
+                                                "size": 1
+                                            },
+                                            "value": [
+                                                2
+                                            ],
+                                            "defined": true,
+                                            "id": "33ee9aad-c4db-4738-ae15-1af8c07fae89",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": {
+                                                "name": "in_arr",
+                                                "parameter": {
+                                                    "name": "in_arr",
+                                                    "shortName": null,
+                                                    "array": true,
+                                                    "size": 1
+                                                },
+                                                "id": "79ca9ece-b4b4-4c9e-b723-8a52a8b6b6de"
+                                            }
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "parameter": {
+                                                "name": "out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": [
+                                                2
+                                            ],
+                                            "defined": true,
+                                            "id": "4b5898bb-9ac7-4964-9860-c620544c1939",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        },
+                                        {
+                                            "parameter": {
+                                                "name": "index_out",
+                                                "shortName": null,
+                                                "array": false,
+                                                "size": 0
+                                            },
+                                            "value": 1,
+                                            "defined": true,
+                                            "id": "cac83820-ecc2-4b41-b177-2e62c9d682c4",
+                                            "serviceCallId": null,
+                                            "host": null,
+                                            "group": null
+                                        }
+                                    ],
+                                    "subTasks": [
+                                        {
+                                            "open": true,
+                                            "service": {
+                                                "name": "BasicSort",
+                                                "axiom": false,
+                                                "inputParameters": [
+                                                    {
+                                                        "name": "in",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    }
+                                                ],
+                                                "outputParameters": [
+                                                    {
+                                                        "name": "out",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    }
+                                                ],
+                                                "remote": false,
+                                                "kubename": "localhost:8000",
+                                                "exampleSignature": ""
+                                            },
+                                            "inputs": [
+                                                {
+                                                    "parameter": {
+                                                        "name": "in",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    },
+                                                    "value": [
+                                                        2
+                                                    ],
+                                                    "defined": true,
+                                                    "id": "d11c6867-89ef-4bd4-a40f-81dd1e0a8566",
+                                                    "serviceCallId": null,
+                                                    "host": null,
+                                                    "group": null
+                                                }
+                                            ],
+                                            "outputs": [
+                                                {
+                                                    "parameter": {
+                                                        "name": "out",
+                                                        "shortName": null,
+                                                        "array": false,
+                                                        "size": 0
+                                                    },
+                                                    "value": [
+                                                        2
+                                                    ],
+                                                    "defined": true,
+                                                    "id": "8384a8fb-44ff-4acc-801e-ccae52595c8d",
+                                                    "serviceCallId": null,
+                                                    "host": null,
+                                                    "group": null
+                                                }
+                                            ],
+                                            "subTasks": [],
+                                            "dataGroups": [],
+                                            "localGroups": [],
+                                            "remote": true,
+                                            "appliedRule": null
+                                        }
+                                    ],
+                                    "dataGroups": [
+                                        {
+                                            "name": "in_arr",
+                                            "parameter": {
+                                                "name": "in_arr",
+                                                "shortName": null,
+                                                "array": true,
+                                                "size": 1
+                                            },
+                                            "id": "79ca9ece-b4b4-4c9e-b723-8a52a8b6b6de"
+                                        }
+                                    ],
+                                    "localGroups": [],
+                                    "remote": false,
+                                    "appliedRule": "Sort_Basic_It_Rule"
+                                }
+                            ],
+                            "dataGroups": [
+                                {
+                                    "name": "out_arr",
+                                    "parameter": {
+                                        "name": "out_arr",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "id": "25b4ce14-5eed-4200-9134-7d5d246daba2"
+                                }
+                            ],
+                            "localGroups": [],
+                            "remote": true,
+                            "appliedRule": null
+                        },
+                        {
+                            "open": true,
+                            "service": {
+                                "name": "Merge_S",
+                                "axiom": false,
+                                "inputParameters": [
+                                    {
+                                        "name": "indices_in",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    {
+                                        "name": "res_left",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    {
+                                        "name": "res_right",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    }
+                                ],
+                                "outputParameters": [
+                                    {
+                                        "name": "out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    {
+                                        "name": "indices_out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    }
+                                ],
+                                "remote": false,
+                                "kubename": "localhost:8000",
+                                "exampleSignature": ""
+                            },
+                            "inputs": [
+                                {
+                                    "parameter": {
+                                        "name": "indices_in",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": [
+                                        0,
+                                        1
+                                    ],
+                                    "defined": true,
+                                    "id": "3016e87d-b09b-4fbe-8b72-0277692dfe26",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                },
+                                {
+                                    "parameter": {
+                                        "name": "res_left",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "value": [
+                                        1
+                                    ],
+                                    "defined": true,
+                                    "id": "af47defa-e9a1-43f1-872f-f80538befb00",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": {
+                                        "name": "res_left",
+                                        "parameter": {
+                                            "name": "res_left",
+                                            "shortName": null,
+                                            "array": true,
+                                            "size": 1
+                                        },
+                                        "id": "91879e10-700a-4934-8283-ff5a39f2ee38"
+                                    }
+                                },
+                                {
+                                    "parameter": {
+                                        "name": "res_right",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "value": [
+                                        2
+                                    ],
+                                    "defined": true,
+                                    "id": "117d9dfd-ad0b-43a5-9085-21edffafed80",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": {
+                                        "name": "res_right",
+                                        "parameter": {
+                                            "name": "res_right",
+                                            "shortName": null,
+                                            "array": true,
+                                            "size": 1
+                                        },
+                                        "id": "dd583a8f-1f4b-417e-8a14-d3ffbbe5617f"
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "parameter": {
+                                        "name": "out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": null,
+                                    "defined": false,
+                                    "id": "19c4aa1a-c251-4c88-9c00-36474f58109b",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                },
+                                {
+                                    "parameter": {
+                                        "name": "indices_out",
+                                        "shortName": null,
+                                        "array": false,
+                                        "size": 0
+                                    },
+                                    "value": null,
+                                    "defined": false,
+                                    "id": "8c089b01-4bbe-4114-96cf-a76e20adde35",
+                                    "serviceCallId": null,
+                                    "host": null,
+                                    "group": null
+                                }
+                            ],
+                            "subTasks": [],
+                            "dataGroups": [
+                                {
+                                    "name": "res_left",
+                                    "parameter": {
+                                        "name": "res_left",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "id": "91879e10-700a-4934-8283-ff5a39f2ee38"
+                                },
+                                {
+                                    "name": "res_right",
+                                    "parameter": {
+                                        "name": "res_right",
+                                        "shortName": null,
+                                        "array": true,
+                                        "size": 1
+                                    },
+                                    "id": "dd583a8f-1f4b-417e-8a14-d3ffbbe5617f"
+                                }
+                            ],
+                            "localGroups": [],
+                            "remote": false,
+                            "appliedRule": null
+                        }
+                    ],
+                    "dataGroups": [
+                        {
+                            "name": "out_arr",
+                            "parameter": {
+                                "name": "out_arr",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "id": "21618ae9-9599-4f51-b572-37d6e3194c20"
+                        }
+                    ],
+                    "localGroups": [],
+                    "remote": true,
+                    "appliedRule": null
+                },
+                {
+                    "open": true,
+                    "service": {
+                        "name": "Merge_S",
+                        "axiom": false,
+                        "inputParameters": [
+                            {
+                                "name": "indices_in",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            },
+                            {
+                                "name": "res_left",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            {
+                                "name": "res_right",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            }
+                        ],
+                        "outputParameters": [
+                            {
+                                "name": "out",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            },
+                            {
+                                "name": "indices_out",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            }
+                        ],
+                        "remote": false,
+                        "kubename": "localhost:8000",
+                        "exampleSignature": ""
+                    },
+                    "inputs": [
+                        {
+                            "parameter": {
+                                "name": "indices_in",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            },
+                            "value": [
+                                0,
+                                1
+                            ],
+                            "defined": true,
+                            "id": "b46f6689-8cfb-4749-93fd-b6e298c64d7f",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": null
+                        },
+                        {
+                            "parameter": {
+                                "name": "res_left",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "value": [
+                                1
+                            ],
+                            "defined": true,
+                            "id": "d9134281-454d-4ec2-b9ff-6cc31ad15d60",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": {
+                                "name": "res_left",
+                                "parameter": {
+                                    "name": "res_left",
+                                    "shortName": null,
+                                    "array": true,
+                                    "size": 1
+                                },
+                                "id": "c841d279-a920-48f2-957e-bf65ccdd2fa8"
+                            }
+                        },
+                        {
+                            "parameter": {
+                                "name": "res_right",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "value": null,
+                            "defined": false,
+                            "id": "05a3a98e-5436-4c63-800f-bf5c33d1f4d4",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": {
+                                "name": "res_right",
+                                "parameter": {
+                                    "name": "res_right",
+                                    "shortName": null,
+                                    "array": true,
+                                    "size": 1
+                                },
+                                "id": "b090747e-f00a-440a-ba95-54610bd98ac5"
+                            }
+                        }
+                    ],
+                    "outputs": [
+                        {
+                            "parameter": {
+                                "name": "out",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            },
+                            "value": null,
+                            "defined": false,
+                            "id": "9d2144f1-c247-44bf-986d-4069dc4bc149",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": null
+                        },
+                        {
+                            "parameter": {
+                                "name": "indices_out",
+                                "shortName": null,
+                                "array": false,
+                                "size": 0
+                            },
+                            "value": null,
+                            "defined": false,
+                            "id": "f0dea1a6-4bda-483e-a175-fd671c349d1b",
+                            "serviceCallId": null,
+                            "host": null,
+                            "group": null
+                        }
+                    ],
+                    "subTasks": [],
+                    "dataGroups": [
+                        {
+                            "name": "res_left",
+                            "parameter": {
+                                "name": "res_left",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "id": "c841d279-a920-48f2-957e-bf65ccdd2fa8"
+                        },
+                        {
+                            "name": "res_right",
+                            "parameter": {
+                                "name": "res_right",
+                                "shortName": null,
+                                "array": true,
+                                "size": 1
+                            },
+                            "id": "b090747e-f00a-440a-ba95-54610bd98ac5"
+                        }
+                    ],
+                    "localGroups": [],
+                    "remote": false,
+                    "appliedRule": null
+                }
+            ],
+            "dataGroups": [
+                {
+                    "name": "out_arr",
+                    "parameter": {
+                        "name": "out_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    },
+                    "id": "137267e5-7ebd-4b49-aa44-fda943dd7c45"
+                }
+            ],
+            "localGroups": [],
+            "remote": true,
+            "appliedRule": null
+        },
+        {
+            "open": true,
+            "service": {
+                "name": "Merge_Main_S",
+                "axiom": false,
+                "inputParameters": [
+                    {
+                        "name": "in_length",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    },
+                    {
+                        "name": "in_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    }
+                ],
+                "outputParameters": [
+                    {
+                        "name": "out_length",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    },
+                    {
+                        "name": "out_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    },
+                    {
+                        "name": "merge_res",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    }
+                ],
+                "remote": false,
+                "kubename": "localhost:8000",
+                "exampleSignature": ""
+            },
+            "inputs": [
+                {
+                    "parameter": {
+                        "name": "in_length",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    },
+                    "value": 1,
+                    "defined": true,
+                    "id": "3f7b7805-b80b-4f33-958f-789359898606",
+                    "serviceCallId": null,
+                    "host": null,
+                    "group": null
+                },
+                {
+                    "parameter": {
+                        "name": "in_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    },
+                    "value": null,
+                    "defined": false,
+                    "id": "e1c12a40-6b42-4d78-b653-3c331a1dcef4",
+                    "serviceCallId": null,
+                    "host": null,
+                    "group": {
+                        "name": "in_arr",
+                        "parameter": {
+                            "name": "in_arr",
+                            "shortName": null,
+                            "array": true,
+                            "size": 1
+                        },
+                        "id": "0815bed9-21f3-43fb-9075-c0cff14288a6"
+                    }
+                }
+            ],
+            "outputs": [
+                {
+                    "parameter": {
+                        "name": "out_length",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    },
+                    "value": null,
+                    "defined": false,
+                    "id": "ef6836ac-85a4-4f70-b370-323052e349cc",
+                    "serviceCallId": null,
+                    "host": null,
+                    "group": null
+                },
+                {
+                    "parameter": {
+                        "name": "out_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    },
+                    "value": null,
+                    "defined": false,
+                    "id": "58c6919c-1fdb-4f87-a322-d61bd54966b7",
+                    "serviceCallId": null,
+                    "host": null,
+                    "group": {
+                        "name": "out_arr",
+                        "parameter": {
+                            "name": "out_arr",
+                            "shortName": null,
+                            "array": true,
+                            "size": 1
+                        },
+                        "id": "3b9f80f2-805c-469e-ae48-d0f5cda4df19"
+                    }
+                },
+                {
+                    "parameter": {
+                        "name": "merge_res",
+                        "shortName": null,
+                        "array": false,
+                        "size": 0
+                    },
+                    "value": null,
+                    "defined": false,
+                    "id": "599581ea-92f5-4556-80bd-1baa5c870fc9",
+                    "serviceCallId": null,
+                    "host": null,
+                    "group": null
+                }
+            ],
+            "subTasks": [],
+            "dataGroups": [
+                {
+                    "name": "in_arr",
+                    "parameter": {
+                        "name": "in_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    },
+                    "id": "0815bed9-21f3-43fb-9075-c0cff14288a6"
+                },
+                {
+                    "name": "out_arr",
+                    "parameter": {
+                        "name": "out_arr",
+                        "shortName": null,
+                        "array": true,
+                        "size": 1
+                    },
+                    "id": "3b9f80f2-805c-469e-ae48-d0f5cda4df19"
+                }
+            ],
+            "localGroups": [],
+            "remote": true,
+            "appliedRule": null
+        }
+    ],
+    "dataGroups": [],
+    "localGroups": [
+        {
+            "name": "out_array",
+            "parameter": {
+                "name": "out_array",
+                "shortName": null,
+                "array": false,
+                "size": 0
+            },
+            "id": "f5b75ab6-cc56-453b-9d9a-ef01480dfd1f"
+        },
+        {
+            "name": "arr",
+            "parameter": {
+                "name": "arr",
+                "shortName": null,
+                "array": false,
+                "size": 0
+            },
+            "id": "0a5a3821-bd18-4683-9388-f791359bf7ee"
+        }
+    ],
+    "remote": false,
+    "appliedRule": "MainSort_remote"
+}

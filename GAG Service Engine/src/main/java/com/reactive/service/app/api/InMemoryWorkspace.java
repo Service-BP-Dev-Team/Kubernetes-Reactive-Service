@@ -47,7 +47,7 @@ public class InMemoryWorkspace {
 
 	public static final ConcurrentHashMap<String, Executor> inMemoryCalls = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, Pair<String, Data>> inSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
-	//public static final ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
+	public static final HashMap<String, Executor> fastTaskAndCallAccess = new HashMap<String, Executor>();
 	//map service call to defined data
 	
 	public static final ConcurrentHashMap<Long, Object> threadFunctionProcess = new ConcurrentHashMap<>();
@@ -59,7 +59,7 @@ public class InMemoryWorkspace {
 	// checking if they are new rules that can be applied
 	// to pending service (open tasks)
 	// this time can be modified by the .env file of the yaml spec.
-	public static final int VALUE_READY_TASK_WAIT_TIME = 1;
+	public static final int VALUE_READY_TASK_WAIT_TIME = 0;
 	// this represent the default value of the precedent key;
 	public static final String KEY_SYNC_IN_NOTIFICATION_TIME = "SYNC_IN_NOTIFICATION_TIME"; // sometimes it may happen
 																							// that a notification

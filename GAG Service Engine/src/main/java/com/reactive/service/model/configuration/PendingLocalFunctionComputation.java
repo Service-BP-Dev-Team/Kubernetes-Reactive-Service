@@ -97,7 +97,7 @@ public class PendingLocalFunctionComputation {
 				ArrayList<Object> params = groupParameters();
 				if (!isThreadFunction) {
 					// execute in an anonymous thread
-					Runnable runner = () -> {
+					//Runnable runner = () -> {
 						Object output = Operation.executeMethodWithReflexion(functionDeclaration.getLocation(),
 								functionDeclaration.getMethod(), params);
 						
@@ -118,8 +118,8 @@ public class PendingLocalFunctionComputation {
 							current.setDefined(true);
 							
 						}
-					};
-					Thread.startVirtualThread(runner);
+					//};
+					//Thread.startVirtualThread(runner);
 				} else {
 					// execute in the thread and make thread available in the
 					// function as first argument

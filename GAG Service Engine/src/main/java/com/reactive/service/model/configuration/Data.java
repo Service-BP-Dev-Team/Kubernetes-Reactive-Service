@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.reactive.service.app.api.InMemoryWorkspace;
 import com.reactive.service.model.specification.Parameter;
-
+import com.reactive.service.util.Executor;
 import com.reactive.service.util.NameGenerator;
 
 public class Data implements Serializable{
@@ -64,8 +65,10 @@ public class Data implements Serializable{
 		return value;
 	}
 
+	
 	public void setValue(Object value) {
 		this.value = value;
+		//System.out.println("set value executed");
 		if(value!=null) {
 			this.defined=true;
 			if(index!=null) {
@@ -81,6 +84,15 @@ public class Data implements Serializable{
 			if(watcher!=null) {
 				watcher.setExecutionToEndWithData(this);
 				//watcher.setData(this);
+			}
+		}
+		// launch the executor as a new data has been defined
+		if(value!=null) {
+			//setDefined(true);
+			Executor exec = InMemoryWorkspace.fastTaskAndCallAccess.get(this.getId());
+			if (exec!=null) {
+			//	System.out.println("lightexecute");
+				exec.lightExecute(this);
 			}
 		}
 	}

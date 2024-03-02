@@ -123,6 +123,7 @@ public class SortFunc {
 		return result;
 	}
 	public ArrayList has_new_elements(Object indices,Object input1,Object input2) {
+		//System.out.println("I execute Merge S guard : indices->"+indices+", left -> "+input1+", right ->"+input2);
 		 ArrayList left = (ArrayList)input1;
 		 ArrayList right = (ArrayList)input2;
 		 ArrayList listToMerge = new ArrayList<>(); 
@@ -132,6 +133,7 @@ public class SortFunc {
 		 if(indices==null) {
 			 // the indices to consider are required to detect
 			 // new elements
+			 //System.out.println("the result is: "+result);
 			 return result;
 		 }
 		 HashSet<Integer> pending=(HashSet<Integer>)indices;
@@ -165,7 +167,7 @@ public class SortFunc {
 	    	  result.add(pending);
 	    	  
 	      }
-	      
+	     // System.out.println("the result is: "+result);
 	      return result;
 
 	}
