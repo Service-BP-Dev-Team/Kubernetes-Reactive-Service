@@ -2,6 +2,7 @@ package com.reactive.service.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class Executor {
 	private Lock lock = new ReentrantLock();
 	private Lock lockFastAccess = new ReentrantLock();
 	private Boolean terminated = false;
-	private ArrayList <Data> inputs = new ArrayList<Data>();
+	private HashSet <Data> inputs = new HashSet<Data>();
 
 	public Executor() {
 
@@ -92,6 +93,7 @@ public class Executor {
 		
 		Runnable runner = () -> {
 			lock.lock();
+			InMemoryWorkspace.fastTaskAndCallAccess.remove(d);
 			if (terminated) {
 				lock.unlock();
 				return;
@@ -116,6 +118,7 @@ public class Executor {
 					for (Task task : readyTasks.keySet()) {
 						Pair<DecompositionRule, ArrayList> firstApplicable = readyTasks.get(task).get(0);
 						applyRule(task, firstApplicable.getFirst(), firstApplicable.getSecond());
+						//removeAlreadyTreatedInputs();
 						computePendingLocalComputations();
 					}
 					readyTasks = context.getReadyTasks();
