@@ -11,7 +11,7 @@ deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
 # List of environment variables and their corresponding values
 env_variables = {
-    'NUMBER_OF_BLOCKS': 200,
+    'NUMBER_OF_BLOCKS': 128,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
@@ -20,7 +20,7 @@ env_variables = {
     'NUMBER_OF_WORKER_PODS': 2,
     'WORKER_POD_CAPACITY':1000,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 5000,
+    'MAX_LEN': 7813,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
   #  'MAXIMUM_THREAD_POOL' : 2,
@@ -38,7 +38,7 @@ def runtest(input,init,env):
 
     number_of_iteration = 20
 
-    number_of_warming = 1
+    number_of_warming = 20
     # Directory containing the text files to modify
     source_directory = rootPathIn
 

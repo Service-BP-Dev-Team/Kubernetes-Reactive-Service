@@ -14,6 +14,8 @@ public class MergeIncremental {
 	
 	public boolean lenght_is_greater_than_one(Object in_length, Object in_array) {
 		if(in_length!=null) {
+			ArrayList in = (ArrayList)  in_array;
+			if (in.get(0)==null) return false; // we require at leat one value to be defined before starting merging
 			return ((Integer) in_length ) > 1;
 		}
 		return false;

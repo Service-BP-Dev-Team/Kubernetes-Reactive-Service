@@ -49,7 +49,7 @@ actions:
  - pending_indices = init_indices(in_length)
  - out_length = divide_length(in_length)
  - out_arr[i/pending_indices] = [Merge_Main_It(pending_indices,in_arr) for i,inc,${NUMBER_OF_BLOCKS}]
- - (size,arr,merge_res) = __call Merge_Main_S(out_length,out_arr)
+ - (size,arr,merge_res) =  __call Merge_Main_S(out_length,out_arr)
 
 
 

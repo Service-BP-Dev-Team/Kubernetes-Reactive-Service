@@ -17,7 +17,7 @@ actions :
  - length = getNUMBER_OF_BLOCKS()
  #adding synchronization
  - sync_out_array = SyncValue(out_array)
- - (size, arr, out_list) = Merge_Main_S(length,sync_out_array) # merge incrementally
+ - (size, arr, out_list) = __call Merge_Main_S(length,sync_out_array) # merge incrementally
 
 #basic case the lenght is 1 
 ---
@@ -52,7 +52,7 @@ actions:
  - out_length = divide_length(in_length)
  - out_arr[i/pending_indices] = [Merge_Main_It(pending_indices,in_arr) for i,inc,${NUMBER_OF_BLOCKS}]
  - sync_out_arr = SyncValue(out_arr)
- - (size,arr,merge_res) = Merge_Main_S(out_length,sync_out_arr)
+ - (size,arr,merge_res) = __call Merge_Main_S(out_length,sync_out_arr)
 
 
 

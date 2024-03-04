@@ -22,7 +22,7 @@ WORKDIR /app
 COPY . .
 
 #RUN mvn dependency:resolve
-COPY ./Specification/MergeSort/com/local/ ./src/main/java/com/local/
+#COPY ./Specification/MergeSort/com/local/ ./src/main/java/com/local/
 RUN mvn clean package
 EXPOSE 8000
 COPY ./Specification/MergeSort/ ./target/spec-merge-sort-enhanced/

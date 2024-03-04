@@ -9,7 +9,7 @@ public class Macro {
 		String regex =""+
 	"\\s-\\s([a-zA-Z_][a-zA-Z_0-9]*)\\[([a-zA-Z_][a-zA-Z_0-9]*)/([a-zA-Z_][a-zA-Z_0-9]*)\\]"
 	// first part above will match expression such as 'tab[i/sync]'
-	+"\\s?=\\s?\\[\\s?([a-zA-Z_][a-zA-Z_0-9]*)\\((([a-zA-Z_][a-zA-Z_0-9]*,)*([a-zA-Z_][a-zA-Z_0-9]*))\\)"+ 
+	+"\\s?=\\s?\\[\\s?(__call)?\\s?([a-zA-Z_][a-zA-Z_0-9]*)\\((([a-zA-Z_][a-zA-Z_0-9]*,)*([a-zA-Z_][a-zA-Z_0-9]*))\\)"+ 
 	// second part above will match expression such as ' = [service (a,b1,c2) ' 
 	" for ([a-zA-Z_][a-zA-Z_0-9]*),([a-zA-Z_][a-zA-Z_0-9]*),(\\d+)\\s?\\]";
 	// this last part above match expression such as 'for i,inc,5]'
@@ -28,8 +28,9 @@ public class Macro {
             String array = matcher.group(1);
             String index = matcher.group(2);
             String sync = matcher.group(3);
-            String service = matcher.group(4);
-            String parameters=matcher.group(5);
+            String call = matcher.group(4);
+            String service = matcher.group(5);
+            String parameters=matcher.group(6);
             String parametersWithoutSync="";
             String[] parametersSplit = parameters.split(",");
             if(parametersSplit.length>1) {
@@ -37,17 +38,17 @@ public class Macro {
             		parametersWithoutSync+=","+parametersSplit[i];
             	}
             }
-            String incFunction= matcher.group(9);
-            String incRepeat= matcher.group(10);
+            String incFunction= matcher.group(10);
+            String incRepeat= matcher.group(11);
             int incRepeatNumber = Integer.parseInt(incRepeat);
             //first line
             String translation=" - ("+array+"["+index+"],"+sync+"1)="+
-            service+"("+sync+parametersWithoutSync+")"+"\n";
+            ((call!=null)?" __call ":"")+service+"("+sync+parametersWithoutSync+")"+"\n";
             String lastIndex=index;
             for(int i=2; i<=incRepeatNumber; i++) {
             	translation+=" - "+index+(i-1)+"="+incFunction+"("+lastIndex+")"+"\n";
             	translation+=" - ("+array+"["+index+(i-1)+"],"+sync+i+")="+
-                        service+"("+sync+(i-1)+parametersWithoutSync+")"+"\n";
+            			((call!=null)?" __call ":"") +service+"("+sync+(i-1)+parametersWithoutSync+")"+"\n";
             	lastIndex=index+(i-1);
             	
             }
@@ -72,7 +73,7 @@ public class Macro {
 	public static void main(String args[]) {
 		String part1 = " - tab[i/sync]";
 		String regex1 ="\\s-\\s([a-zA-Z_][a-zA-Z_0-9]*)\\[([a-zA-Z_][a-zA-Z_0-9]*)/([a-zA-Z_][a-zA-Z_0-9]*)\\]";
-		String part2 = " = [service(a,b,c)";
+		String part2 = " = [ __call service(a,b,c)";
 		String regex2 = "\\s?=\\s?\\[([a-zA-Z_][a-zA-Z_0-9]*)\\(([a-zA-Z_][a-zA-Z_0-9]*,)*([a-zA-Z_][a-zA-Z_0-9]*)\\)";
 		String part3 = " for i,inc,10]";
 		String regex3 =" for ([a-zA-Z_][a-zA-Z_0-9]*),([a-zA-Z_][a-zA-Z_0-9]*),(\\d+)\\s?\\]";
