@@ -54,12 +54,7 @@ public class InMemoryWorkspace {
 	public static final ConcurrentHashMap<String, Boolean> discardNotificationsAlreadyDone = new ConcurrentHashMap<>();
 	public static final String defaultGAGFolder = "spec-merge-sort-enhanced";
 	public static final Map<String, String> environmentVariables = new HashMap<String, String>();
-	public static final String KEY_READY_TASK_WAIT_TIME = "READY_TASK_WAIT_TIME"; // time where each gag process will
-																					// wait before
-	// checking if they are new rules that can be applied
-	// to pending service (open tasks)
-	// this time can be modified by the .env file of the yaml spec.
-	public static final int VALUE_READY_TASK_WAIT_TIME = 0;
+
 	// this represent the default value of the precedent key;
 	public static final String KEY_SYNC_IN_NOTIFICATION_TIME = "SYNC_IN_NOTIFICATION_TIME"; // sometimes it may happen
 																							// that a notification
@@ -110,6 +105,13 @@ public class InMemoryWorkspace {
 		
 	// by default the value is set to false
 	public static final int VALUE_USE_CACHED_THREAD_POOL=0;
+	
+	// key below gives the failure probability of a sort request to a worker
+	public static final String KEY_WORKER_REQUEST_FAILURE_PROBABILITY="WORKER_REQUEST_FAILURE_PROBABILITY";
+	
+	// the default value is 0. by default it's impossible for a pod to fail
+	
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
 	
 	
 	private static GAG gag;
@@ -428,13 +430,6 @@ public class InMemoryWorkspace {
 		return result;
 	}
 
-	public static int getReadyTaskWaitTime() {
-		String val = environmentVariables.get(KEY_READY_TASK_WAIT_TIME);
-		if (val != null) {
-			return Integer.parseInt(val);
-		}
-		return VALUE_READY_TASK_WAIT_TIME;
-	}
 
 	public static int getSyncInNotificationTime() {
 		String val = environmentVariables.get(KEY_SYNC_IN_NOTIFICATION_TIME);
@@ -487,6 +482,15 @@ public class InMemoryWorkspace {
 			return val.equals("True");
 		} else {
 			return VALUE_USE_CACHED_THREAD_POOL==1;
+		}
+	}
+	
+	public static Double getWorkerRequestFailureProbability() {
+		String val = environmentVariables.get(KEY_WORKER_REQUEST_FAILURE_PROBABILITY);
+		if (val!=null) {
+			return Double.parseDouble(val);
+		}else {
+			return VALUE_WORKER_REQUEST_FAILURE_PROBABILITY;
 		}
 	}
 

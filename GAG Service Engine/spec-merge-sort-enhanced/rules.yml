@@ -48,7 +48,7 @@ actions:
  - i = getZero()
  - pending_indices = init_indices(in_length)
  - out_length = divide_length(in_length)
- - out_arr[i/pending_indices] = [__call Merge_Main_It(pending_indices,in_arr) for i,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[i/pending_indices] = [ Merge_Main_It(pending_indices,in_arr) for i,inc,${NUMBER_OF_BLOCKS}]
  - (size,arr,merge_res) = __call Merge_Main_S(out_length,out_arr)
 
 
@@ -135,7 +135,8 @@ functions :
 actions :
 # - out_arr = sort_array_lists(inp_arr)
  - index_out = inc(index_in)
- - out = __call BasicSort(in_arr[index_in])
+ - inter = __call BasicSort(in_arr[index_in])
+ - out = Check_output(in_arr[index_in],inter)
 
 ---
 #basic sort work 
@@ -146,7 +147,7 @@ guard :
  classPath: com.local.SortFunc
  method: base_sort_input_defined
 functions :
- - { classPath: com.local.Base, method: sort, label: sort}
+ - { classPath: com.local.Base, method: sortWithPossibleFaillure, label: sort}
 actions :
  - out = sort(in) 
 
@@ -193,4 +194,25 @@ actions :
  - indices_out = remainingIndices
  - out = merge_two(list1,list2)
 
-# we need to add a rule to terminate the merge I think
+---
+#check output rule  
+kind : rule
+name : Check_output_failure_Rule
+service : Check_output
+guard : 
+ classPath: com.local.Base
+ method: worker_failure
+actions :
+ - inter = __call BasicSort(in)
+ - out = Check_output(in,inter) 
+
+---
+#check output rule  
+kind : rule
+name : Check_output_success_Rule
+service : Check_output
+guard : 
+ classPath: com.local.Base
+ method: worker_success
+actions :
+ - out = res

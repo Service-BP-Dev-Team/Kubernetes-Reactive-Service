@@ -72,3 +72,13 @@ inputs :
  - { name : in }
 outputs :
  - { name : out}
+ 
+---
+kind : service
+name : Check_output
+kubename : ${KUBE_NAME}
+inputs : 
+ - { name : in }
+ - { name : res }
+outputs :
+ - { name : out}
