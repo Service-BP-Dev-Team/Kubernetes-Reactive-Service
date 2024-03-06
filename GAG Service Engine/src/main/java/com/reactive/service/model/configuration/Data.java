@@ -30,6 +30,7 @@ public class Data implements Serializable{
 	private Data index;
 	private OutputWatcher watcher;
 	private boolean terminated; //when the data has been exploited and destroyed
+	private Executor executor;
 	public Data() {
 		idCounter++;
 	    id = UUID.randomUUID().toString();
@@ -89,7 +90,8 @@ public class Data implements Serializable{
 		// launch the executor as a new data has been defined
 		if(value!=null) {
 			//setDefined(true);
-			Executor exec = InMemoryWorkspace.fastTaskAndCallAccess.get(this.getId());
+			//Executor exec = InMemoryWorkspace.fastTaskAndCallAccess.get(this.getId());
+			Executor exec=this.executor;
 			if (exec!=null) {
 			//	System.out.println("lightexecute");
 				exec.lightExecute(this);
@@ -253,6 +255,21 @@ public class Data implements Serializable{
 		this.value=null;
 				
 	}
+
+
+
+	@JsonIgnore
+	public Executor getExecutor() {
+		return executor;
+	}
+
+
+
+
+	public void setExecutor(Executor executor) {
+		this.executor = executor;
+	}
+	
 	
 	
 	

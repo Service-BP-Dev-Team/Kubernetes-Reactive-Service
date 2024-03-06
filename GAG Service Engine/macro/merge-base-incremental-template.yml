@@ -1,0 +1,25 @@
+#basic case the lenght is 1 
+---
+kind : rule
+name : Merge_Main_Incremental_Base
+service: Merge_Main_S
+guard :
+ classPath: com.local.MergeIncremental
+ method: lenght_is_one
+functions:
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+actions:
+ - i = getZero()
+ - merge_res=in_arr[i]
+ 
+#service used by the main sort to merge incrementally the result
+---
+kind : service
+name : Merge_Main_S
+kubename : ${KUBE_NAME}
+inputs : 
+ - { name : in_length }
+ - { name : in_arr, array: true, size: ${total_lenght} }
+outputs :
+ - { name : merge_res}
+ 

@@ -15,6 +15,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 
 import org.yaml.snakeyaml.Yaml;
@@ -47,7 +49,9 @@ public class InMemoryWorkspace {
 
 	public static final ConcurrentHashMap<String, Executor> inMemoryCalls = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, Pair<String, Data>> inSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
-	public static final HashMap<String, Executor> fastTaskAndCallAccess = new HashMap<String, Executor>();
+	
+	
+	
 	//map service call to defined data
 	
 	public static final ConcurrentHashMap<Long, Object> threadFunctionProcess = new ConcurrentHashMap<>();
@@ -113,6 +117,7 @@ public class InMemoryWorkspace {
 	
 	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
 	
+
 	
 	private static GAG gag;
 	
