@@ -42,10 +42,8 @@ public class Executor {
 	private ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
 	private boolean running = false;
 	private Lock lock = new ReentrantLock();
-	private Lock lockFastAccess = new ReentrantLock();
 	private Boolean terminated = false;
 	private HashSet <Data> inputs = new HashSet<Data>();
-
 	public Executor() {
 
 	}
@@ -92,8 +90,11 @@ public class Executor {
 		// if(running) return ; //when it is already running we do nothing
 		
 		Runnable runner = () -> {
+			
+		
+			
 			lock.lock();
-			InMemoryWorkspace.fastTaskAndCallAccess.remove(d);
+			
 			if (terminated) {
 				lock.unlock();
 				return;
@@ -104,12 +105,14 @@ public class Executor {
 				return;
 			}
 			try {
-				
+				//inputs.remove(d);
 				running = true;
 				removeAlreadyTreatedInputs();
 				computePendingLocalComputations();
 				// Really important is mandatory to compute pending local computations before
 				// looking for ready task
+				//System.out.println(terminated);
+				//System.out.println(context);
 				Hashtable<Task, List<Pair<DecompositionRule, ArrayList>>> readyTasks = context.getReadyTasks();
 				// System.out.println("" + readyTasks);
 				
@@ -126,6 +129,7 @@ public class Executor {
 				
 				running = false;
 				if (!continuous()) {
+					terminated=true;
 					clearAllData();
 				}
 			} finally {
@@ -453,11 +457,11 @@ public class Executor {
 						Executor exec = new Executor();
 						Context ctx = new Context();
 						ctx.setExecutor(exec);
+						exec.setContext(ctx);
 						exec.setConfiguration(conf);
 						//make fast access
 						makeFastAccess(newTask.getOutputs());
 						exec.setGag(gag);
-						exec.setContext(ctx);
 						exec.setServiceCallId(sc.getId());
 						exec.setSubExecutor(true);
 						InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
@@ -530,31 +534,26 @@ public class Executor {
 
 				try {
 					Thread.sleep(5000);
+					// remove the service call in the memory
+					InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
+					configuration.clearData();
+					configuration = null;
+					this.gag = null;
+					this.context = null;
+					this.serviceCallId = null;
+
+					terminateTasks(root);
+					// clear all data recursively
+					clearTaskData(root);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				terminateTasks(root);
-				// clear all data recursively
-				clearTaskData(root);
+
 			});
 			clear.start();
 		}
-		// remove the service call in the memory
-		InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
-		// we suggest the garbage collector to pass
-		// Suggest garbage collection
-		// System.gc();
-
-		// clear configuration
-		configuration.clearData();
-		// outSubscriptions.clear();
-		// outSubscriptions=null;
-		configuration = null;
-		this.gag = null;
-		this.context = null;
-		this.serviceCallId = null;
-
+		
 		/*
 		 * System.out.println("the memory call size is : "+
 		 * InMemoryWorkspace.inMemoryCalls.size());
@@ -615,22 +614,24 @@ public class Executor {
 		}
 
 	}
-
+	// this method is used to take into account all inputs
 	private void makeFastAccess(List<Data> datas) {
 		//System.out.println("make fast access");
-		lockFastAccess.lock();
-		;
+		lock.lock();
 		try {
 			for (Data d : datas) {
-				InMemoryWorkspace.fastTaskAndCallAccess.put(d.getId(), this);
-			}
-			inputs.addAll(datas);
+				inputs.add(d);
+				d.setExecutor(this);
+				}
+			
 		} finally {
-			lockFastAccess.unlock();
+			lock.unlock();
 		}
+		
 	}
 	
-	// this method is used to take into account all inputs
+	// this method allow to not process already processed inputs
+	// it should be called on a block preceded by lock.lock()
 	public void removeAlreadyTreatedInputs() {
 		ArrayList<Data> toRemove = new ArrayList<Data>();
 		for(Data d : inputs) {
@@ -639,6 +640,7 @@ public class Executor {
 			}
 		}
 		inputs.removeAll(toRemove);
+		
 	}
 
 }
