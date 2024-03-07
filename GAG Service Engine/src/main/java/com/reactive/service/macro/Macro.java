@@ -3,6 +3,8 @@ package com.reactive.service.macro;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.reactive.service.util.FileWriting;
+
 public class Macro {
 
 	public static String handleForLoop(String input) {
@@ -63,10 +65,12 @@ public class Macro {
 	
 	public static String expandAllMacro(String input) {
 		String result="";
-		String[] splited = input.split("\n");
+		String inputWithMerge = MergeIncremental.findAndExpandMacro(input);
+		String[] splited = inputWithMerge.split("\n");
 		for(String line:splited) {
 			result+=handleForLoop(line);
 		}
+		//FileWriting.writeStringToFile(result,"./macro/log.yml");
 		return result;
 	}
 	

@@ -92,7 +92,7 @@ public class Data implements Serializable{
 			//setDefined(true);
 			//Executor exec = InMemoryWorkspace.fastTaskAndCallAccess.get(this.getId());
 			Executor exec=this.executor;
-			if (exec!=null) {
+			if (exec!=null ) {
 			//	System.out.println("lightexecute");
 				exec.lightExecute(this);
 			}

@@ -6,9 +6,14 @@ import java.util.HashSet;
 public class MergeIncremental {
 
 	public boolean lenght_is_one(Object in_length, Object in_array) {
+		boolean result;
 		if(in_length!=null) {
+			//result= ((Integer) in_length ) == 1;
 			return ((Integer) in_length ) == 1;
 		}
+		//else{result=false;}
+		//System.out.println("the inlength is "+in_length);
+		//System.out.println("the result is "+result);
 		return false;
 	}
 	

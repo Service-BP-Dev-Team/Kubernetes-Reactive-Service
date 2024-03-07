@@ -85,6 +85,24 @@ public class Executor {
 	public void setOutSubscriptions(ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions) {
 		this.outSubscriptions = outSubscriptions;
 	}
+	
+	
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
+
+	public Boolean getTerminated() {
+		return terminated;
+	}
+
+	public void setTerminated(Boolean terminated) {
+		this.terminated = terminated;
+	}
 
 	public void lightExecute(Data d) {
 		// if(running) return ; //when it is already running we do nothing

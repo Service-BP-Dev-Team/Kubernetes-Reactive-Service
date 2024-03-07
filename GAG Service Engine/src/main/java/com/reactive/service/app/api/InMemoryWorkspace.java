@@ -388,6 +388,10 @@ public class InMemoryWorkspace {
 			// reading rules
 			ArrayList<YAMLSpec> myRules = new ArrayList<>();
 			String allRulesWithEnvVariable;
+			// all all the environmet variables in the workspace memory
+						for (String key : EnvVariables.keySet()) {
+							environmentVariables.put(key, EnvVariables.get(key));
+						}
 			try {
 				String allRulesYamlSpecString = ENV_Manager.readFileToString(rootFolder + "/rules.yml");
 				allRulesWithEnvVariable = ENV_Manager.replaceEnvVariablesInYaml(allRulesYamlSpecString, EnvVariables);
@@ -410,10 +414,7 @@ public class InMemoryWorkspace {
 			Parser parser = new Parser();
 			parser.setSpecs(allSpecs);
 			gag = parser.getGAG();
-			// all all the environmet variables in the workspace memory
-			for (String key : EnvVariables.keySet()) {
-				environmentVariables.put(key, EnvVariables.get(key));
-			}
+			
 			// System.out.println(gag);
 		}
 		return gag;

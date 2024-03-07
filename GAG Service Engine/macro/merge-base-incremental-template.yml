@@ -2,7 +2,7 @@
 ---
 kind : rule
 name : Merge_Main_Incremental_Base
-service: Merge_Main_S
+service: Merge_Main_S_${array_size}
 guard :
  classPath: com.local.MergeIncremental
  method: lenght_is_one
@@ -11,15 +11,21 @@ functions:
 actions:
  - i = getZero()
  - merge_res=in_arr[i]
+ - out_length=in_length
+ - out_arr[i] = in_arr[i]
+
  
 #service used by the main sort to merge incrementally the result
 ---
 kind : service
-name : Merge_Main_S
+name : Merge_Main_S_${array_size}
 kubename : ${KUBE_NAME}
 inputs : 
  - { name : in_length }
- - { name : in_arr, array: true, size: ${total_lenght} }
+ - { name : in_arr, array: true, size: ${array_size} }
 outputs :
+ - { name : out_length}
+ - { name : out_arr, array: true, size: ${array_size}}
  - { name : merge_res}
+ 
  

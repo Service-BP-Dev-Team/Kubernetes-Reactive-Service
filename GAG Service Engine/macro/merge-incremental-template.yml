@@ -1,5 +1,4 @@
-
-#the lenght to merge is greater than one
+#the lenght to merge is greater than one (so it is at least 2)
 ---
 kind : rule
 name : Merge_Main_Incremental_Greater_Than_One_${array_size}
@@ -16,7 +15,7 @@ actions:
  - i = getZero()
  - pending_indices = init_indices(in_length)
  - out_length = divide_length(in_length)
- - out_arr[i/pending_indices] = [ Merge_Main_It_${array_size}(pending_indices,in_arr) for i,inc,${array_size}]
+ - out_arr[i/pending_indices] = [ Merge_Main_It_${array_size}(pending_indices,in_arr) for i,inc,${divide_array_size}]
  - (size,arr,merge_res) = __call Merge_Main_S_${divide_array_size}(out_length,out_arr)
  
 ---
@@ -43,10 +42,10 @@ name : Merge_Main_S_${array_size}
 kubename : ${KUBE_NAME}
 inputs : 
  - { name : in_length }
- - { name : in_arr, array: true, size: ${double_array_size} }
+ - { name : in_arr, array: true, size: ${array_size} }
 outputs :
  - { name : out_length}
- - { name : out_arr, array: true, size: ${array_size}}
+ - { name : out_arr, array: true, size: ${divide_array_size}}
  - { name : merge_res}
  
 ---
