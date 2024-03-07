@@ -28,8 +28,19 @@ inputs :
 outputs :
  - { name : out}
  - { name : indices_out}
+
+# service that checks if a work request succeeded
+---
+kind : service
+name : Check_output
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : in }
+ - { name : res }
+outputs :
+ - { name : out}
  
- 
+
 ---
 kind : service
 name : Sort_Basic_It
@@ -47,27 +58,5 @@ name : BasicSort
 kubename : ${KUBE_WORKER_NAME}
 inputs : 
  - { name : in }
-outputs :
- - { name : out}
-
-
-#service for synchronous wait
----
-kind : service
-name : SyncValue
-kubename : ${KUBE_CONTROLLER_NAME}
-inputs : 
- - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
-outputs :
- - { name : out_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
-
-# service that checks if a work request succeeded
----
-kind : service
-name : Check_output
-kubename : ${KUBE_CONTROLLER_NAME}
-inputs : 
- - { name : in }
- - { name : res }
 outputs :
  - { name : out}

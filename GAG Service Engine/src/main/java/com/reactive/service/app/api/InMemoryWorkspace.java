@@ -115,7 +115,14 @@ public class InMemoryWorkspace {
 	
 	// the default value is 0. by default it's impossible for a pod to fail
 	
-	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.3;
+	
+	// key below gives the time to wait before attempting to redo a request
+	public static final String KEY_WORKER_REQUEST_WAIT_BEFORE_REDO="WORKER_REQUEST_WAIT_BEFORE_REDO";
+		
+	// the default value is 1. By default we wait 1 millis
+		
+	public static final int VALUE_WORKER_REQUEST_WAIT_BEFORE_REDO=1;
 	
 
 	
@@ -497,6 +504,15 @@ public class InMemoryWorkspace {
 			return Double.parseDouble(val);
 		}else {
 			return VALUE_WORKER_REQUEST_FAILURE_PROBABILITY;
+		}
+	}
+	
+	public static int getTimeToWaitBeforeReDoWorkerRequest() {
+		String val = environmentVariables.get(KEY_WORKER_REQUEST_WAIT_BEFORE_REDO);
+		if (val!=null) {
+			return Integer.parseInt(val);
+		}else {
+			return VALUE_WORKER_REQUEST_WAIT_BEFORE_REDO;
 		}
 	}
 

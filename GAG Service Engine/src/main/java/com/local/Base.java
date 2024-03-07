@@ -75,6 +75,13 @@ public class Base {
 	
 	public boolean worker_failure(Object in, Object res) {
 		if (in!=null && res!=null && !(res instanceof ArrayList)) {
+			int timebeforeretry = InMemoryWorkspace.getTimeToWaitBeforeReDoWorkerRequest();
+			try {
+				Thread.sleep(timebeforeretry);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return true;
 		}
 		return false;

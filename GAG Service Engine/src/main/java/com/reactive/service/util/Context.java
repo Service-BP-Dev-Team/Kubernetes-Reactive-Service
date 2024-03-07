@@ -85,7 +85,7 @@ public class Context {
 		ArrayList<Task> openTasks = new ArrayList<Task>();
 		if (root.isOpen()) {
 			openTasks.add(root);
-		} else {
+		} else if(!root.isRemote()){
 			for (Task element : root.getSubTasks()) {
 				ArrayList<Task> subOpenTasks = getPendingTasksFromRoot( element);
 				openTasks.addAll(subOpenTasks);

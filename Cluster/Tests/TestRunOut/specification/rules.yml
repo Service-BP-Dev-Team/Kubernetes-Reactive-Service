@@ -15,9 +15,7 @@ functions :
 actions :
  - out_array = __call RecSort(inp_list)
  - length = getNUMBER_OF_BLOCKS()
- #adding synchronization
- - sync_out_array = SyncValue(out_array)
- - (size, arr, out_list) = __call Merge | ${NUMBER_OF_BLOCKS} (length,sync_out_array) # merge incrementally macro
+ - (size, arr, out_list) = __call Merge | ${NUMBER_OF_BLOCKS} (length,out_array) # merge incrementally macro
 
 ---
 #R2 is active when the list is short enough to sort it locally
@@ -108,11 +106,8 @@ actions :
  - arr_right = divideRight(inp_arr) 
  - res_left = __call RecSort(arr_left)
  - res_right = __call RecSort(arr_right)
- #adding synchronization
- - sync_res_left = SyncValue(res_left)
- - sync_res_right = SyncValue(res_right)
  - index = getZero()
- - out_arr[index/pending_indices] = [Merge_S(pending_indices,sync_res_left,sync_res_right) for index,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
 
 
 ---
@@ -121,7 +116,7 @@ name : merge_rule
 service : Merge_S
 guard:
  classPath: com.local.SortFunc
- method : has_new_elements_sync
+ method : has_new_elements
  binding: 
   - {name : list1}
   - {name : list2}
@@ -132,16 +127,6 @@ actions :
  - indices_out = remainingIndices
  - out = merge_two(list1,list2)
 
-# rule for the service that makes sync
----
-kind : rule
-name : Sync_Value_Rule
-service: SyncValue
-functions:
- - { classPath: com.local.SortFunc, method: syncValue, label: sync, multiOutput : true, outputSize: ${NUMBER_OF_BLOCKS} }
-actions:
- - out_arr = sync(in_arr)
- 
 ---
 #check output rule  
 kind : rule
