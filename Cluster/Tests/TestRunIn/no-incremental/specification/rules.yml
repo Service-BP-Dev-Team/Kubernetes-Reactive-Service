@@ -142,7 +142,7 @@ functions:
 actions:
  - out_arr = sync(in_arr)
  
- ---
+---
 #check output rule  
 kind : rule
 name : Check_output_failure_Rule
