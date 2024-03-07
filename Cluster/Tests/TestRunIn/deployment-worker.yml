@@ -26,11 +26,17 @@ spec:
         volumeMounts:
         - name: hostpath-volume
           mountPath: /app/target/spec-merge-sort-enhanced
+        - name: hostpath-macro
+          mountPath: /app/target/macro
       volumes:
       - name: hostpath-volume
         hostPath:
-          path: /vagrant/Tests/TestRunOut
-          type: Directory  
+          path: /vagrant/Tests/TestRunOut/specification
+          type: Directory
+      - name: hostpath-macro
+        hostPath:
+          path: /vagrant/Tests/TestRunOut/macro
+          type: Directory 
 ---
 apiVersion: v1
 kind: Service

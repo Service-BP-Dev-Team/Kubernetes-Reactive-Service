@@ -33,7 +33,7 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
             #print(f"Modified file: {destination_path}")
 
     #store the env used in an environment file
-    with open(os.path.join(destination_directory,".env"), 'w') as fenv:
+    with open(os.path.join(destination_directory,"specification",".env"), 'w') as fenv:
         for key, value in env_variables.items() :
             if(value):
                 fenv.write(f'{key}={value}\n')
@@ -49,13 +49,21 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
             shutil.copy2(source_path, destination_path)
 
     # Copy services and rules files in the destination directory
-    specdir_name = "incremental" if (env_variables.get("INCREMENTAL_EXECUTION",False)) else "no-incremental"
+    specdir_name = "incremental/specification" if (env_variables.get("INCREMENTAL_EXECUTION",False)) else "no-incremental/specification"
     specdir=os.path.join(source_directory,specdir_name)
     for filename in os.listdir(specdir):
         source_path = os.path.join(specdir, filename)
-        destination_path = os.path.join(destination_directory, filename)
+        destination_path = os.path.join(destination_directory,'specification', filename)
 
         if filename.endswith('.yml'):
             shutil.copy2(source_path, destination_path)
     
-    
+        # Copy macro files in the destination directory
+    specdir_name = "incremental/macro" if (env_variables.get("INCREMENTAL_EXECUTION",False)) else "no-incremental/macro"
+    specdir=os.path.join(source_directory,specdir_name)
+    for filename in os.listdir(specdir):
+        source_path = os.path.join(specdir, filename)
+        destination_path = os.path.join(destination_directory,'macro', filename)
+
+        if filename.endswith('.yml'):
+            shutil.copy2(source_path, destination_path)

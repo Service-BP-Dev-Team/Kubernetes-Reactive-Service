@@ -4,8 +4,6 @@ import time
 from changeenv import buildEnvironment
 
 rootPathIn ="/vagrant/Tests/TestRunIn"
-rootPathSpecGAGIncremental="/vagrant/Tests/TestRunIn/incremental"
-rootPathSpecGAGNOIncremental="/vagrant/Tests/TestRunIn/no-incremental"
 rootPathOut ="/vagrant/Tests/TestRunOut"
 deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
@@ -25,8 +23,8 @@ env_variables = {
     'READY_TASK_WAIT_TIME' : 1,
   #  'MAXIMUM_THREAD_POOL' : 2,
     'USE_VIRTUAL_THREAD' : True,
-  #  'INCREMENTAL_EXECUTION':False,
-    'INCREMENTAL_EXECUTION':True,
+    'INCREMENTAL_EXECUTION':False,
+  #  'INCREMENTAL_EXECUTION':True,
     
 
 }
