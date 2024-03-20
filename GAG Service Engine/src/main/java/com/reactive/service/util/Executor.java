@@ -148,7 +148,9 @@ public class Executor {
 				running = false;
 				if (!continuous()) {
 					terminated=true;
+					if(!subExecutor) {
 					clearAllData();
+					}
 				}
 			} finally {
 				lock.unlock();
@@ -487,12 +489,13 @@ public class Executor {
 						Context ctx = new Context();
 						ctx.setExecutor(exec);
 						exec.setContext(ctx);
+						exec.setSubExecutor(true);
 						exec.setConfiguration(conf);
 						//make fast access
 						makeFastAccess(newTask.getOutputs());
 						exec.setGag(gag);
 						exec.setServiceCallId(sc.getId());
-						exec.setSubExecutor(true);
+						
 						InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
 						// execute the task
 						exec.execute();
@@ -553,17 +556,11 @@ public class Executor {
 
 	private void clearAllData() {
 		terminated=true;
-		if (!isSubExecutor()) {
 			// when it is a subs executor the task to terminate tasks
 			// and data is left to the parent executor
 			// wit some time for the notification to be performed before clearing
 			// everything
 			final Task root = configuration.getRoot();
-			Thread clear = new Thread(() -> {
-
-				try {
-					Thread.sleep(5000);
-					// remove the service call in the memory
 					InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
 					configuration.clearData();
 					configuration = null;
@@ -574,14 +571,8 @@ public class Executor {
 					terminateTasks(root);
 					// clear all data recursively
 					clearTaskData(root);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			});
-			clear.start();
-		}
+		
+		
 		
 		/*
 		 * System.out.println("the memory call size is : "+
