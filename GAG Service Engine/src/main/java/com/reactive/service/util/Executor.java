@@ -535,10 +535,10 @@ public class Executor {
 					// now notify in separate thread
 
 					outSubscriptions.remove(nf.getData().getId());
-					Runnable runner = () -> {
+					//Runnable runner = () -> {
 						InMemoryWorkspace.processOutNotification(nf, p.getKey());
-					};
-					Thread.startVirtualThread(runner);
+					//};
+					//Thread.startVirtualThread(runner);
 				}
 			}
 
