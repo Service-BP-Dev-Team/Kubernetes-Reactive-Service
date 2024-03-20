@@ -60,6 +60,8 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		RandomInputRequest rq= super.readRequest(is, RandomInputRequest.class);
 		int size =rq.getSize();
 		System.out.println("start data execution");
+
+		Console.printMemory();
 		Pair<OutputWatcher,Task> p=createTheTask(size);
 		OutputWatcher watcher = p.getFirst();
 		int timeElapsed = 0;
@@ -82,7 +84,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
         
         System.out.println("finished to create data");
         System.gc();
-        //Console.printMemory();
+        Console.printMemory();
         return new ResponseEntity<>(watcher,
             getHeaders(Constants.CONTENT_TYPE, Constants.APPLICATION_JSON), StatusCode.OK);
 		

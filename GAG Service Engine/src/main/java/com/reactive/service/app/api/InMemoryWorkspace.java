@@ -44,12 +44,12 @@ import com.reactive.service.util.Logger;
 import com.reactive.service.util.Operation;
 
 import static com.consulner.app.Configuration.getObjectMapper;
-
+import java.util.concurrent.Semaphore;
 public class InMemoryWorkspace {
 
 	public static final ConcurrentHashMap<String, Executor> inMemoryCalls = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, Pair<String, Data>> inSubscriptions = new ConcurrentHashMap<String, Pair<String, Data>>();
-	
+	public static Semaphore computingRessource; 
 	
 	
 	//map service call to defined data
@@ -115,14 +115,21 @@ public class InMemoryWorkspace {
 	
 	// the default value is 0. by default it's impossible for a pod to fail
 	
-	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.3;
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
 	
 	// key below gives the time to wait before attempting to redo a request
-	public static final String KEY_WORKER_REQUEST_WAIT_BEFORE_REDO="WORKER_REQUEST_WAIT_BEFORE_REDO";
+	public static final String KEY_WORKER_REQUEST_FAIL_DETECT_DURATION="WORKER_REQUEST_FAIL_DETECT_DURATION";
 		
 	// the default value is 1. By default we wait 1 millis
 		
-	public static final int VALUE_WORKER_REQUEST_WAIT_BEFORE_REDO=1;
+	public static final int VALUE_WORKER_REQUEST_FAIL_DETECT_DURATION=20;
+	
+	// key of the number of acceptable concurrent remote request
+	public static final String KEY_MAX_CONCURRENT_SERVICE_REQUEST="MAX_CONCURRENT_SERVICE_REQUEST";
+	
+	// the default value of the key above
+	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=1;
+			
 	
 
 	
@@ -507,16 +514,35 @@ public class InMemoryWorkspace {
 		}
 	}
 	
-	public static int getTimeToWaitBeforeReDoWorkerRequest() {
-		String val = environmentVariables.get(KEY_WORKER_REQUEST_WAIT_BEFORE_REDO);
+	public static int getWorkerRequestFailDuration() {
+		String val = environmentVariables.get(KEY_WORKER_REQUEST_FAIL_DETECT_DURATION);
 		if (val!=null) {
 			return Integer.parseInt(val);
 		}else {
-			return VALUE_WORKER_REQUEST_WAIT_BEFORE_REDO;
+			return VALUE_WORKER_REQUEST_FAIL_DETECT_DURATION;
 		}
 	}
 
 	public static String getEnvironmentValue(String key) {
 		return environmentVariables.get(key);
+	}
+	
+	public static Semaphore getComputingRessource() {
+		if(computingRessource!=null) {
+			return computingRessource;
+		}
+		GAG g= getGag();
+		if(g==null) {
+			return null;
+		}
+		String val = environmentVariables.get(KEY_MAX_CONCURRENT_SERVICE_REQUEST);
+		int max;
+		if(val!=null) {
+			max=Integer.parseInt(val);
+		}else {
+			max = VALUE_MAX_CONCURRENT_SERVICE_REQUEST;
+		}
+		computingRessource= new Semaphore(max);
+		return computingRessource;
 	}
 }

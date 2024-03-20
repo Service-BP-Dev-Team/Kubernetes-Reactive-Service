@@ -9,7 +9,7 @@ deploymentPath1="/".join([rootPathOut,"deployment.yml"])
 deploymentPath2="/".join([rootPathOut,"deployment-worker.yml"])
 # List of environment variables and their corresponding values
 env_variables = {
-    'NUMBER_OF_BLOCKS': 8,
+    'NUMBER_OF_BLOCKS': 128,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
@@ -23,9 +23,11 @@ env_variables = {
     'READY_TASK_WAIT_TIME' : 1,
   #  'MAXIMUM_THREAD_POOL' : 2,
     'USE_VIRTUAL_THREAD' : True,
-    #'INCREMENTAL_EXECUTION':False,
-    'WORKER_REQUEST_FAILURE_PROBABILITY':0.3,
-   'INCREMENTAL_EXECUTION':True,
+    'INCREMENTAL_EXECUTION':False,
+    'WORKER_REQUEST_FAILURE_PROBABILITY':0.5,
+    'MAX_CONCURRENT_SERVICE_REQUEST':1,
+  #  'INCREMENTAL_EXECUTION':True,
+   'WORKER_REQUEST_FAIL_DETECT_DURATION':10
     
 
 }

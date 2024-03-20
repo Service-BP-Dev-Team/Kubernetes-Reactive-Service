@@ -80,7 +80,7 @@ guard :
  classPath: com.local.SortFunc
  method: base_sort_input_defined
 functions :
- - { classPath: com.local.Base, method: sort, label: sort}
+ - { classPath: com.local.Base, method: sortWithPossibleFaillure, label: sort}
 actions :
  - out = sort(in) 
 
