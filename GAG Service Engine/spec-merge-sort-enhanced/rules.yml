@@ -13,9 +13,9 @@ functions :
  - { classPath: com.local.SortFunc, method: getNUMBER_OF_BLOCKS, label: getNUMBER_OF_BLOCKS}
  # update_values replaces some intentional values in out_list.
 actions :
- - out_array = __call RecSort(inp_list)
+ - out_array =  RecSort(inp_list)
  - length = getNUMBER_OF_BLOCKS()
- - (size, arr, out_list) = __call Merge | ${NUMBER_OF_BLOCKS} (length,out_array) # merge incrementally
+ - (size, arr, out_list) =  Merge | ${NUMBER_OF_BLOCKS} (length,out_array) # merge incrementally
 
 ---
 #R2 is active when the list is short enough to sort it locally
@@ -68,7 +68,7 @@ functions :
 actions :
 # - out_arr = sort_array_lists(inp_arr)
  - index_out = inc(index_in)
- - inter = __call BasicSort(in_arr[index_in])
+ - inter =  __call BasicSort(in_arr[index_in])
  - out = Check_output(in_arr[index_in],inter)
 
 ---
@@ -104,8 +104,8 @@ actions :
  - pending_indices = init_indices()
  - arr_left = divideLeft(inp_arr)
  - arr_right = divideRight(inp_arr) 
- - res_left = __call RecSort(arr_left)
- - res_right = __call RecSort(arr_right)
+ - res_left =  RecSort(arr_left)
+ - res_right =  RecSort(arr_right)
  - index = getZero()
  - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
 

@@ -27,6 +27,8 @@ public class Task implements Serializable{
 	private ArrayList<DataGroup> localGroups; // for handling local array
 											  // not corresponding to an input
 											  // or an output array
+	private boolean externalCall = false; // this used to know if we need to execute the task remotely
+	// in a different GAG engine
 	private boolean remote = false;
 	private boolean terminated = false; //when the task has been exploited and destroyed
 	
@@ -254,5 +256,13 @@ public class Task implements Serializable{
 		this.service=null;
 		
 	}
+	public boolean isExternalCall() {
+		return externalCall;
+	}
+	public void setExternalCall(boolean externalCall) {
+		this.externalCall = externalCall;
+	}
+	
+	
 	
 }

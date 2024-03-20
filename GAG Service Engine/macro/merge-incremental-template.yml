@@ -16,7 +16,7 @@ actions:
  - pending_indices = init_indices(in_length)
  - out_length = divide_length(in_length)
  - out_arr[i/pending_indices] = [ Merge_Main_It_${array_size}(pending_indices,in_arr) for i,inc,${divide_array_size}]
- - (size,arr,merge_res) = __call Merge_Main_S_${divide_array_size}(out_length,out_arr)
+ - (size,arr,merge_res) =  Merge_Main_S_${divide_array_size}(out_length,out_arr)
  
 ---
 kind : rule

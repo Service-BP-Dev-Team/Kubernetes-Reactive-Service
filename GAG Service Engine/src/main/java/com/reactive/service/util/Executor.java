@@ -213,7 +213,8 @@ public class Executor {
 				t.setInputs(inputs);
 				t.setOutputs(outputs);
 				t.setLocals(locals);
-				t.setRemote(si.isRemote());
+				//t.setRemote(si.isRemote());
+				t.setExternalCall(si.isRemote());
 				// create inputs
 				for (Parameter par : si.getService().getInputParameters()) {
 					if (par.isArray()) {
@@ -451,11 +452,20 @@ public class Executor {
 	public void invokeRemote(List<Task> tasks) {
 		for (Task t : tasks) {
 			// invoke now remote service in separate threads
+			
+			final boolean localCall = !t.isExternalCall();
+			t.setRemote(true); // now we put all task to remote to notice the fact that we want to execute 
+			// all tasks remotely in a different executor. 
+			// localCall tell us if we need to retrieve the ip of an available engine in the cluster
+			// to exetute the task
 			Runnable runner = () -> {
-				if (t.isRemote()) {
-					String receiver = InMemoryWorkspace.bind(t.getService().getKubename());
-					if (receiver.equals(InMemoryWorkspace.getLocalHostIp())
-							&& !InMemoryWorkspace.isForcedTCPOnLocalhost()) {
+				
+					String receiver = null;
+					if(!localCall) {
+						receiver=InMemoryWorkspace.bind(t.getService().getKubename());
+					}
+					if (localCall ||(receiver.equals(InMemoryWorkspace.getLocalHostIp())
+							&& !InMemoryWorkspace.isForcedTCPOnLocalhost())) {
 
 						// we do not use tcp when the call is local
 
@@ -498,7 +508,7 @@ public class Executor {
 
 						InMemoryWorkspace.processOutServiceCall(sc, receiver, this);
 					}
-				}
+				
 				// else {
 				// makeFastAccess(t);
 				// }

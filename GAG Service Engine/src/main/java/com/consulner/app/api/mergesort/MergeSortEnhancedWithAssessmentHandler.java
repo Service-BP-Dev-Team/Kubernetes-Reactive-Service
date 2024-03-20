@@ -62,8 +62,9 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		System.out.println("start data execution");
 
 		Console.printMemory();
-		Pair<OutputWatcher,Task> p=createTheTask(size);
+		Pair<OutputWatcher,Executor> p=createTheTask(size);
 		OutputWatcher watcher = p.getFirst();
+		Executor exec = p.getSecond();
 		int timeElapsed = 0;
 		while(!watcher.isEnded()) {
 			try {
@@ -71,7 +72,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 				Thread.sleep(1000);
 				timeElapsed+=1000;
 				if(timeElapsed >= 100000) { // stop after 100 seconds
-					String log = p.getSecond().getJsonRepresentation();
+					String log = p.getSecond().getConfiguration().getRoot().getJsonRepresentation();
 					// write log on a file
 					FileWriting.writeStringToFile(log,"./spec-merge-sort-enhanced/log.json");
 					break;
@@ -81,7 +82,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 				e.printStackTrace();
 			}
 		}
-        
+       // exec.clearAllData(); // we free up the memory
         System.out.println("finished to create data");
         System.gc();
         Console.printMemory();
@@ -90,12 +91,13 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		
 	}
 	
-	public Pair<OutputWatcher,Task> createTheTask(int size) {
+	public Pair<OutputWatcher,Executor> createTheTask(int size) {
 		GAG g = InMemoryWorkspace.getGagWithRootFolder("spec-merge-sort-enhanced");
 		// System.out.println(g);
 
 		Context nContext = new Context();
 		Executor exec = new Executor(nContext, g);
+		exec.setSubExecutor(true); // we do this to prevent the executor to clear the memory itself
 		Configuration conf = new Configuration();
 
 		ArrayList<Integer> inputTable = ToolKit.generateArray(size);
@@ -113,7 +115,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 		OutputWatcher watcher = new OutputWatcher();
 		root.getOutputs().get(0).setWatcher(watcher);
 		exec.execute();
-		return new Pair(watcher,root);
+		return new Pair(watcher,exec);
 	}
 
 	
