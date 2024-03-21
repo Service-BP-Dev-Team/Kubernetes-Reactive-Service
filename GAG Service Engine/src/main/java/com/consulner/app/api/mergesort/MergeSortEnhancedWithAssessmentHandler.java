@@ -82,7 +82,8 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 				e.printStackTrace();
 			}
 		}
-       // exec.clearAllData(); // we free up the memory
+        exec.clearAllData(); // we free up the memory
+        // we will compute all the statistics here
         System.out.println("finished to create data");
         System.gc();
         Console.printMemory();

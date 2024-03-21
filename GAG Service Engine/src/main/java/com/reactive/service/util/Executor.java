@@ -554,7 +554,7 @@ public class Executor {
 		terminateIfPossible(t);
 	}
 
-	private void clearAllData() {
+	public void clearAllData() {
 		terminated=true;
 			// when it is a subs executor the task to terminate tasks
 			// and data is left to the parent executor

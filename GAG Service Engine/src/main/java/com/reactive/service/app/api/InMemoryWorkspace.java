@@ -115,20 +115,20 @@ public class InMemoryWorkspace {
 	
 	// the default value is 0. by default it's impossible for a pod to fail
 	
-	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.9;
 	
 	// key below gives the time to wait before attempting to redo a request
 	public static final String KEY_WORKER_REQUEST_FAIL_DETECT_DURATION="WORKER_REQUEST_FAIL_DETECT_DURATION";
 		
 	// the default value is 1. By default we wait 1 millis
 		
-	public static final int VALUE_WORKER_REQUEST_FAIL_DETECT_DURATION=20;
+	public static final int VALUE_WORKER_REQUEST_FAIL_DETECT_DURATION=10;
 	
 	// key of the number of acceptable concurrent remote request
 	public static final String KEY_MAX_CONCURRENT_SERVICE_REQUEST="MAX_CONCURRENT_SERVICE_REQUEST";
 	
 	// the default value of the key above
-	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=1;
+	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=100;
 			
 	
 
