@@ -68,8 +68,8 @@ functions :
 actions :
 # - out_arr = sort_array_lists(inp_arr)
  - index_out = inc(index_in)
- - inter =  __call BasicSort(in_arr[index_in])
- - out = Check_output(in_arr[index_in],inter)
+ - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
+ - out = Check_output(in_arr[index_in],inter,inter_time)
 
 ---
 #basic sort work 
@@ -81,8 +81,12 @@ guard :
  method: base_sort_input_defined
 functions :
  - { classPath: com.local.Base, method: sortWithPossibleFaillure, label: sort}
+ - { classPath: com.local.Base, method: first, label: first}
+ - { classPath: com.local.Base, method: second, label: second}
 actions :
- - out = sort(in) 
+ - work = sort(in)
+ - out = first(work)
+ - time = second(work)  
 
 ---
 #Service: RecSort -- 2 rules:
@@ -136,8 +140,9 @@ guard :
  classPath: com.local.Base
  method: worker_failure
 actions :
- - inter = __call BasicSort(in)
- - out = Check_output(in,inter) 
+ - (inter, inter_time) = __call BasicSort(in)
+ -  out = Check_output(in,inter,inter_time)
+ 
 
 ---
 #check output rule  

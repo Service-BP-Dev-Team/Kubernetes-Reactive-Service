@@ -58,11 +58,16 @@ public class Base {
 	}
 
 	public Object sortWithPossibleFaillure(Object array) {
+
+		ArrayList<Object> result = new ArrayList<Object>();
+		long startTime = System.currentTimeMillis();
 		try {
 			computingRessource.acquire();
 
 			Random random = new Random();
 			double randomValue = (1 + random.nextInt(100)) / 100.0;
+			
+			long time = 0;
 			// System.out.println("The random value is: "+randomValue);
 			if (randomValue < faillureProbability || faillureProbability >= 1) {
 				// Operation to be performed when the random value is less than or equal to the
@@ -72,43 +77,44 @@ public class Base {
 
 				try {
 					// Start the timer
-					//long startTime = System.currentTimeMillis();
 
 					Thread.sleep(faillureDuration);
-					//long end = System.currentTimeMillis();
-					//System.out.println(end - startTime);
+
+					result.add(Failed);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
-				// sort(array);
-				computingRessource.release();
-				return Failed;
 			} else {
-				// Operation to be performed when the random value is greater than the
-				// probability
-				// System.out.println("perfoming the sort");
-				computingRessource.release();
-				return sort(array);
+				ArrayList<Integer> arraySorted = sort(array);
+				//System.out.println("performing the sort !");
+				result.add(arraySorted);
+
 			}
+			long endTime = System.currentTimeMillis();
+			time = endTime - startTime;
+			result.add(time);
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			computingRessource.release();
 		}
-		return Failed;
-	
+		return result;
+
 	}
 
-	public boolean worker_success(Object in, Object res) {
-		if (in != null && res != null && res instanceof ArrayList) {
+	public boolean worker_success(Object in, Object res, Object time) {
+		if (in != null && res != null && time!=null && res instanceof ArrayList) {
 			return true;
 		}
 		return false;
 	}
 
-	public boolean worker_failure(Object in, Object res) {
-		if (in != null && res != null && !(res instanceof ArrayList)) {
+	public boolean worker_failure(Object in, Object res, Object time) {
+		if (in != null && res != null && time!=null && !(res instanceof ArrayList)) {
 			int timebeforeretry = 1;
 			try {
 				Thread.sleep(timebeforeretry); // by sleeping by we priorityze other threads
@@ -119,5 +125,13 @@ public class Base {
 			return true;
 		}
 		return false;
+	}
+
+	public Object first(Object array) {
+		return ((ArrayList) array).get(0);
+	}
+
+	public Object second(Object array) {
+		return ((ArrayList) array).get(1);
 	}
 }

@@ -115,7 +115,7 @@ public class InMemoryWorkspace {
 	
 	// the default value is 0. by default it's impossible for a pod to fail
 	
-	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.9;
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
 	
 	// key below gives the time to wait before attempting to redo a request
 	public static final String KEY_WORKER_REQUEST_FAIL_DETECT_DURATION="WORKER_REQUEST_FAIL_DETECT_DURATION";
@@ -128,7 +128,14 @@ public class InMemoryWorkspace {
 	public static final String KEY_MAX_CONCURRENT_SERVICE_REQUEST="MAX_CONCURRENT_SERVICE_REQUEST";
 	
 	// the default value of the key above
-	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=100;
+	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=128;
+	
+	// Asking the engine to be incremental or non incremental during the execution
+	// of a GAG service specification
+	public static final String KEY_INCREMENTAL_EXECUTION="INCREMENTAL_EXECUTION";
+	// the default value is set to true by default the service is incremental
+	public static final int VALUE_INCREMENTAL_EXECUTION=0;
+	
 			
 	
 
@@ -544,5 +551,14 @@ public class InMemoryWorkspace {
 		}
 		computingRessource= new Semaphore(max);
 		return computingRessource;
+	}
+	
+	public static Boolean isIncrementalExecution() {
+		String val = environmentVariables.get(KEY_INCREMENTAL_EXECUTION);
+		if (val != null) {
+			return val.equals("True");
+		} else {
+			return VALUE_INCREMENTAL_EXECUTION==1;
+		}
 	}
 }

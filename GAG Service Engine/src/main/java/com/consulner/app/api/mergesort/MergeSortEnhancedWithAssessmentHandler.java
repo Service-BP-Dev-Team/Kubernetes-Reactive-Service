@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import com.consulner.app.api.Constants;
@@ -71,7 +72,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 				
 				Thread.sleep(1000);
 				timeElapsed+=1000;
-				if(timeElapsed >= 100000) { // stop after 100 seconds
+				if(timeElapsed >= 5000) { // stop after 100 seconds
 					String log = p.getSecond().getConfiguration().getRoot().getJsonRepresentation();
 					// write log on a file
 					FileWriting.writeStringToFile(log,"./spec-merge-sort-enhanced/log.json");
@@ -82,7 +83,10 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 				e.printStackTrace();
 			}
 		}
-        exec.clearAllData(); // we free up the memory
+		//compute statistics
+		HashMap stat = Statistics.getNumberOfSuccessAndFailedNode(exec.getConfiguration().getRoot());
+        watcher.setAdditionnalExecutionInformation(stat);
+		exec.clearAllData(); // we free up the memory
         // we will compute all the statistics here
         System.out.println("finished to create data");
         System.gc();

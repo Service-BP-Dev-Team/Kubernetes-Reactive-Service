@@ -44,14 +44,16 @@ public class Executor {
 	private Lock lock = new ReentrantLock();
 	private Boolean terminated = false;
 	private HashSet <Data> inputs = new HashSet<Data>();
+	private Boolean incrementalExecution = null;
 	public Executor() {
-
+		incrementalExecution=InMemoryWorkspace.isIncrementalExecution();
 	}
 
 	public Executor(Context ctx, GAG gag) {
 		this.context = ctx;
 		this.context.setExecutor(this);
 		this.gag = gag;
+		incrementalExecution=InMemoryWorkspace.isIncrementalExecution();
 	}
 
 	public GAG getGag() {
@@ -113,6 +115,14 @@ public class Executor {
 			
 			lock.lock();
 			
+			//this for checking the behavior of the execution
+			if(!incrementalExecution) {
+				// when the execution is not incremental, all the inputs has to be defined
+				if(!allInputsFromCallDefined()) {
+					lock.unlock();
+					return;
+				}
+			}
 			if (terminated) {
 				lock.unlock();
 				return;
@@ -138,9 +148,10 @@ public class Executor {
 				while (readyTasks.size() != 0) {
 					for (Task task : readyTasks.keySet()) {
 						Pair<DecompositionRule, ArrayList> firstApplicable = readyTasks.get(task).get(0);
+						
 						applyRule(task, firstApplicable.getFirst(), firstApplicable.getSecond());
 						//removeAlreadyTreatedInputs();
-						computePendingLocalComputations();
+						
 					}
 					readyTasks = context.getReadyTasks();
 				}
@@ -256,6 +267,20 @@ public class Executor {
 		task.setAppliedRule(rule.getName());
 		task.setOpen(false);
 
+		// important we compute local computations
+		// before performing calls
+		computePendingLocalComputations();
+		/*
+		 * really important comment here !!!
+		 * There is an issue if we compute
+		 * pending local computations after invoking the service
+		 * this is because of the way we handle array
+		 * and by the fact that we are forced to call
+		 * isDefined in a data local match, in order for the
+		 * real data (a data amount an input or output data group) to be defined
+		 * solving the issue will probably consist in handling array in a different way  
+		 */
+		
 		// invoke remote task
 		invokeRemote(substasks);
 	}
@@ -663,4 +688,26 @@ public class Executor {
 		
 	}
 
+	public Boolean getIncrementalExecution() {
+		
+		return incrementalExecution;
+	}
+
+	public void setIncrementalExecution(Boolean incrementalExecution) {
+		this.incrementalExecution = incrementalExecution;
+	}
+	
+	public boolean allInputsFromCallDefined() {
+		// make the data to be up to date first
+		computePendingLocalComputations();
+		for (Data d : configuration.getRoot().getInputs()) {
+			if(!d.isDefined()) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	
 }

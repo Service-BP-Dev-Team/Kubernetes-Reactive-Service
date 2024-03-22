@@ -68,9 +68,14 @@ public class Data implements Serializable{
 
 	
 	public void setValue(Object value) {
-		this.value = value;
+		
 		//System.out.println("set value executed");
+		if(value==null) {
+			System.out.println("we set an undefined value ! Not normal !");
+		}
 		if(value!=null) {
+
+			this.value = value;
 			this.defined=true;
 			if(index!=null) {
 			Data match = getMacthedDataDefined();
@@ -87,6 +92,7 @@ public class Data implements Serializable{
 				//watcher.setData(this);
 			}
 		}
+		
 		// launch the executor as a new data has been defined
 		if(value!=null) {
 			//setDefined(true);
@@ -97,15 +103,16 @@ public class Data implements Serializable{
 				exec.lightExecute(this);
 			}
 		}
+		
 	}
 
 	public boolean isDefined() {
 		// index data are defined if they corresponding data
 		// in a data group is defined
 		if(index==null) {
-			return defined;
+			return value!=null;
 		}else {
-			if(defined)return defined;
+			if(defined)return value!=null;
 			Data match = getMacthedDataDefined();
 			if(match!=null && match.isDefined()) {
 				setValue(match.getValue());

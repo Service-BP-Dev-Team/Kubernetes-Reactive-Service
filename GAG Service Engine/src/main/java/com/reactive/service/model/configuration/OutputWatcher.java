@@ -8,6 +8,7 @@ public class OutputWatcher {
 	private boolean ended;
 	private long duration;
 	private Data data;
+	private Object additionnalExecutionInformation;
 	
 	public OutputWatcher() {
 		start = System.currentTimeMillis();
@@ -59,6 +60,14 @@ public class OutputWatcher {
 
 	public void setData(Data data) {
 		this.data = data;
+	}
+
+	public Object getAdditionnalExecutionInformation() {
+		return additionnalExecutionInformation;
+	}
+
+	public void setAdditionnalExecutionInformation(Object additionnalExecutionInformation) {
+		this.additionnalExecutionInformation = additionnalExecutionInformation;
 	}
 	
 	
