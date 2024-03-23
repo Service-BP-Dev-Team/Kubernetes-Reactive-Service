@@ -278,7 +278,12 @@ public class Data implements Serializable{
 	}
 	
 	
+	public Data lightCopy() {
+		Data d = new Data();
+		d.parameter=parameter;
+		return d;
 	
+	}
 	
 	
 

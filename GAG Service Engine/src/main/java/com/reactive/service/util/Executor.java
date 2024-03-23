@@ -43,17 +43,22 @@ public class Executor {
 	private boolean running = false;
 	private Lock lock = new ReentrantLock();
 	private Boolean terminated = false;
-	private HashSet <Data> inputs = new HashSet<Data>();
+	private HashSet<Data> inputs = new HashSet<Data>();
+	private ArrayList<Data> outputsNonIncrementaBound = new ArrayList<Data>(); // this attribute is only used when the engine
+	// is not incremental. It allows to notify of all the outputs at once, rather
+	// than doing it incrementally
+	private ArrayList<Data> realOutputs = new ArrayList<Data>(); // when it is no incremental the real outputs are stored here
 	private Boolean incrementalExecution = null;
+
 	public Executor() {
-		incrementalExecution=InMemoryWorkspace.isIncrementalExecution();
+		incrementalExecution = InMemoryWorkspace.isIncrementalExecution();
 	}
 
 	public Executor(Context ctx, GAG gag) {
 		this.context = ctx;
 		this.context.setExecutor(this);
 		this.gag = gag;
-		incrementalExecution=InMemoryWorkspace.isIncrementalExecution();
+		incrementalExecution = InMemoryWorkspace.isIncrementalExecution();
 	}
 
 	public GAG getGag() {
@@ -87,8 +92,6 @@ public class Executor {
 	public void setOutSubscriptions(ConcurrentHashMap<String, Pair<String, Data>> outSubscriptions) {
 		this.outSubscriptions = outSubscriptions;
 	}
-	
-	
 
 	public boolean isRunning() {
 		return running;
@@ -108,17 +111,15 @@ public class Executor {
 
 	public void lightExecute(Data d) {
 		// if(running) return ; //when it is already running we do nothing
-		
+
 		Runnable runner = () -> {
-			
-		
-			
+
 			lock.lock();
-			
-			//this for checking the behavior of the execution
-			if(!incrementalExecution) {
+
+			// this for checking the behavior of the execution
+			if (!incrementalExecution) {
 				// when the execution is not incremental, all the inputs has to be defined
-				if(!allInputsFromCallDefined()) {
+				if (!allInputsFromCallDefined()) {
 					lock.unlock();
 					return;
 				}
@@ -127,40 +128,43 @@ public class Executor {
 				lock.unlock();
 				return;
 			}
-			if (d!=null && !inputs.contains(d)) {
+			if (d != null && !inputs.contains(d)) {
 				// the inputs has already been treated
 				lock.unlock();
 				return;
 			}
 			try {
-				//inputs.remove(d);
+				// inputs.remove(d);
 				running = true;
 				removeAlreadyTreatedInputs();
 				computePendingLocalComputations();
 				// Really important is mandatory to compute pending local computations before
 				// looking for ready task
-				//System.out.println(terminated);
-				//System.out.println(context);
+				// System.out.println(terminated);
+				// System.out.println(context);
 				Hashtable<Task, List<Pair<DecompositionRule, ArrayList>>> readyTasks = context.getReadyTasks();
 				// System.out.println("" + readyTasks);
-				
 
 				while (readyTasks.size() != 0) {
 					for (Task task : readyTasks.keySet()) {
 						Pair<DecompositionRule, ArrayList> firstApplicable = readyTasks.get(task).get(0);
-						
+
 						applyRule(task, firstApplicable.getFirst(), firstApplicable.getSecond());
-						//removeAlreadyTreatedInputs();
-						
+						// removeAlreadyTreatedInputs();
+
 					}
 					readyTasks = context.getReadyTasks();
 				}
-				
+
 				running = false;
 				if (!continuous()) {
-					terminated=true;
-					if(!subExecutor) {
-					clearAllData();
+					terminated = true;
+					if(!incrementalExecution) {
+						// set the real outputs value and notify the subscribers
+						whenNoIncrementalSetRealOuputsAndNotifySubscribers();
+					}
+					if (!subExecutor) {
+						clearAllData();
 					}
 				}
 			} finally {
@@ -168,14 +172,22 @@ public class Executor {
 			}
 		};
 		Thread.startVirtualThread(runner);
-		//new Thread(runner).start();
+		// new Thread(runner).start();
 	}
 
 	public void execute() {
 		if (configuration == null) {
 			Task t = context.getStartingTask();
 		}
-		//System.out.println("execute large");
+		// copy outputs when it is no incremental
+		if (!incrementalExecution) {
+			for (Data d : configuration.getRoot().getOutputs()) {
+				outputsNonIncrementaBound.add(d);
+			}
+			realOutputs=configuration.getRoot().getOutputs();
+			configuration.getRoot().setOutputs(outputsNonIncrementaBound);
+		}
+		// System.out.println("execute large");
 		Runnable runner = () -> {
 			// initialization
 			lightExecute(null);
@@ -198,12 +210,21 @@ public class Executor {
 
 	public boolean continuous() {
 		Boolean result = false;
+		if (incrementalExecution) {
 		for (Data output : configuration.getRoot().getOutputs()) {
 			if (!output.isDefined() || outSubscriptions.get(output.getId()) != null) {
 				// when a data is not defined or
 				// has been defined but not yet notified to subscribers
 				result = true;
 				break;
+			}
+		}}
+		else {
+			for (Data output:outputsNonIncrementaBound) {
+				if (!output.isDefined()) {
+					result=true;
+					break;
+				}
 			}
 		}
 		return result;
@@ -226,7 +247,7 @@ public class Executor {
 				t.setInputs(inputs);
 				t.setOutputs(outputs);
 				t.setLocals(locals);
-				//t.setRemote(si.isRemote());
+				// t.setRemote(si.isRemote());
 				t.setExternalCall(si.isRemote());
 				// create inputs
 				for (Parameter par : si.getService().getInputParameters()) {
@@ -271,16 +292,14 @@ public class Executor {
 		// before performing calls
 		computePendingLocalComputations();
 		/*
-		 * really important comment here !!!
-		 * There is an issue if we compute
-		 * pending local computations after invoking the service
-		 * this is because of the way we handle array
-		 * and by the fact that we are forced to call
-		 * isDefined in a data local match, in order for the
-		 * real data (a data amount an input or output data group) to be defined
-		 * solving the issue will probably consist in handling array in a different way  
+		 * really important comment here !!! There is an issue if we compute pending
+		 * local computations after invoking the service this is because of the way we
+		 * handle array and by the fact that we are forced to call isDefined in a data
+		 * local match, in order for the real data (a data amount an input or output
+		 * data group) to be defined solving the issue will probably consist in handling
+		 * array in a different way
 		 */
-		
+
 		// invoke remote task
 		invokeRemote(substasks);
 	}
@@ -479,64 +498,65 @@ public class Executor {
 	public void invokeRemote(List<Task> tasks) {
 		for (Task t : tasks) {
 			// invoke now remote service in separate threads
-			
+
 			final boolean localCall = !t.isExternalCall();
-			t.setRemote(true); // now we put all task to remote to notice the fact that we want to execute 
-			// all tasks remotely in a different executor. 
-			// localCall tell us if we need to retrieve the ip of an available engine in the cluster
+			t.setRemote(true); // now we put all task to remote to notice the fact that we want to execute
+			// all tasks remotely in a different executor.
+			// localCall tell us if we need to retrieve the ip of an available engine in the
+			// cluster
 			// to exetute the task
 			Runnable runner = () -> {
-				
-					String receiver = null;
-					if(!localCall) {
-						receiver=InMemoryWorkspace.bind(t.getService().getKubename());
-					}
-					if (localCall ||(receiver.equals(InMemoryWorkspace.getLocalHostIp())
-							&& !InMemoryWorkspace.isForcedTCPOnLocalhost())) {
 
-						// we do not use tcp when the call is local
+				String receiver = null;
+				if (!localCall) {
+					receiver = InMemoryWorkspace.bind(t.getService().getKubename());
+				}
+				if (localCall || (receiver.equals(InMemoryWorkspace.getLocalHostIp())
+						&& !InMemoryWorkspace.isForcedTCPOnLocalhost())) {
 
-						Task newTask = new Task();
-						newTask.setDataGroups(t.getDataGroups());
-						newTask.setInputs(t.getInputs());
-						newTask.setLocals(t.getLocals());
-						newTask.setOutputs(t.getOutputs());
-						newTask.setService(t.getService());
-						newTask.setSubTasks(t.getSubTasks());
-						ServiceCall sc = new ServiceCall();
-						sc.setTask(newTask);
-						Configuration conf = new Configuration();
-						conf.setRoot(sc.getTask());
-						conf.getRoot().setRemote(false);// transform the task to a local one
-						conf.setId(sc.getId());
-						// add the configuration
-						Executor exec = new Executor();
-						Context ctx = new Context();
-						ctx.setExecutor(exec);
-						exec.setContext(ctx);
-						exec.setSubExecutor(true);
-						exec.setConfiguration(conf);
-						//make fast access
-						makeFastAccess(newTask.getOutputs());
-						exec.setGag(gag);
-						exec.setServiceCallId(sc.getId());
-						
-						InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
-						// execute the task
-						exec.execute();
-					} else {
-						//make fast access
-						makeFastAccess(t.getOutputs());
-						ServiceCall sc = new ServiceCall();
-						sc.setTask(t);
-						Service emptyService = new Service();
-						emptyService.setName(t.getService().getName());
-						emptyService.setKubename(t.getService().getKubename());
-						t.setService(emptyService);
+					// we do not use tcp when the call is local
 
-						InMemoryWorkspace.processOutServiceCall(sc, receiver, this);
-					}
-				
+					Task newTask = new Task();
+					newTask.setDataGroups(t.getDataGroups());
+					newTask.setInputs(t.getInputs());
+					newTask.setLocals(t.getLocals());
+					newTask.setOutputs(t.getOutputs());
+					newTask.setService(t.getService());
+					newTask.setSubTasks(t.getSubTasks());
+					ServiceCall sc = new ServiceCall();
+					sc.setTask(newTask);
+					Configuration conf = new Configuration();
+					conf.setRoot(sc.getTask());
+					conf.getRoot().setRemote(false);// transform the task to a local one
+					conf.setId(sc.getId());
+					// add the configuration
+					Executor exec = new Executor();
+					Context ctx = new Context();
+					ctx.setExecutor(exec);
+					exec.setContext(ctx);
+					exec.setSubExecutor(true);
+					exec.setConfiguration(conf);
+					// make fast access
+					makeFastAccess(newTask.getOutputs());
+					exec.setGag(gag);
+					exec.setServiceCallId(sc.getId());
+
+					InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
+					// execute the task
+					exec.execute();
+				} else {
+					// make fast access
+					makeFastAccess(t.getOutputs());
+					ServiceCall sc = new ServiceCall();
+					sc.setTask(t);
+					Service emptyService = new Service();
+					emptyService.setName(t.getService().getName());
+					emptyService.setKubename(t.getService().getKubename());
+					t.setService(emptyService);
+
+					InMemoryWorkspace.processOutServiceCall(sc, receiver, this);
+				}
+
 				// else {
 				// makeFastAccess(t);
 				// }
@@ -563,10 +583,10 @@ public class Executor {
 					// now notify in separate thread
 
 					outSubscriptions.remove(nf.getData().getId());
-					//Runnable runner = () -> {
-						InMemoryWorkspace.processOutNotification(nf, p.getKey());
-					//};
-					//Thread.startVirtualThread(runner);
+					// Runnable runner = () -> {
+					InMemoryWorkspace.processOutNotification(nf, p.getKey());
+					// };
+					// Thread.startVirtualThread(runner);
 				}
 			}
 
@@ -580,25 +600,23 @@ public class Executor {
 	}
 
 	public void clearAllData() {
-		terminated=true;
-			// when it is a subs executor the task to terminate tasks
-			// and data is left to the parent executor
-			// wit some time for the notification to be performed before clearing
-			// everything
-			final Task root = configuration.getRoot();
-					InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
-					configuration.clearData();
-					configuration = null;
-					this.gag = null;
-					this.context = null;
-					this.serviceCallId = null;
+		terminated = true;
+		// when it is a subs executor the task to terminate tasks
+		// and data is left to the parent executor
+		// wit some time for the notification to be performed before clearing
+		// everything
+		final Task root = configuration.getRoot();
+		InMemoryWorkspace.inMemoryCalls.remove(serviceCallId);
+		configuration.clearData();
+		configuration = null;
+		this.gag = null;
+		this.context = null;
+		this.serviceCallId = null;
 
-					terminateTasks(root);
-					// clear all data recursively
-					clearTaskData(root);
-		
-		
-		
+		terminateTasks(root);
+		// clear all data recursively
+		clearTaskData(root);
+
 		/*
 		 * System.out.println("the memory call size is : "+
 		 * InMemoryWorkspace.inMemoryCalls.size());
@@ -659,55 +677,62 @@ public class Executor {
 		}
 
 	}
+
 	// this method is used to take into account all inputs
 	private void makeFastAccess(List<Data> datas) {
-		//System.out.println("make fast access");
+		// System.out.println("make fast access");
 		lock.lock();
 		try {
 			for (Data d : datas) {
 				inputs.add(d);
 				d.setExecutor(this);
-				}
-			
+			}
+
 		} finally {
 			lock.unlock();
 		}
-		
+
 	}
-	
+
 	// this method allow to not process already processed inputs
 	// it should be called on a block preceded by lock.lock()
 	public void removeAlreadyTreatedInputs() {
 		ArrayList<Data> toRemove = new ArrayList<Data>();
-		for(Data d : inputs) {
-			if (d.isDefined()){
+		for (Data d : inputs) {
+			if (d.isDefined()) {
 				toRemove.add(d);
 			}
 		}
 		inputs.removeAll(toRemove);
-		
+
 	}
 
 	public Boolean getIncrementalExecution() {
-		
+
 		return incrementalExecution;
 	}
 
 	public void setIncrementalExecution(Boolean incrementalExecution) {
 		this.incrementalExecution = incrementalExecution;
 	}
-	
+
 	public boolean allInputsFromCallDefined() {
 		// make the data to be up to date first
 		computePendingLocalComputations();
 		for (Data d : configuration.getRoot().getInputs()) {
-			if(!d.isDefined()) {
+			if (!d.isDefined()) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-
 	
+	public void whenNoIncrementalSetRealOuputsAndNotifySubscribers() {
+		for (int i=0;i<realOutputs.size();i++) {
+			realOutputs.get(i).setValue(outputsNonIncrementaBound.get(i).getValue());
+		}
+		notifySubscribers();
+	}
+
 }

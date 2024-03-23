@@ -128,13 +128,13 @@ public class InMemoryWorkspace {
 	public static final String KEY_MAX_CONCURRENT_SERVICE_REQUEST="MAX_CONCURRENT_SERVICE_REQUEST";
 	
 	// the default value of the key above
-	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=128;
+	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=3;
 	
 	// Asking the engine to be incremental or non incremental during the execution
 	// of a GAG service specification
 	public static final String KEY_INCREMENTAL_EXECUTION="INCREMENTAL_EXECUTION";
 	// the default value is set to true by default the service is incremental
-	public static final int VALUE_INCREMENTAL_EXECUTION=0;
+	public static final int VALUE_INCREMENTAL_EXECUTION=1;
 	
 			
 	
