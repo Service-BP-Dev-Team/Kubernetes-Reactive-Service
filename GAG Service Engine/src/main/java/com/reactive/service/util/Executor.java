@@ -718,7 +718,7 @@ public class Executor {
 
 	public boolean allInputsFromCallDefined() {
 		// make the data to be up to date first
-		computePendingLocalComputations();
+		//computePendingLocalComputations();
 		for (Data d : configuration.getRoot().getInputs()) {
 			if (!d.isDefined()) {
 				return false;

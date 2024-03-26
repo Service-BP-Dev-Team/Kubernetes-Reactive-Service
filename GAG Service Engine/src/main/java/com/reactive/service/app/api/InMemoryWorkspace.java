@@ -91,7 +91,7 @@ public class InMemoryWorkspace {
 	public  static final String KEY_NETWORK_DATA_COMPRESSION_THRESHOLD="NETWORK_DATA_COMPRESSION_THRESHOLD";
 	
 	// the value of the key above by default
-	public  static final int VALUE_NETWORK_DATA_COMPRESSION_THRESHOLD=5000000; // I placed a too high value to avoid compression
+	public  static final int VALUE_NETWORK_DATA_COMPRESSION_THRESHOLD=10000000; // I placed a too high value to avoid compression
 	
 	// the key bellow is used to know the maximum of concurrent incoming thread that a engine can handle
 	public static final String KEY_MAXIMUM_THREAD_POOL = "MAXIMUM_THREAD_POOL";
@@ -115,7 +115,7 @@ public class InMemoryWorkspace {
 	
 	// the default value is 0. by default it's impossible for a pod to fail
 	
-	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.3;
 	
 	// key below gives the time to wait before attempting to redo a request
 	public static final String KEY_WORKER_REQUEST_FAIL_DETECT_DURATION="WORKER_REQUEST_FAIL_DETECT_DURATION";
@@ -128,7 +128,7 @@ public class InMemoryWorkspace {
 	public static final String KEY_MAX_CONCURRENT_SERVICE_REQUEST="MAX_CONCURRENT_SERVICE_REQUEST";
 	
 	// the default value of the key above
-	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=3;
+	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=1;
 	
 	// Asking the engine to be incremental or non incremental during the execution
 	// of a GAG service specification
