@@ -70,9 +70,9 @@ public class Data implements Serializable{
 	public void setValue(Object value) {
 		
 		//System.out.println("set value executed");
-		if(value==null) {
+		/*if(value==null) {
 			System.out.println("we set an undefined value ! Not normal !");
-		}
+		}*/
 		if(value!=null) {
 
 			this.value = value;

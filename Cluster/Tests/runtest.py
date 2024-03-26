@@ -23,7 +23,7 @@ env_variables = {
     'READY_TASK_WAIT_TIME' : 1,
   #  'MAXIMUM_THREAD_POOL' : 2,
     'USE_VIRTUAL_THREAD' : True,
-    'INCREMENTAL_EXECUTION':False,
+    'INCREMENTAL_EXECUTION':True,
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.5,
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
   #  'INCREMENTAL_EXECUTION':True,
@@ -100,9 +100,12 @@ def runtest(input,init,env):
             output_dict = json.loads(output)
             # Access and manipulate the dictionary as needed
             duration = output_dict["duration"]
-            time.sleep(2)
+            statistics = output_dict["additionnalExecutionInformation"]
+            #time.sleep(2)
             if __name__ == "__main__":
-                print(f"{(i+1)} / {number_of_iteration} -> {duration}")
+                print(f"{(i+1)} / {number_of_iteration} : ")
+                print(f"duration -> {duration}")
+                print(f"statistics -> {statistics}")
             sumResult+=duration
         return sumResult/number_of_iteration
     except subprocess.CalledProcessError as e:

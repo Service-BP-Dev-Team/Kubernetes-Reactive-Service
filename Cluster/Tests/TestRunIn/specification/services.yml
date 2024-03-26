@@ -28,17 +28,6 @@ inputs :
 outputs :
  - { name : out}
  - { name : indices_out}
-
-# service that checks if a work request succeeded
----
-kind : service
-name : Check_output
-kubename : ${KUBE_CONTROLLER_NAME}
-inputs : 
- - { name : in }
- - { name : res }
-outputs :
- - { name : out}
  
 
 ---
@@ -58,5 +47,17 @@ name : BasicSort
 kubename : ${KUBE_WORKER_NAME}
 inputs : 
  - { name : in }
+outputs :
+ - { name : out}
+ - { name : time}
+ 
+---
+kind : service
+name : Check_output
+kubename : ${KUBE_CONTROLLER_NAME}
+inputs : 
+ - { name : in }
+ - { name : res }
+ - { name : in_time}
 outputs :
  - { name : out}

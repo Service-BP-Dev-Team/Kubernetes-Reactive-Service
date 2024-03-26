@@ -13,11 +13,9 @@ functions :
  - { classPath: com.local.SortFunc, method: getNUMBER_OF_BLOCKS, label: getNUMBER_OF_BLOCKS}
  # update_values replaces some intentional values in out_list.
 actions :
- - out_array = __call RecSort(inp_list)
+ - out_array =  RecSort(inp_list)
  - length = getNUMBER_OF_BLOCKS()
- #adding synchronization
- - sync_out_array = SyncValue(out_array)
- - (size, arr, out_list) = __call Merge | ${NUMBER_OF_BLOCKS} (length,sync_out_array) # merge incrementally macro
+ - (size, arr, out_list) =  Merge | ${NUMBER_OF_BLOCKS} (length,out_array) # merge incrementally
 
 ---
 #R2 is active when the list is short enough to sort it locally
@@ -70,8 +68,8 @@ functions :
 actions :
 # - out_arr = sort_array_lists(inp_arr)
  - index_out = inc(index_in)
- - inter = __call BasicSort(in_arr[index_in])
- - out = Check_output(in_arr[index_in],inter)
+ - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
+ - out = Check_output(in_arr[index_in],inter,inter_time)
 
 ---
 #basic sort work 
@@ -83,8 +81,12 @@ guard :
  method: base_sort_input_defined
 functions :
  - { classPath: com.local.Base, method: sortWithPossibleFaillure, label: sort}
+ - { classPath: com.local.Base, method: first, label: first}
+ - { classPath: com.local.Base, method: second, label: second}
 actions :
- - out = sort(in) 
+ - work = sort(in)
+ - out = first(work)
+ - time = second(work)  
 
 ---
 #Service: RecSort -- 2 rules:
@@ -106,13 +108,10 @@ actions :
  - pending_indices = init_indices()
  - arr_left = divideLeft(inp_arr)
  - arr_right = divideRight(inp_arr) 
- - res_left = __call RecSort(arr_left)
- - res_right = __call RecSort(arr_right)
- #adding synchronization
- - sync_res_left = SyncValue(res_left)
- - sync_res_right = SyncValue(res_right)
+ - res_left =  RecSort(arr_left)
+ - res_right =  RecSort(arr_right)
  - index = getZero()
- - out_arr[index/pending_indices] = [Merge_S(pending_indices,sync_res_left,sync_res_right) for index,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
 
 
 ---
@@ -121,7 +120,7 @@ name : merge_rule
 service : Merge_S
 guard:
  classPath: com.local.SortFunc
- method : has_new_elements_sync
+ method : has_new_elements
  binding: 
   - {name : list1}
   - {name : list2}
@@ -132,16 +131,6 @@ actions :
  - indices_out = remainingIndices
  - out = merge_two(list1,list2)
 
-# rule for the service that makes sync
----
-kind : rule
-name : Sync_Value_Rule
-service: SyncValue
-functions:
- - { classPath: com.local.SortFunc, method: syncValue, label: sync, multiOutput : true, outputSize: ${NUMBER_OF_BLOCKS} }
-actions:
- - out_arr = sync(in_arr)
- 
 ---
 #check output rule  
 kind : rule
@@ -151,8 +140,9 @@ guard :
  classPath: com.local.Base
  method: worker_failure
 actions :
- - inter = __call BasicSort(in)
- - out = Check_output(in,inter) 
+ - (inter, inter_time) = __call BasicSort(in)
+ -  out = Check_output(in,inter,inter_time)
+ 
 
 ---
 #check output rule  

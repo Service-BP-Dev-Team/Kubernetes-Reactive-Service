@@ -72,7 +72,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 				
 				Thread.sleep(1000);
 				timeElapsed+=1000;
-				if(timeElapsed >= 10000) { // stop after 100 seconds
+				if(timeElapsed >= 100000) { // stop after 100 seconds
 					String log = p.getSecond().getConfiguration().getRoot().getJsonRepresentation();
 					// write log on a file
 					FileWriting.writeStringToFile(log,"./spec-merge-sort-enhanced/log.json");

@@ -49,7 +49,7 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
             shutil.copy2(source_path, destination_path)
 
     # Copy services and rules files in the destination directory
-    specdir_name = "incremental/specification" if (env_variables.get("INCREMENTAL_EXECUTION",False)) else "no-incremental/specification"
+    specdir_name = "specification"
     specdir=os.path.join(source_directory,specdir_name)
     for filename in os.listdir(specdir):
         source_path = os.path.join(specdir, filename)
@@ -59,7 +59,7 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
             shutil.copy2(source_path, destination_path)
     
         # Copy macro files in the destination directory
-    specdir_name = "incremental/macro" if (env_variables.get("INCREMENTAL_EXECUTION",False)) else "no-incremental/macro"
+    specdir_name = "macro"
     specdir=os.path.join(source_directory,specdir_name)
     for filename in os.listdir(specdir):
         source_path = os.path.join(specdir, filename)

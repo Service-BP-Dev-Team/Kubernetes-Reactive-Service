@@ -29,15 +29,25 @@ public class Statistics {
 		ArrayList<Long> successDuration = new ArrayList<Long>();
 		
 			if(root.getService().getName().equals("Check_output")) {
+				Object val = root.getInputs().get(2).getValue();
+				Long d;
+				if (val instanceof Long) { // we have to do this check because of the object mapper
+					// that serialize a long to a json int
+					// if the serialization did'nt happen, it will still be a long value
+					// in the other case, it will be a integer value
+					d=(Long)val;
+				}else {
+					d=((Integer)val).longValue();
+				}
 				if(root.getInputs().get(1).getValue() instanceof ArrayList) {
 					// this is a success case
 					successSum++;
-					successDuration.add((Long)root.getInputs().get(2).getValue());
+					successDuration.add(d);
 				}
 				else {
 					// this is a failure case
 					failedSum++;
-					failedDuration.add((Long)root.getInputs().get(2).getValue());
+					failedDuration.add(d);
 				}
 			}
 			if (!root.getSubTasks().isEmpty()) {

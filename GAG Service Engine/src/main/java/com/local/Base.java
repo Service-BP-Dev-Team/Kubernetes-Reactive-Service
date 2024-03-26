@@ -108,6 +108,7 @@ public class Base {
 
 	public boolean worker_success(Object in, Object res, Object time) {
 		if (in != null && res != null && time!=null && res instanceof ArrayList) {
+			//System.out.println(time);
 			return true;
 		}
 		return false;
