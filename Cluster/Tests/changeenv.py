@@ -35,11 +35,8 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
     #store the env used in an environment file
     with open(os.path.join(destination_directory,"specification",".env"), 'w') as fenv:
         for key, value in env_variables.items() :
-            if(value):
-                fenv.write(f'{key}={value}\n')
-            else:
-                fenv.write(f'{key}=\"\"\n')
-
+            fenv.write(f'{key}={str(value)}\n')
+            
     # Copy non-text files from source to destination directory
     for filename in os.listdir(source_directory):
         source_path = os.path.join(source_directory, filename)

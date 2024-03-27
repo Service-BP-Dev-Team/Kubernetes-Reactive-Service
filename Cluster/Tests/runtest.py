@@ -35,18 +35,15 @@ inputSize=1000000
 #inputSize=5001
 initSize=min(500000,env_variables.get("MAX_LEN")*env_variables.get("NUMBER_OF_WORKER_PODS"))
 initSize = max(inputSize//4,initSize)
-def runtest(input,init,env):
+def runtest(input,init,env,number_of_warming,number_of_iteration):
 
-    number_of_iteration = 20
-
-    number_of_warming = 10
     # Directory containing the text files to modify
     source_directory = rootPathIn
 
     # Directory to store the modified files
     destination_directory = rootPathOut
 
-    buildEnvironment(env_variables,source_directory,destination_directory)
+    buildEnvironment(env,source_directory,destination_directory)
 
     # Command to execute
     commands = ["kubectl delete deployment --all",
@@ -76,8 +73,8 @@ def runtest(input,init,env):
         print(f"Error executing command: {e}")
 
     podCommand="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":";
-    podInitCommand=podCommand+f"{initSize}"+"}\'\"";
-    podCommand=podCommand+f"{inputSize}"+"}\'\""
+    podInitCommand=podCommand+f"{init}"+"}\'\"";
+    podCommand=podCommand+f"{input}"+"}\'\""
     #if __name__ == "__main__":
         #print(podCommand)
     commantToInit=f"kubectl exec -it {podId} -- /bin/bash -c {podInitCommand}"
@@ -93,6 +90,7 @@ def runtest(input,init,env):
                 print(f"warming {(i+1)}/{number_of_warming}")
         # the engine is warn : we now execute the desired command
         sumResult=0
+        result=[]
         for i in range(number_of_iteration):
             output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
             # Process the output lines
@@ -101,15 +99,21 @@ def runtest(input,init,env):
             # Access and manipulate the dictionary as needed
             duration = output_dict["duration"]
             statistics = output_dict["additionnalExecutionInformation"]
-            #time.sleep(2)
+            time.sleep(2)
+            # I make a sleep because I don't want to break my computer
             if __name__ == "__main__":
                 print(f"{(i+1)} / {number_of_iteration} : ")
                 print(f"duration -> {duration}")
                 print(f"statistics -> {statistics}")
             sumResult+=duration
-        return sumResult/number_of_iteration
+            result.append({"duration":duration,"statistics":statistics})
+        return result
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
 
 if __name__ == "__main__":
-    print(runtest(inputSize,initSize,env_variables))
+
+    number_of_iteration = 1
+    number_of_warming = 3
+    result = runtest(inputSize,initSize,env_variables,number_of_warming,number_of_iteration)
+    print(sum( el["duration"] for el in result )/len(result))
