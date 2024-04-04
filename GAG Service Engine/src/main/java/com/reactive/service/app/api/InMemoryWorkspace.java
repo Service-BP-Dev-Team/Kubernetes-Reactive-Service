@@ -81,7 +81,7 @@ public class InMemoryWorkspace {
 	public  static final String KEY_TCP_ON_LOCALHOST="DO_TCP_FOR_CALL_TO_LOCALHOST";
 	//the above key is used to check if we have use tcp on the localhost when calling
 	// a remote service, if set to false the execution is enhanced
-	// since tcp communication are avoided when a component sen a message to itself
+	// since tcp communication are avoided when a component sends a message to itself
 	public static final int VALUE_TCP_ON_LOCALHOST=0;
 	// by default we force to have tcp on localhost
 	
@@ -115,7 +115,7 @@ public class InMemoryWorkspace {
 	
 	// the default value is 0. by default it's impossible for a pod to fail
 	
-	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.3;
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.7;
 	
 	// key below gives the time to wait before attempting to redo a request
 	public static final String KEY_WORKER_REQUEST_FAIL_DETECT_DURATION="WORKER_REQUEST_FAIL_DETECT_DURATION";
@@ -128,7 +128,7 @@ public class InMemoryWorkspace {
 	public static final String KEY_MAX_CONCURRENT_SERVICE_REQUEST="MAX_CONCURRENT_SERVICE_REQUEST";
 	
 	// the default value of the key above
-	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=1;
+	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=3;
 	
 	// Asking the engine to be incremental or non incremental during the execution
 	// of a GAG service specification

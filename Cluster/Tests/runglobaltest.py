@@ -21,12 +21,17 @@ env_variables = {
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
     'USE_VIRTUAL_THREAD' : True,
     'WORKER_REQUEST_FAIL_DETECT_DURATION':20,
-    'VARYING' : "NUMBER_OF_BLOCKS", # possible case are NUMBER_OF_BLOCKS, or WORKER_REQUEST_FAILURE_PROBABILITY
-    "STEP_INCREMENT" : 1,
-    "WORKER_REQUEST_FAILURE_PROBABILITY":0.0,
-    "START_AT": 1,
-    "STOP_AT" : 2,
-    "INPUT_SIZE": 1000000
+    'VARYING' : 'NUMBER_OF_BLOCKS', # possible case are NUMBER_OF_BLOCKS, or WORKER_REQUEST_FAILURE_PROBABILITY
+    'STEP_INCREMENT' : 1,
+    'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
+    'START_AT': 1,
+    'STOP_AT' : 2,
+    'WARMING_INPUT_SIZE': 1000000,
+    'NUMBER_OF_WARMING':10,
+    'NUMNER_OF_ITERATION':20,
+    'INPUT_SIZE_START':500000,
+    'INPUT_SIZE_INCREMENT':50000,
+    'INPUT_SIZE_STOP':3000000
   #  'INCREMENTAL_EXECUTION':True,
     
 
@@ -89,7 +94,7 @@ def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warm
     # Get the current date and time
     now = datetime.datetime.now()
     #get the last place we were before we left
-    currentProgressFilePath=os.path.join("Results",destinationDirectory,folder_execution_type,"stop.txt")
+    currentProgressFilePath=os.path.join("Results",destinationDirectory,folder_execution_type,"stop.json")
         
     if os.path.isfile(currentProgressFilePath):
         with open(currentProgressFilePath, "r") as file:
@@ -117,7 +122,7 @@ def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warm
         day = now.day
         minutes = now.minute
         #run the test and get the result in a file
-        file_name =f"{execution_type}_{year}_{month}_{day}_{minutes}.txt"
+        file_name =f"{execution_type}_{year}_{month}_{day}_{minutes}.json"
         file_path = os.path.join("Results",destinationDirectory,folder_execution_type,file_name)
         running_env[varying]=i
         result = runtest(inputSize, initSize,running_env,number_of_warming,number_of_iteration)
@@ -152,15 +157,12 @@ def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warm
 
 if env_variables.get("VARYING",False):
 
-    number_of_iteration = 20
-
-    number_of_warming = 10
     # Perform non incremental test
-    perform_test(running_env,"NON_INCREMENTAL",env_variables,inputSize,initSize,number_of_warming,number_of_iteration)
+    perform_test(running_env,"NON_INCREMENTAL",env_variables)
     # Perform incremental test
-    perform_test(running_env,"INCREMENTAL",env_variables,inputSize,initSize,number_of_warming,number_of_iteration)
+    perform_test(running_env,"INCREMENTAL",env_variables)
         
 else:
-    print(runtest(inputSize, initSize,running_env,10,20))
+    print(runtest(running_env))
 
 

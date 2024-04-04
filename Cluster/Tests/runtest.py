@@ -24,10 +24,16 @@ env_variables = {
   #  'MAXIMUM_THREAD_POOL' : 2,
     'USE_VIRTUAL_THREAD' : True,
     'INCREMENTAL_EXECUTION':True,
-    'WORKER_REQUEST_FAILURE_PROBABILITY':0.5,
+    'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
   #  'INCREMENTAL_EXECUTION':True,
-   'WORKER_REQUEST_FAIL_DETECT_DURATION':10
+    'WORKER_REQUEST_FAIL_DETECT_DURATION':10,
+    'WARMING_INPUT_SIZE': 1000000,
+    'NUMBER_OF_WARMING':10,
+    'NUMNER_OF_ITERATION':20,
+    'INPUT_SIZE_START':500000,
+    'INPUT_SIZE_INCREMENT':50000,
+    'INPUT_SIZE_STOP':500000
     
 
 }
@@ -35,8 +41,13 @@ inputSize=1000000
 #inputSize=5001
 initSize=min(500000,env_variables.get("MAX_LEN")*env_variables.get("NUMBER_OF_WORKER_PODS"))
 initSize = max(inputSize//4,initSize)
-def runtest(input,init,env,number_of_warming,number_of_iteration):
-
+def runtest(env):
+    input_start=env.get("INPUT_SIZE_START")
+    input_stop=env.get("INPUT_SIZE_STOP")
+    input_increment=env.get("INPUT_SIZE_INCREMENT")
+    init=env.get("WARMING_INPUT_SIZE")
+    number_of_warming = env.get("NUMBER_OF_WARMING",10)
+    number_of_iteration = env.get("NUMBER_OF_ITERATION",20)
     # Directory containing the text files to modify
     source_directory = rootPathIn
 
@@ -72,13 +83,14 @@ def runtest(input,init,env,number_of_warming,number_of_iteration):
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
 
-    podCommand="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":";
-    podInitCommand=podCommand+f"{init}"+"}\'\"";
-    podCommand=podCommand+f"{input}"+"}\'\""
+    
+    podCommandBase="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":";
+    podInitCommand=podCommandBase+f"{init}"+"}\'\""
+    
     #if __name__ == "__main__":
         #print(podCommand)
     commantToInit=f"kubectl exec -it {podId} -- /bin/bash -c {podInitCommand}"
-    commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
+    
     #print(commantToRun)
 
     # Run the command that assess the execution time 
@@ -90,30 +102,42 @@ def runtest(input,init,env,number_of_warming,number_of_iteration):
                 print(f"warming {(i+1)}/{number_of_warming}")
         # the engine is warn : we now execute the desired command
         sumResult=0
-        result=[]
-        for i in range(number_of_iteration):
-            output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
-            # Process the output lines
-            #print(output)
-            output_dict = json.loads(output)
-            # Access and manipulate the dictionary as needed
-            duration = output_dict["duration"]
-            statistics = output_dict["additionnalExecutionInformation"]
-            time.sleep(2)
-            # I make a sleep because I don't want to break my computer
-            if __name__ == "__main__":
-                print(f"{(i+1)} / {number_of_iteration} : ")
-                print(f"duration -> {duration}")
-                print(f"statistics -> {statistics}")
-            sumResult+=duration
-            result.append({"duration":duration,"statistics":statistics})
+        result={}
+        input=input_start
+        podCommand=podCommandBase+f"{input}"+"}\'\""
+        commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
+        while input<=input_stop:
+            element_of_result=[]    
+            for i in range(number_of_iteration):
+                output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
+                # Process the output lines
+                #print(output)
+                output_dict = json.loads(output)
+                # Access and manipulate the dictionary as needed
+                duration = output_dict["duration"]
+                statistics = output_dict["additionnalExecutionInformation"]
+                time.sleep(2)
+                # I make a sleep because I don't want to break my computer
+                if __name__ == "__main__":
+                    print(f"{(i+1)} / {number_of_iteration} : ")
+                    print(f"duration -> {duration}")
+                    print(f"statistics -> {statistics}")
+                sumResult+=duration
+                element_of_result.append({"duration":duration,"statistics":statistics})
+            #add the result of the input to the global result
+            result[input]=element_of_result
+            #update input
+            input+=input_increment
+            #update command to run
+            podCommand=podCommandBase+f"{input}"+"}\'\""
+            commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
         return result
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
 
 if __name__ == "__main__":
 
-    number_of_iteration = 1
-    number_of_warming = 3
-    result = runtest(inputSize,initSize,env_variables,number_of_warming,number_of_iteration)
-    print(sum( el["duration"] for el in result )/len(result))
+    result = runtest(env_variables)
+    if len(result)==1:
+        element_result=result.get([el for el in result ][0])
+        print(sum( el["duration"] for el in element_result )/len(element_result))
