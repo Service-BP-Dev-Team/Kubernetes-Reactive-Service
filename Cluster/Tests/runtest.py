@@ -107,7 +107,8 @@ def runtest(env):
         podCommand=podCommandBase+f"{input}"+"}\'\""
         commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
         while input<=input_stop:
-            element_of_result=[]    
+            element_of_result=[]
+            print(f"performing execution for input {input}")    
             for i in range(number_of_iteration):
                 output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
                 # Process the output lines

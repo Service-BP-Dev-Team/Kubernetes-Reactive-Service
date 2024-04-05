@@ -30,7 +30,9 @@ functions :
  - { classPath: com.local.Base, method: sort, label: sort }
  # function from java.utils
 actions :
- - out_list = sort(inp_list)
+# - out_list = sort(inp_list)
+ - (inter, inter_time) =  __call BasicSort(inp_list)
+ - out_list = Check_output(inp_list,inter,inter_time)
 
 
 
