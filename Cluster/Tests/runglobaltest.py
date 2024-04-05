@@ -5,48 +5,42 @@ import json
 import psutil
 import time
 env_variables = {
-    'NUMBER_OF_BLOCKS': 8,
+    'NUMBER_OF_BLOCKS': 1,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
     'NUMBER_OF_CONTROLLER_PODS': 1,
-    'NUMBER_OF_WORKER_PODS': 2,
-    'WORKER_POD_CAPACITY':1500,
+    #'NUMBER_OF_WORKER_PODS': 2,
+    'WORKER_POD_CAPACITY':300,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 7813,
+    'MAX_LEN': 25000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'INCREMENTAL_EXECUTION':False,
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
     'USE_VIRTUAL_THREAD' : True,
     'WORKER_REQUEST_FAIL_DETECT_DURATION':20,
-    'VARYING' : 'NUMBER_OF_BLOCKS', # possible case are NUMBER_OF_BLOCKS, or WORKER_REQUEST_FAILURE_PROBABILITY
+    'VARYING' : 'NUMBER_OF_WORKER_PODS', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, or NUMBER_OF_WORKER_NODE
     'STEP_INCREMENT' : 1,
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
     'START_AT': 1,
-    'STOP_AT' : 2,
-    'DO_ONLY_INCREMENTAL_EXECUTION': False,
+    'STOP_AT' : 8,
+    'DO_ONLY_INCREMENTAL_EXECUTION': True,
     'WARMING_INPUT_SIZE': 1000000,
     'NUMBER_OF_WARMING':10,
     'NUMNER_OF_ITERATION':20,
-    'INPUT_SIZE_START':500000,
+    'INPUT_SIZE_START':50000,
     'INPUT_SIZE_INCREMENT':50000,
-    'INPUT_SIZE_STOP':600000
+    'INPUT_SIZE_STOP':3000000
   #  'INCREMENTAL_EXECUTION':True,
     
 
 }
-max_len =0
-if env_variables.get("MAX_LEN",False) and not env_variables.get("VARYING",False):
-    max_len=env_variables.get("MAX_LEN")
-else:
-    max_len=env_variables.get("START_AT")
-number_of_workers=env_variables.get("NUMBER_OF_WORKER_PODS")
 
-initSize=max(500000,max_len * number_of_workers)
+initSize=env_variables.get("WARMING_INPUT_SIZE")
 
-inputSize= env_variables.get("INPUT_SIZE")
+inputSize= env_variables.get("INPUT_SIZE_START")
 globalKeys=["VARYING","STEP_INCREMENT","START_AT","STOP_AT","DO_ONLY_INCREMENTAL_EXECUTION"]
 running_env = {key:value for key,value in env_variables.items() 
                if not key in globalKeys }
@@ -88,6 +82,9 @@ def perform_test(env,execution_type,global_env):
     if global_env.get("VARYING",False)=="NUMBER_OF_BLOCKS":
         varying = "NUMBER_OF_BLOCKS"
         destinationDirectory="NumberOfBlocks"
+    elif global_env.get("VARYING",False)=="NUMBER_OF_WORKER_PODS":
+        varying = "NUMBER_OF_WORKER_PODS"
+        destinationDirectory="NumberOfWorkers"
     else:
         varying = "WORKER_REQUEST_FAILURE_PROBABILITY"
         destinationDirectory="Probability"
@@ -114,7 +111,7 @@ def perform_test(env,execution_type,global_env):
                          "year":now_env_to_store.year,
                          "month":now_env_to_store.month,
                          "day":now_env_to_store.day,
-                         "minutes":now_env_to_store.minutes}
+                         "minutes":now_env_to_store.minute}
         with open(str(executionGlobalParameterFilePath),"w") as current:
             current.write(json.dumps(env_execution_to_store))
     #do the execution
@@ -138,9 +135,9 @@ def perform_test(env,execution_type,global_env):
         output = {}
         output["environment"]=running_env
         output["result"]=result
-        to_print =f"K={i}, R={output} \n"
+        #to_print =f"K={i}, R={output} \n"
         #display the result
-        print(to_print)
+        #print(to_print)
         #store the result in a file
         with open(str(file_path),"w") as file:
             file.write(json.dumps(output))
@@ -159,8 +156,8 @@ def perform_test(env,execution_type,global_env):
             current.write(json.dumps(currentProgress))
         
         #wait 5 minutes before the next execution
-        #time.sleep(5*60)
-        time.sleep(1)
+        time.sleep(5*60)
+        #time.sleep(1)
         # why I make it sleep because I don't want to break my computer
         # my computer is expensive
 
