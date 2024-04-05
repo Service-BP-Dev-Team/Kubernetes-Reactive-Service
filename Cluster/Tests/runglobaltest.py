@@ -26,12 +26,13 @@ env_variables = {
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
     'START_AT': 1,
     'STOP_AT' : 2,
+    'DO_ONLY_INCREMENTAL_EXECUTION': False,
     'WARMING_INPUT_SIZE': 1000000,
     'NUMBER_OF_WARMING':10,
     'NUMNER_OF_ITERATION':20,
     'INPUT_SIZE_START':500000,
     'INPUT_SIZE_INCREMENT':50000,
-    'INPUT_SIZE_STOP':3000000
+    'INPUT_SIZE_STOP':600000
   #  'INCREMENTAL_EXECUTION':True,
     
 
@@ -46,7 +47,7 @@ number_of_workers=env_variables.get("NUMBER_OF_WORKER_PODS")
 initSize=max(500000,max_len * number_of_workers)
 
 inputSize= env_variables.get("INPUT_SIZE")
-globalKeys=["VARYING","STEP_INCREMENT","START_AT","STOP_AT"]
+globalKeys=["VARYING","STEP_INCREMENT","START_AT","STOP_AT","DO_ONLY_INCREMENTAL_EXECUTION"]
 running_env = {key:value for key,value in env_variables.items() 
                if not key in globalKeys }
 
@@ -74,7 +75,7 @@ def isBaterryOkay():
     return result
 
 
-def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warming,number_of_iteration):
+def perform_test(env,execution_type,global_env):
 
     env["INCREMENTAL_EXECUTION"]= True if execution_type=="INCREMENTAL" else False
     folder_execution_type="Incremental" if execution_type=="INCREMENTAL" else "NoIncremental"
@@ -95,7 +96,7 @@ def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warm
     now = datetime.datetime.now()
     #get the last place we were before we left
     currentProgressFilePath=os.path.join("Results",destinationDirectory,folder_execution_type,"stop.json")
-        
+    executionGlobalParameterFilePath=os.path.join("Results",destinationDirectory,folder_execution_type,"env.json")
     if os.path.isfile(currentProgressFilePath):
         with open(currentProgressFilePath, "r") as file:
             file_contents = file.read()
@@ -107,7 +108,15 @@ def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warm
                 
     else:
         print("starting execution from the beginning")
-
+        #store where we haved started
+        now_env_to_store = datetime.datetime.now()
+        env_execution_to_store={"environment":global_env,
+                         "year":now_env_to_store.year,
+                         "month":now_env_to_store.month,
+                         "day":now_env_to_store.day,
+                         "minutes":now_env_to_store.minutes}
+        with open(str(executionGlobalParameterFilePath),"w") as current:
+            current.write(json.dumps(env_execution_to_store))
     #do the execution
     while (i <= global_env.get("STOP_AT")):
         if not isBaterryOkay() :
@@ -125,7 +134,7 @@ def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warm
         file_name =f"{execution_type}_{year}_{month}_{day}_{minutes}.json"
         file_path = os.path.join("Results",destinationDirectory,folder_execution_type,file_name)
         running_env[varying]=i
-        result = runtest(inputSize, initSize,running_env,number_of_warming,number_of_iteration)
+        result = runtest(running_env)
         output = {}
         output["environment"]=running_env
         output["result"]=result
@@ -158,7 +167,8 @@ def perform_test(env,execution_type,global_env,inputSize,initSize,number_of_warm
 if env_variables.get("VARYING",False):
 
     # Perform non incremental test
-    perform_test(running_env,"NON_INCREMENTAL",env_variables)
+    if not env_variables.get("DO_ONLY_INCREMENTAL_EXECUTION",False):
+        perform_test(running_env,"NON_INCREMENTAL",env_variables)
     # Perform incremental test
     perform_test(running_env,"INCREMENTAL",env_variables)
         
