@@ -14,7 +14,7 @@ env_variables = {
     #'NUMBER_OF_WORKER_PODS': 2,
     'WORKER_POD_CAPACITY':300,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 50000,
+    'MAX_LEN': 2**13,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'INCREMENTAL_EXECUTION':False,
@@ -26,13 +26,15 @@ env_variables = {
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
     'START_AT': 1,
     'STOP_AT' : 8,
+    'STEP_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
     'DO_ONLY_INCREMENTAL_EXECUTION': True,
     'WARMING_INPUT_SIZE': 1000000,
     'NUMBER_OF_WARMING':10,
     'NUMNER_OF_ITERATION':20,
-    'INPUT_SIZE_START':100000,
-    'INPUT_SIZE_INCREMENT':100000,
-    'INPUT_SIZE_STOP':3000000
+    'INPUT_SIZE_START':2**15,
+    'INPUT_SIZE_INCREMENT':2,
+    'INPUT_SIZE_STOP':2**21,
+    'INPUT_SIZE_GROWTH': "GEOMETRIC" # the value are GEOMETRIC and ARITHMETIC 
   #  'INCREMENTAL_EXECUTION':True,
     
 
@@ -41,7 +43,7 @@ env_variables = {
 initSize=env_variables.get("WARMING_INPUT_SIZE")
 
 inputSize= env_variables.get("INPUT_SIZE_START")
-globalKeys=["VARYING","STEP_INCREMENT","START_AT","STOP_AT","DO_ONLY_INCREMENTAL_EXECUTION"]
+globalKeys=["VARYING","STEP_INCREMENT","STEP_GROWTH","START_AT","STOP_AT","DO_ONLY_INCREMENTAL_EXECUTION"]
 running_env = {key:value for key,value in env_variables.items() 
                if not key in globalKeys }
 
@@ -75,7 +77,7 @@ def perform_test(env,execution_type,global_env):
     folder_execution_type="Incremental" if execution_type=="INCREMENTAL" else "NoIncremental"
     
     # Create a new file with the generated name
-    
+    geometric = env.get("STEP_GROWTH", False)=="GEOMETRIC"
     varying=""
     destinationDirectory=""
     #when varying number_of_blocks
@@ -142,7 +144,10 @@ def perform_test(env,execution_type,global_env):
         with open(str(file_path),"w") as file:
             file.write(json.dumps(output))
         #increment for next execution
-        i+=global_env.get("STEP_INCREMENT")
+        if geometric:
+            i=i*global_env.get("STEP_INCREMENT")
+        else:
+            i+=global_env.get("STEP_INCREMENT")
         now = datetime.datetime.now()
         #store where we are in a file
         #storing where we are is necessary in order to not perform

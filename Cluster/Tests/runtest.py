@@ -33,7 +33,8 @@ env_variables = {
     'NUMNER_OF_ITERATION':20,
     'INPUT_SIZE_START':500000,
     'INPUT_SIZE_INCREMENT':50000,
-    'INPUT_SIZE_STOP':500000
+    'INPUT_SIZE_STOP':500000,
+    'INPUT_SIZE_GROWTH': "GEOMETRIC" # the value are GEOMETRIC and ARITHMETIC 
     
 
 }
@@ -41,22 +42,9 @@ inputSize=1000000
 #inputSize=5001
 initSize=min(500000,env_variables.get("MAX_LEN")*env_variables.get("NUMBER_OF_WORKER_PODS"))
 initSize = max(inputSize//4,initSize)
-def runtest(env):
-    input_start=env.get("INPUT_SIZE_START")
-    input_stop=env.get("INPUT_SIZE_STOP")
-    input_increment=env.get("INPUT_SIZE_INCREMENT")
-    init=env.get("WARMING_INPUT_SIZE")
-    number_of_warming = env.get("NUMBER_OF_WARMING",10)
-    number_of_iteration = env.get("NUMBER_OF_ITERATION",20)
-    # Directory containing the text files to modify
-    source_directory = rootPathIn
 
-    # Directory to store the modified files
-    destination_directory = rootPathOut
-
-    buildEnvironment(env,source_directory,destination_directory)
-
-    # Command to execute
+def deploy(env):
+      # Command to execute
     commands = ["kubectl delete deployment --all",
                 f"kubectl apply -f {deploymentPath1}",
                 f"kubectl apply -f {deploymentPath2}"]
@@ -77,13 +65,30 @@ def runtest(env):
         output = subprocess.check_output(get_pod_command, shell=True, universal_newlines=True)
         # Process the output lines
         podId=output.split("\n")[1].split(" ")[0]
+        return podId
         # Access and manipulate the dictionary as needed
         if __name__ == "__main__":
             print(podId)
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
 
+def runtest(env):
+    input_start=env.get("INPUT_SIZE_START")
+    input_stop=env.get("INPUT_SIZE_STOP")
+    input_increment=env.get("INPUT_SIZE_INCREMENT")
+    init=env.get("WARMING_INPUT_SIZE")
+    number_of_warming = env.get("NUMBER_OF_WARMING",10)
+    number_of_iteration = env.get("NUMBER_OF_ITERATION",20)
+    # Directory containing the text files to modify
+    source_directory = rootPathIn
+
+    # Directory to store the modified files
+    destination_directory = rootPathOut
+
+    buildEnvironment(env,source_directory,destination_directory)
     
+    #deploy
+    podId=deploy(env)
     podCommandBase="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":";
     podInitCommand=podCommandBase+f"{init}"+"}\'\""
     
@@ -102,33 +107,49 @@ def runtest(env):
                 print(f"warming {(i+1)}/{number_of_warming}")
         # the engine is warn : we now execute the desired command
         sumResult=0
-        result={}
+        result={'failed':0}
         input=input_start
         podCommand=podCommandBase+f"{input}"+"}\'\""
         commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
+        geometric = env.get("INPUT_SIZE_GROWTH", False)=="GEOMETRIC"
         while input<=input_stop:
             element_of_result=[]
-            print(f"performing execution for input {input}")    
-            for i in range(number_of_iteration):
+            print(f"performing execution for input {input}")
+            i=0    
+            while i < number_of_iteration:
                 output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
                 # Process the output lines
                 #print(output)
                 output_dict = json.loads(output)
                 # Access and manipulate the dictionary as needed
-                duration = output_dict["duration"]
-                statistics = output_dict["additionnalExecutionInformation"]
-                time.sleep(2)
-                # I make a sleep because I don't want to break my computer
-                if __name__ == "__main__":
-                    print(f"{(i+1)} / {number_of_iteration} : ")
-                    print(f"duration -> {duration}")
-                    print(f"statistics -> {statistics}")
-                sumResult+=duration
-                element_of_result.append({"duration":duration,"statistics":statistics})
+                duration=output_dict.get(duration,0)
+                if not duration ==0 :
+                    duration = output_dict["duration"]
+                    statistics = output_dict["additionnalExecutionInformation"]
+                    time.sleep(10)
+                    # I make a sleep because I don't want to break my computer
+                    if __name__ == "__main__":
+                        print(f"{(i+1)} / {number_of_iteration} : ")
+                        print(f"duration -> {duration}")
+                        print(f"statistics -> {statistics}")
+                    sumResult+=duration
+                    element_of_result.append({"duration":duration,"statistics":statistics})
+                    i=i+1
+                else:
+                    result['failed']=result["failed"]+1
+                    #redeploy
+                    podId=deploy(env)
+                    commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
+                    # in case of error we do not want to lose all logs statistics
+                    # we redeploy and resume from where we were
+
             #add the result of the input to the global result
             result[input]=element_of_result
             #update input
-            input+=input_increment
+            if geometric:
+                input=input*input_increment
+            else:
+                input+=input_increment
             #update command to run
             podCommand=podCommandBase+f"{input}"+"}\'\""
             commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
