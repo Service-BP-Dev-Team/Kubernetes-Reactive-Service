@@ -72,6 +72,24 @@ def deploy(env):
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
 
+def warming(podId,init,number_of_warming):
+        
+    podCommandBase="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":";
+    podInitCommand=podCommandBase+f"{init}"+"}\'\""
+    
+    #if __name__ == "__main__":
+        #print(podCommand)
+    commantToInit=f"kubectl exec -it {podId} -- /bin/bash -c {podInitCommand}"
+            # execute init 4 times
+    try:
+        for i in range(number_of_warming):
+            output = subprocess.check_output(commantToInit, shell=True, universal_newlines=True)
+            if __name__ == "__main__":
+                print(f"warming {(i+1)}/{number_of_warming}")
+            # the engine is warn : we now execute the desired command
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")
+
 def runtest(env):
     input_start=env.get("INPUT_SIZE_START")
     input_stop=env.get("INPUT_SIZE_STOP")
@@ -89,23 +107,13 @@ def runtest(env):
     
     #deploy
     podId=deploy(env)
-    podCommandBase="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":";
-    podInitCommand=podCommandBase+f"{init}"+"}\'\""
-    
-    #if __name__ == "__main__":
-        #print(podCommand)
-    commantToInit=f"kubectl exec -it {podId} -- /bin/bash -c {podInitCommand}"
-    
+    #warm
+    warming(podId,init,number_of_warming)
+    podCommandBase="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":"; 
     #print(commantToRun)
 
     # Run the command that assess the execution time 
     try:
-        # execute init 4 times
-        for i in range(number_of_warming):
-            output = subprocess.check_output(commantToInit, shell=True, universal_newlines=True)
-            if __name__ == "__main__":
-                print(f"warming {(i+1)}/{number_of_warming}")
-        # the engine is warn : we now execute the desired command
         sumResult=0
         result={'redeployment':0}
         input=input_start
@@ -139,6 +147,8 @@ def runtest(env):
                     result['redeployment']=result["redeployment"]+1
                     #redeploy
                     podId=deploy(env)
+                    #warm
+                    warming(podId,init,number_of_warming)
                     commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
                     # in case of error we do not want to lose all logs statistics
                     # we redeploy and resume from where we were

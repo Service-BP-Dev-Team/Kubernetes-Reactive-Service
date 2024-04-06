@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: java-worker
-  replicas: 1 
+  replicas: 8 
   template:
     metadata:
       labels:
