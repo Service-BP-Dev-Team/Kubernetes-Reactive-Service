@@ -107,7 +107,7 @@ def runtest(env):
                 print(f"warming {(i+1)}/{number_of_warming}")
         # the engine is warn : we now execute the desired command
         sumResult=0
-        result={'failed':0}
+        result={'redeployment':0}
         input=input_start
         podCommand=podCommandBase+f"{input}"+"}\'\""
         commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
@@ -136,7 +136,7 @@ def runtest(env):
                     element_of_result.append({"duration":duration,"statistics":statistics})
                     i=i+1
                 else:
-                    result['failed']=result["failed"]+1
+                    result['redeployment']=result["redeployment"]+1
                     #redeploy
                     podId=deploy(env)
                     commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
