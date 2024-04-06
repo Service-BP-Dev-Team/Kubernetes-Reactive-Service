@@ -122,7 +122,7 @@ def runtest(env):
                 #print(output)
                 output_dict = json.loads(output)
                 # Access and manipulate the dictionary as needed
-                duration=output_dict.get(duration,0)
+                duration=output_dict.get("duration",0)
                 if not duration ==0 :
                     duration = output_dict["duration"]
                     statistics = output_dict["additionnalExecutionInformation"]
