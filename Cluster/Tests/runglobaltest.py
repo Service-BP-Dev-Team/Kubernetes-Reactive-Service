@@ -14,7 +14,7 @@ env_variables = {
     #'NUMBER_OF_WORKER_PODS': 2,
     'WORKER_POD_CAPACITY':300,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 2**13,
+    'MAX_LEN': 20000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'INCREMENTAL_EXECUTION':False,
@@ -25,16 +25,16 @@ env_variables = {
     'STEP_INCREMENT' : 1,
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
     'START_AT': 1,
-    'STOP_AT' : 8,
+    'STOP_AT' : 6,
     'STEP_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
     'DO_ONLY_INCREMENTAL_EXECUTION': True,
     'WARMING_INPUT_SIZE': 1000000,
     'NUMBER_OF_WARMING':10,
-    'NUMNER_OF_ITERATION':20,
-    'INPUT_SIZE_START':2**15,
-    'INPUT_SIZE_INCREMENT':2,
-    'INPUT_SIZE_STOP':2**21,
-    'INPUT_SIZE_GROWTH': "GEOMETRIC" # the value are GEOMETRIC and ARITHMETIC 
+    'NUMBER_OF_ITERATION':50,
+    'INPUT_SIZE_START':200000,
+    'INPUT_SIZE_INCREMENT':200000,
+    'INPUT_SIZE_STOP':2600000,
+    'INPUT_SIZE_GROWTH': "ARITHMETIC" # the value are GEOMETRIC and ARITHMETIC 
   #  'INCREMENTAL_EXECUTION':True,
     
 
@@ -113,6 +113,7 @@ def perform_test(env,execution_type,global_env):
                          "year":now_env_to_store.year,
                          "month":now_env_to_store.month,
                          "day":now_env_to_store.day,
+                         "hour":now_env_to_store.hour,
                          "minutes":now_env_to_store.minute}
         with open(str(executionGlobalParameterFilePath),"w") as current:
             current.write(json.dumps(env_execution_to_store))
@@ -128,9 +129,10 @@ def perform_test(env,execution_type,global_env):
         year = now.year
         month = now.month
         day = now.day
+        hour = now.hour
         minutes = now.minute
         #run the test and get the result in a file
-        file_name =f"{execution_type}_{year}_{month}_{day}_{minutes}.json"
+        file_name =f"{execution_type}_{year}_{month}_{day}_{hour}_{minutes}.json"
         file_path = os.path.join("Results",destinationDirectory,folder_execution_type,file_name)
         running_env[varying]=i
         result = runtest(running_env)
@@ -156,6 +158,7 @@ def perform_test(env,execution_type,global_env):
                          "year":year,
                          "month":month,
                          "day":day,
+                         "hour":hour,
                          "minutes":minutes}
         with open(str(currentProgressFilePath),"w") as current:
             current.write(json.dumps(currentProgress))

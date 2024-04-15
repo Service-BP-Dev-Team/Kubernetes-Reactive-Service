@@ -2,6 +2,7 @@ import subprocess
 import json
 import time
 from changeenv import buildEnvironment
+from cpuusage import waitForNormalCpuUsage
 
 rootPathIn ="/vagrant/Tests/TestRunIn"
 rootPathOut ="/vagrant/Tests/TestRunOut"
@@ -54,6 +55,7 @@ def deploy(env):
     for command in commands:
         try:
             output = subprocess.check_output(command, shell=True, universal_newlines=True)
+            time.sleep(30)
             
         except subprocess.CalledProcessError as e:
             print(f"Error executing command: {e}")
@@ -125,25 +127,35 @@ def runtest(env):
             print(f"performing execution for input {input}")
             i=0    
             while i < number_of_iteration:
+                reloadExecution= not waitForNormalCpuUsage()
                 output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
+                print(f"{(i+1)} / {number_of_iteration} : ")
                 # Process the output lines
                 #print(output)
-                output_dict = json.loads(output)
-                # Access and manipulate the dictionary as needed
-                duration=output_dict.get("duration",0)
-                if not duration ==0 :
-                    duration = output_dict["duration"]
-                    statistics = output_dict["additionnalExecutionInformation"]
-                    time.sleep(10)
-                    # I make a sleep because I don't want to break my computer
-                    if __name__ == "__main__":
-                        print(f"{(i+1)} / {number_of_iteration} : ")
-                        print(f"duration -> {duration}")
-                        print(f"statistics -> {statistics}")
-                    sumResult+=duration
-                    element_of_result.append({"duration":duration,"statistics":statistics})
-                    i=i+1
+                if output:
+                    output_dict = json.loads(output)
+                    # Access and manipulate the dictionary as needed
+                    duration=output_dict.get("duration",0)
+                    if not duration ==0 :
+                        duration = output_dict["duration"]
+                        statistics = output_dict["additionnalExecutionInformation"]
+                        time.sleep(5)
+                        # I make a sleep because I don't want to break my computer
+                        if __name__ == "__main__":
+                            print(f"{(i+1)} / {number_of_iteration} : ")
+                            print(f"duration -> {duration}")
+                            print(f"statistics -> {statistics}")
+                        sumResult+=duration
+                        element_of_result.append({"duration":duration,"statistics":statistics})
+                        i=i+1
+                    else:
+                        reloadExecution=True
                 else:
+                    reloadExecution=True
+                if reloadExecution:
+                    print("performing a redeployment")
+                    i=0 # discard previous result
+                    element_of_result=[] # discard previous result for this assessement
                     result['redeployment']=result["redeployment"]+1
                     #redeploy
                     podId=deploy(env)
