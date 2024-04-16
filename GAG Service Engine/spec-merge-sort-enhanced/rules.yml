@@ -70,6 +70,26 @@ actions :
  - index_out = inc(index_in)
  - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
  - out = Check_output(in_arr[index_in],inter,inter_time)
+ 
+---
+#basic sort iterration when the array is empty
+kind : rule
+name : Sort_Basic_It_Rule_When_Array_is_empty
+service : Sort_Basic_It
+guard : 
+ classPath: com.local.SortFunc
+ method: index_basic_defined_with_empty_array
+ # The guard requires a maximum length l-1 of the input list
+functions :
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+actions :
+# - out_arr = sort_array_lists(inp_arr)
+ - index_out = inc(index_in)
+# - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
+ - inter = in_arr[index_in]
+ - inter_time = getZero()
+ - out = Check_output(in_arr[index_in],inter,inter_time)
 
 ---
 #basic sort work 

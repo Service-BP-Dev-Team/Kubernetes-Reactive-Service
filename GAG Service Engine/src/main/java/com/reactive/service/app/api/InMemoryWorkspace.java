@@ -115,7 +115,7 @@ public class InMemoryWorkspace {
 	
 	// the default value is 0. by default it's impossible for a pod to fail
 	
-	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.7;
+	public static final Double VALUE_WORKER_REQUEST_FAILURE_PROBABILITY=0.0;
 	
 	// key below gives the time to wait before attempting to redo a request
 	public static final String KEY_WORKER_REQUEST_FAIL_DETECT_DURATION="WORKER_REQUEST_FAIL_DETECT_DURATION";
@@ -128,7 +128,7 @@ public class InMemoryWorkspace {
 	public static final String KEY_MAX_CONCURRENT_SERVICE_REQUEST="MAX_CONCURRENT_SERVICE_REQUEST";
 	
 	// the default value of the key above
-	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=3;
+	public static final int VALUE_MAX_CONCURRENT_SERVICE_REQUEST=2;
 	
 	// Asking the engine to be incremental or non incremental during the execution
 	// of a GAG service specification

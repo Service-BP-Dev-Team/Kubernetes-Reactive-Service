@@ -23,16 +23,21 @@ public class SortFunc {
 
 	public ArrayList<ArrayList<Integer>> split(Object inputs) {
 		ArrayList<Integer> list = (ArrayList<Integer>) inputs;
-		int cell_len = list.size() / getNUMBER_OF_BLOCKS();
+		//int cell_len = list.size() / getNUMBER_OF_BLOCKS();
+		int cell_len=getMAX_LEN();
 		ArrayList<ArrayList<Integer>> result = new ArrayList();
-		for (int i = 0; i < getNUMBER_OF_BLOCKS() - 1; i++) {
+		int start =0;
+		int size = list.size();
+		for (int i = 0; i < getNUMBER_OF_BLOCKS(); i++) {
 			ArrayList<Integer> el = new ArrayList<Integer>();
-			el.addAll(list.subList(cell_len * i, cell_len * (i + 1)));
+			int end = Math.min(start+cell_len,size);
+			if(start!=size) { el.addAll(list.subList(start,end));}
+			start=end;
 			result.add(el);
 		}
-		ArrayList<Integer> el = new ArrayList<Integer>();
+		/*ArrayList<Integer> el = new ArrayList<Integer>();
 		el.addAll(list.subList(cell_len * (getNUMBER_OF_BLOCKS() - 1), list.size()));
-		result.add(el);
+		result.add(el);*/
 		//System.out.println(" inputs after split : " + result);
 		return result;
 	}
@@ -58,7 +63,7 @@ public class SortFunc {
 		ArrayList<Integer> list = new ArrayList<>();
 		int leftSize = left.size();
 		int rightSize = right.size();
-		if(leftSize==0) {return right;}if(rightSize==0) {return left;}
+		if(leftSize==0) {return right;}if(rightSize==0) {return left;} //great test
 		int i = 0; // Index for the left list
 		int j = 0; // Index for the right list
 
@@ -174,14 +179,30 @@ public class SortFunc {
 	
 	public boolean index_basic_defined( Object i, Object arr) {
 		if(i!=null && arr!=null) {
+			ArrayList<ArrayList> array = (ArrayList<ArrayList>) arr;
 			Integer index = (Integer)i;
-			ArrayList array = (ArrayList) arr;
-			if(array.get(index)!=null) {
+			ArrayList el = array.get(index);
+			if(el!=null) {
+				if(el.isEmpty())return false;
 				return true;
 			}
 		}
 		return false;
 	}
+	
+	public boolean index_basic_defined_with_empty_array( Object i, Object arr) {
+		if(i!=null && arr!=null) {
+			ArrayList<ArrayList> array = (ArrayList<ArrayList>) arr;
+			Integer index = (Integer)i;
+			ArrayList el = array.get(index);
+			if(el!=null) {
+				if(el.isEmpty())return true;
+				return false;
+			}
+		}
+		return false;
+	}
+	
 	
 	public boolean base_sort_input_defined(Object input) {
 		return (input!=null);
