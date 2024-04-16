@@ -131,7 +131,7 @@ actions :
  - res_left =  RecSort(arr_left)
  - res_right =  RecSort(arr_right)
  - index = getZero()
- - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[index/pending_indices] = [ __internal Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
 
 
 ---
