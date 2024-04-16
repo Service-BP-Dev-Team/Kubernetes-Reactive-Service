@@ -3,12 +3,16 @@ package com.reactive.service.model.specification;
 import java.io.Serializable;
 
 public class FunctionDeclaration implements Serializable{
+	private static FunctionDeclaration REFERENCE_DATAGROUP;
 	private String name;
 	private String location;
 	private String method;
 	private boolean multiOutput;
 	private int ouputSize;
-	
+	static {
+		REFERENCE_DATAGROUP = new FunctionDeclaration();
+		REFERENCE_DATAGROUP.setName("~ref");
+	}
 	
 	public String getName() {
 		return name;
@@ -42,8 +46,12 @@ public class FunctionDeclaration implements Serializable{
 	public void setOuputSize(int ouputSize) {
 		this.ouputSize = ouputSize;
 	}
+	public static FunctionDeclaration getREFERENCE_DATAGROUP() {
+		return REFERENCE_DATAGROUP;
+	}
+	public static void setREFERENCE_DATAGROUP(FunctionDeclaration rEFERENCE_DATAGROUP) {
+		REFERENCE_DATAGROUP = rEFERENCE_DATAGROUP;
+	}
 	
 	
-	
-
 }

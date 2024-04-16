@@ -13,6 +13,7 @@ functions:
  - { classPath: com.local.MergeIncremental, method: init_indices, label: init_indices}
 actions:
  - i = getZero()
+ - ref_array = ~ref in_arr
  - pending_indices = init_indices(in_length)
  - out_length = divide_length(in_length)
  - out_arr[i/pending_indices] = [ __internal Merge_Main_It_${array_size}(pending_indices,in_arr) for i,inc,${divide_array_size}]

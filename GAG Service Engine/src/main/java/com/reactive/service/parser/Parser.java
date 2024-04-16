@@ -268,7 +268,12 @@ public class Parser {
 	}
 	
 	private FunctionDeclaration findFunctionByName(DecompositionRule rule, String name) {
+		//check if the function reference a data group
 		FunctionDeclaration res=null;
+		if(name.equals("~ref")) {
+			return FunctionDeclaration.getREFERENCE_DATAGROUP();
+		}
+		
 		for( FunctionDeclaration func : rule.getFunctionDeclarations() ) {
 			if(func.getName().equals(name)) {res=func;break;}
 		}

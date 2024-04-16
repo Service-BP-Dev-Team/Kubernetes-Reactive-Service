@@ -23,6 +23,7 @@ import com.reactive.service.model.configuration.Task;
 import com.reactive.service.model.specification.ArrayExpression;
 import com.reactive.service.model.specification.DecompositionRule;
 import com.reactive.service.model.specification.Equation;
+import com.reactive.service.model.specification.FunctionDeclaration;
 import com.reactive.service.model.specification.FunctionExpression;
 import com.reactive.service.model.specification.GAG;
 import com.reactive.service.model.specification.IdExpression;
@@ -348,18 +349,25 @@ public class Executor {
 				}
 				List<Data> listLeft = findDataByParameterNameInTask(taskLeft, id.getParameterName(), id);
 				Data dleft = listLeft.get(0);
+				List<Data> allRightData = new ArrayList<Data>();
+				for (IdExpression right : funcExpr.getIdExpressions()) {
+					Task taskRight = servicetask.get(right.getServiceInstance());
+					List<Data> listRight = findDataByParameterNameInTask(taskRight, right.getParameterName(), right);
+					//we use above a list because an idespression can correspond to a datagroup (array)
+					allRightData.addAll(listRight);
+				}
+				if(funcExpr.getFunction()!=FunctionDeclaration.getREFERENCE_DATAGROUP()) {
 				PendingLocalFunctionComputation pendingComputation = new PendingLocalFunctionComputation();
 				pendingComputation.getDatasToCompute().addAll(listLeft);
 				pendingComputation.setActualParameters(new ArrayList<Data>());
 
 				pendingComputation.setFunctionDeclaration(funcExpr.getFunction());
 				pendingComputation.setThreadFunction(funcExpr.isThreadFunction());
-				for (IdExpression right : funcExpr.getIdExpressions()) {
-					Task taskRight = servicetask.get(right.getServiceInstance());
-					List<Data> listRight = findDataByParameterNameInTask(taskRight, right.getParameterName(), right);
-					pendingComputation.getActualParameters().addAll(listRight);
-				}
+				pendingComputation.getActualParameters().addAll(allRightData);
 				configuration.getPendingLocalComputations().add(pendingComputation);
+				}else {
+					dleft.setValue(allRightData); // a special data that store reference of other data
+				}
 			}
 
 		}
