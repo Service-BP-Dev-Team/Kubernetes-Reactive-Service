@@ -30,6 +30,8 @@ public class Task implements Serializable{
 	private boolean externalCall = false; // this used to know if we need to execute the task remotely
 	// in a different GAG engine
 	private boolean remote = false;
+	private boolean internal=false; // when set to true the task is not executed independantly, but by its parent
+	//instead
 	private boolean terminated = false; //when the task has been exploited and destroyed
 	
 	public Task() {
@@ -261,6 +263,12 @@ public class Task implements Serializable{
 	}
 	public void setExternalCall(boolean externalCall) {
 		this.externalCall = externalCall;
+	}
+	public boolean isInternal() {
+		return internal;
+	}
+	public void setInternal(boolean internal) {
+		this.internal = internal;
 	}
 	
 	

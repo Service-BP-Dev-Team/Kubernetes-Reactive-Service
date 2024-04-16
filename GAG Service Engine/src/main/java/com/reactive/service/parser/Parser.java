@@ -133,11 +133,19 @@ public class Parser {
 	private void processServiceAction(String left, String right, DecompositionRule rule) {
 		String computationSymbol=right.split("\\(")[0].trim();
 		boolean remote=false;
+		boolean internal=false;
+		String internalPrefix="__internal ";
 		String callPrefix="__call ";
 		if(computationSymbol.startsWith(callPrefix)) {
 			remote=true;
 			//System.out.println(computationSymbol);
 			computationSymbol=computationSymbol.substring(callPrefix.length(),computationSymbol.length());
+			computationSymbol=computationSymbol.trim();
+		}
+		else if(computationSymbol.startsWith(internalPrefix)) {
+			internal=true;
+			//System.out.println(computationSymbol);
+			computationSymbol=computationSymbol.substring(internalPrefix.length(),computationSymbol.length());
 			computationSymbol=computationSymbol.trim();
 		}
 		String cutright = right.split("\\(")[1];
@@ -154,6 +162,8 @@ public class Parser {
 		int inputCounter=0;
 		ServiceInstance si = createServiceInstanceByName(rule, computationSymbol);
 		si.setRemote(remote);
+		// set internal
+		si.setInternal(internal);
 		for(String rv : rvariables) {
 			IdExpression idl = new IdExpression();
 			idl.setServiceInstance(si);

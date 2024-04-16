@@ -4,6 +4,7 @@ public class ServiceInstance {
 	String name;
 	Service service;
 	private boolean remote=false;
+	private boolean internal=false;
 	public String getName() {
 		return name;
 	}
@@ -22,6 +23,14 @@ public class ServiceInstance {
 	public void setRemote(boolean remote) {
 		this.remote = remote;
 	}
+	public void setInternal(boolean internal) {
+		// TODO Auto-generated method stub
+		this.internal=internal;
+	}
+	public boolean isInternal() {
+		return internal;
+	}
+	
 	
 	
 	

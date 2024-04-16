@@ -44,10 +44,12 @@ public class Executor {
 	private Lock lock = new ReentrantLock();
 	private Boolean terminated = false;
 	private HashSet<Data> inputs = new HashSet<Data>();
-	private ArrayList<Data> outputsNonIncrementaBound = new ArrayList<Data>(); // this attribute is only used when the engine
+	private ArrayList<Data> outputsNonIncrementaBound = new ArrayList<Data>(); // this attribute is only used when the
+																				// engine
 	// is not incremental. It allows to notify of all the outputs at once, rather
 	// than doing it incrementally
-	private ArrayList<Data> realOutputs = new ArrayList<Data>(); // when it is no incremental the real outputs are stored here
+	private ArrayList<Data> realOutputs = new ArrayList<Data>(); // when it is no incremental the real outputs are
+																	// stored here
 	private Boolean incrementalExecution = null;
 
 	public Executor() {
@@ -159,7 +161,7 @@ public class Executor {
 				running = false;
 				if (!continuous()) {
 					terminated = true;
-					if(!incrementalExecution) {
+					if (!incrementalExecution) {
 						// set the real outputs value and notify the subscribers
 						whenNoIncrementalSetRealOuputsAndNotifySubscribers();
 					}
@@ -184,7 +186,7 @@ public class Executor {
 			for (Data d : configuration.getRoot().getOutputs()) {
 				outputsNonIncrementaBound.add(d);
 			}
-			realOutputs=configuration.getRoot().getOutputs();
+			realOutputs = configuration.getRoot().getOutputs();
 			configuration.getRoot().setOutputs(outputsNonIncrementaBound);
 		}
 		// System.out.println("execute large");
@@ -211,18 +213,18 @@ public class Executor {
 	public boolean continuous() {
 		Boolean result = false;
 		if (incrementalExecution) {
-		for (Data output : configuration.getRoot().getOutputs()) {
-			if (!output.isDefined() || outSubscriptions.get(output.getId()) != null) {
-				// when a data is not defined or
-				// has been defined but not yet notified to subscribers
-				result = true;
-				break;
+			for (Data output : configuration.getRoot().getOutputs()) {
+				if (!output.isDefined() || outSubscriptions.get(output.getId()) != null) {
+					// when a data is not defined or
+					// has been defined but not yet notified to subscribers
+					result = true;
+					break;
+				}
 			}
-		}}
-		else {
-			for (Data output:outputsNonIncrementaBound) {
+		} else {
+			for (Data output : outputsNonIncrementaBound) {
 				if (!output.isDefined()) {
-					result=true;
+					result = true;
 					break;
 				}
 			}
@@ -249,6 +251,7 @@ public class Executor {
 				t.setLocals(locals);
 				// t.setRemote(si.isRemote());
 				t.setExternalCall(si.isRemote());
+				t.setInternal(si.isInternal());
 				// create inputs
 				for (Parameter par : si.getService().getInputParameters()) {
 					if (par.isArray()) {
@@ -498,70 +501,72 @@ public class Executor {
 	public void invokeRemote(List<Task> tasks) {
 		for (Task t : tasks) {
 			// invoke now remote service in separate threads
+			// when the task is internal we do not invoke it
+			if (!t.isInternal()) {
+				final boolean localCall = !t.isExternalCall();
+				t.setRemote(true); // now we put all task to remote to notice the fact that we want to execute
+				// all tasks remotely in a different executor.
+				// localCall tell us if we need to retrieve the ip of an available engine in the
+				// cluster
+				// to exetute the task
+				Runnable runner = () -> {
 
-			final boolean localCall = !t.isExternalCall();
-			t.setRemote(true); // now we put all task to remote to notice the fact that we want to execute
-			// all tasks remotely in a different executor.
-			// localCall tell us if we need to retrieve the ip of an available engine in the
-			// cluster
-			// to exetute the task
-			Runnable runner = () -> {
+					String receiver = null;
+					if (!localCall) {
+						receiver = InMemoryWorkspace.bind(t.getService().getKubename());
+					}
+					if (localCall || (receiver.equals(InMemoryWorkspace.getLocalHostIp())
+							&& !InMemoryWorkspace.isForcedTCPOnLocalhost())) {
 
-				String receiver = null;
-				if (!localCall) {
-					receiver = InMemoryWorkspace.bind(t.getService().getKubename());
-				}
-				if (localCall || (receiver.equals(InMemoryWorkspace.getLocalHostIp())
-						&& !InMemoryWorkspace.isForcedTCPOnLocalhost())) {
+						// we do not use tcp when the call is local
 
-					// we do not use tcp when the call is local
+						Task newTask = new Task();
+						newTask.setDataGroups(t.getDataGroups());
+						newTask.setInputs(t.getInputs());
+						newTask.setLocals(t.getLocals());
+						newTask.setOutputs(t.getOutputs());
+						newTask.setService(t.getService());
+						newTask.setSubTasks(t.getSubTasks());
+						ServiceCall sc = new ServiceCall();
+						sc.setTask(newTask);
+						Configuration conf = new Configuration();
+						conf.setRoot(sc.getTask());
+						conf.getRoot().setRemote(false);// transform the task to a local one
+						conf.setId(sc.getId());
+						// add the configuration
+						Executor exec = new Executor();
+						Context ctx = new Context();
+						ctx.setExecutor(exec);
+						exec.setContext(ctx);
+						exec.setSubExecutor(true);
+						exec.setConfiguration(conf);
+						// make fast access
+						makeFastAccess(newTask.getOutputs());
+						exec.setGag(gag);
+						exec.setServiceCallId(sc.getId());
 
-					Task newTask = new Task();
-					newTask.setDataGroups(t.getDataGroups());
-					newTask.setInputs(t.getInputs());
-					newTask.setLocals(t.getLocals());
-					newTask.setOutputs(t.getOutputs());
-					newTask.setService(t.getService());
-					newTask.setSubTasks(t.getSubTasks());
-					ServiceCall sc = new ServiceCall();
-					sc.setTask(newTask);
-					Configuration conf = new Configuration();
-					conf.setRoot(sc.getTask());
-					conf.getRoot().setRemote(false);// transform the task to a local one
-					conf.setId(sc.getId());
-					// add the configuration
-					Executor exec = new Executor();
-					Context ctx = new Context();
-					ctx.setExecutor(exec);
-					exec.setContext(ctx);
-					exec.setSubExecutor(true);
-					exec.setConfiguration(conf);
-					// make fast access
-					makeFastAccess(newTask.getOutputs());
-					exec.setGag(gag);
-					exec.setServiceCallId(sc.getId());
+						InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
+						// execute the task
+						exec.execute();
+					} else {
+						// make fast access
+						makeFastAccess(t.getOutputs());
+						ServiceCall sc = new ServiceCall();
+						sc.setTask(t);
+						Service emptyService = new Service();
+						emptyService.setName(t.getService().getName());
+						emptyService.setKubename(t.getService().getKubename());
+						t.setService(emptyService);
 
-					InMemoryWorkspace.inMemoryCalls.put(sc.getId(), exec);
-					// execute the task
-					exec.execute();
-				} else {
-					// make fast access
-					makeFastAccess(t.getOutputs());
-					ServiceCall sc = new ServiceCall();
-					sc.setTask(t);
-					Service emptyService = new Service();
-					emptyService.setName(t.getService().getName());
-					emptyService.setKubename(t.getService().getKubename());
-					t.setService(emptyService);
+						InMemoryWorkspace.processOutServiceCall(sc, receiver, this);
+					}
 
-					InMemoryWorkspace.processOutServiceCall(sc, receiver, this);
-				}
-
-				// else {
-				// makeFastAccess(t);
-				// }
-			};
-			Thread.startVirtualThread(runner);
+					// else {
+					// makeFastAccess(t);
+					// }
+				};
+				Thread.startVirtualThread(runner);
+			}
 		}
 	}
 
@@ -718,7 +723,7 @@ public class Executor {
 
 	public boolean allInputsFromCallDefined() {
 		// make the data to be up to date first
-		//computePendingLocalComputations();
+		// computePendingLocalComputations();
 		for (Data d : configuration.getRoot().getInputs()) {
 			if (!d.isDefined()) {
 				return false;
@@ -727,9 +732,9 @@ public class Executor {
 
 		return true;
 	}
-	
+
 	public void whenNoIncrementalSetRealOuputsAndNotifySubscribers() {
-		for (int i=0;i<realOutputs.size();i++) {
+		for (int i = 0; i < realOutputs.size(); i++) {
 			realOutputs.get(i).setValue(outputsNonIncrementaBound.get(i).getValue());
 		}
 		notifySubscribers();
