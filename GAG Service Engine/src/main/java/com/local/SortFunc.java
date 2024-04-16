@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.reactive.service.app.api.InMemoryWorkspace;
+import com.reactive.service.model.configuration.Data;
 
 import java.util.HashSet;
 
@@ -129,13 +130,13 @@ public class SortFunc {
 	}
 	public ArrayList has_new_elements(Object indices,Object input1,Object input2) {
 		//System.out.println("I execute Merge S guard : indices->"+indices+", left -> "+input1+", right ->"+input2);
-		 ArrayList left = (ArrayList)input1;
-		 ArrayList right = (ArrayList)input2;
+		 ArrayList<Data> left = (ArrayList<Data>)input1;
+		 ArrayList<Data> right = (ArrayList<Data>)input2;
 		 ArrayList listToMerge = new ArrayList<>(); 
 		 ArrayList indicesToRemove = new ArrayList();
 		 ArrayList result = new ArrayList<>();
 		 result.add(false);//by default we return false
-		 if(indices==null) {
+		 if(indices==null || left==null || right==null) {
 			 // the indices to consider are required to detect
 			 // new elements
 			 //System.out.println("the result is: "+result);
@@ -145,9 +146,9 @@ public class SortFunc {
 		  int count = 0;
 	      for (int i: pending) {
 	         if (i < getNUMBER_OF_BLOCKS()) {
-	      	    if (left.get(i)!=null) {
+	      	    if (left.get(i).getValue()!=null) {
 	      	       count++;
-	      	       listToMerge.add(left.get(i));
+	      	       listToMerge.add(left.get(i).getValue());
 	      	       indicesToRemove.add(i);
 	      	       if (count>1) {
 	      	          break;
@@ -155,9 +156,9 @@ public class SortFunc {
 	      	    }
 	      	 }
 	      	 else {
-	      	    if (right.get(i-getNUMBER_OF_BLOCKS())!=null){
+	      	    if (right.get(i-getNUMBER_OF_BLOCKS()).getValue()!=null){
 	      	       count++;
-	      	       listToMerge.add(right.get(i-getNUMBER_OF_BLOCKS()));
+	      	       listToMerge.add(right.get(i-getNUMBER_OF_BLOCKS()).getValue());
 	      	       indicesToRemove.add(i);
 	      	       if (count>1) {
 	      	          break;
@@ -227,13 +228,13 @@ public class SortFunc {
 	
 	// has new elements with sync 
 	public ArrayList has_new_elements_sync(Object indices,Object input1,Object input2) {
-		 ArrayList left = (ArrayList)input1;
-		 ArrayList right = (ArrayList)input2;
+		 ArrayList<Data> left = (ArrayList<Data>)input1;
+		 ArrayList<Data> right = (ArrayList<Data>)input2;
 		 ArrayList listToMerge = new ArrayList<>(); 
 		 ArrayList indicesToRemove = new ArrayList();
 		 ArrayList result = new ArrayList<>();
 		 result.add(false);//by default we return false
-		 if(indices==null) {
+		 if(indices==null || left==null || right==null) {
 			 // the indices to consider are required to detect
 			 // new elements
 			 return result;
@@ -242,13 +243,13 @@ public class SortFunc {
 		 HashSet<Integer> pending=(HashSet<Integer>)indices;
 		//when we are at the first iteration we verify that all values have been received
 		 if(pending.size()==left.size()) {
-			 for(Object el :left) {
-				 if (el==null ) {
+			 for(Data el :left) {
+				 if (el.getValue()==null ) {
 					 return result;
 				 }					 
 			 }
-			 for(Object el :right) {
-				 if (el==null ) {
+			 for(Data el :right) {
+				 if (el.getValue()==null ) {
 					 return result;
 				 }					 
 			 }
@@ -258,9 +259,9 @@ public class SortFunc {
 		  int count = 0;
 	      for (int i: pending) {
 	         if (i < getNUMBER_OF_BLOCKS()) {
-	      	    if (left.get(i)!=null) {
+	      	    if (left.get(i).getValue()!=null) {
 	      	       count++;
-	      	       listToMerge.add(left.get(i));
+	      	       listToMerge.add(left.get(i).getValue());
 	      	       indicesToRemove.add(i);
 	      	       if (count>1) {
 	      	          break;
@@ -268,9 +269,9 @@ public class SortFunc {
 	      	    }
 	      	 }
 	      	 else {
-	      	    if (right.get(i-getNUMBER_OF_BLOCKS())!=null){
+	      	    if (right.get(i-getNUMBER_OF_BLOCKS()).getValue()!=null){
 	      	       count++;
-	      	       listToMerge.add(right.get(i-getNUMBER_OF_BLOCKS()));
+	      	       listToMerge.add(right.get(i-getNUMBER_OF_BLOCKS()).getValue());
 	      	       indicesToRemove.add(i);
 	      	       if (count>1) {
 	      	          break;

@@ -130,8 +130,10 @@ actions :
  - arr_right = divideRight(inp_arr) 
  - res_left =  RecSort(arr_left)
  - res_right =  RecSort(arr_right)
+ - ref_left = ~ref(res_left)
+ - ref_right = ~ref(res_right)
  - index = getZero()
- - out_arr[index/pending_indices] = [ __internal Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[index/pending_indices] = [ __internal Merge_S(pending_indices,ref_left,ref_right) for index,inc,${NUMBER_OF_BLOCKS}]
 
 
 ---

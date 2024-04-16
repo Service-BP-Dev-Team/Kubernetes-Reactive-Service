@@ -3,6 +3,8 @@ package com.local;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.reactive.service.model.configuration.Data;
+
 public class MergeIncremental {
 
 	public boolean lenght_is_one(Object in_length, Object in_array) {
@@ -40,22 +42,23 @@ public class MergeIncremental {
 	}
 	
 	public ArrayList has_new_elements(Object indices,Object input) {
-		 ArrayList array = (ArrayList)input;
+		 ArrayList<Data> array = (ArrayList<Data>)input;
 		 ArrayList listToMerge = new ArrayList<>(); 
 		 ArrayList indicesToRemove = new ArrayList();
 		 ArrayList result = new ArrayList<>();
 		 result.add(false);//by default we return false
-		 if(indices==null) {
+		 if(indices==null || array==null) {
 			 // the indices to consider are required to detect
 			 // new elements
 			 return result;
 		 }
 		 HashSet<Integer> pending=(HashSet<Integer>)indices;
 		  int count = 0;
+		  //System.out.print(array.get(0));
 	      for (int i: pending) {
-	         if (array.get(i)!=null) {
+	         if (array.get(i).getValue()!=null) {
 	      	       count++;
-	      	       listToMerge.add(array.get(i));
+	      	       listToMerge.add(array.get(i).getValue());
 	      	       indicesToRemove.add(i);
 	      	       if (count>1) {
 	      	          break;

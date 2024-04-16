@@ -23,8 +23,11 @@ name : Merge_S
 kubename : ${KUBE_NAME}
 inputs : 
  - { name : indices_in }
- - { name : res_left, array: true, size: ${NUMBER_OF_BLOCKS} }
- - { name : res_right, array: true, size: ${NUMBER_OF_BLOCKS} }
+# - { name : res_left, array: true, size: ${NUMBER_OF_BLOCKS} }
+# - { name : res_right, array: true, size: ${NUMBER_OF_BLOCKS} }
+ - { name : res_left}
+ - { name : res_right}
+
 outputs :
  - { name : out}
  - { name : indices_out}
