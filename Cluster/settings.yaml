@@ -10,7 +10,7 @@ network:
 nodes:
   control:
     cpu: 3
-    memory: 4096
+    memory: 8192
   workers:
     count: 2
     list:

@@ -11,22 +11,21 @@ env_variables = {
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
     'NUMBER_OF_CONTROLLER_PODS': 1,
-    #'NUMBER_OF_WORKER_PODS': 2,
+    'NUMBER_OF_WORKER_PODS': 2,
     'WORKER_POD_CAPACITY':300,
     'SPEC_TO_LOAD' : "",
     'MAX_LEN': 20000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
-    'INCREMENTAL_EXECUTION':False,
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
     'USE_VIRTUAL_THREAD' : True,
     'WORKER_REQUEST_FAIL_DETECT_DURATION':20,
-    'VARYING' : 'NUMBER_OF_WORKER_PODS', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, or NUMBER_OF_WORKER_NODE
-    'STEP_INCREMENT' : 1,
+    'VARYING' : 'NUMBER_OF_BLOCKS', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, or NUMBER_OF_WORKER_NODE
+    'STEP_INCREMENT' : 4,
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
-    'START_AT': 1,
-    'STOP_AT' : 6,
-    'STEP_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
+    'START_AT': 16,
+    'STOP_AT' : 256,
+    'STEP_GROWTH': "GEOMETRIC", # the value are GEOMETRIC and ARITHMETIC 
     'DO_ONLY_INCREMENTAL_EXECUTION': True,
     'WARMING_INPUT_SIZE': 1000000,
     'NUMBER_OF_WARMING':10,
@@ -34,8 +33,8 @@ env_variables = {
     'INPUT_SIZE_START':200000,
     'INPUT_SIZE_INCREMENT':200000,
     'INPUT_SIZE_STOP':2600000,
-    'INPUT_SIZE_GROWTH': "ARITHMETIC" # the value are GEOMETRIC and ARITHMETIC 
-  #  'INCREMENTAL_EXECUTION':True,
+    'INPUT_SIZE_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
+    #'INCREMENTAL_EXECUTION':True,
     
 
 }
@@ -77,7 +76,8 @@ def perform_test(env,execution_type,global_env):
     folder_execution_type="Incremental" if execution_type=="INCREMENTAL" else "NoIncremental"
     
     # Create a new file with the generated name
-    geometric = env.get("STEP_GROWTH", False)=="GEOMETRIC"
+    geometric = global_env.get("STEP_GROWTH", False)=="GEOMETRIC"
+    print(f"the geomertric step growth is set to {geometric}")
     varying=""
     destinationDirectory=""
     #when varying number_of_blocks
@@ -101,7 +101,10 @@ def perform_test(env,execution_type,global_env):
             file_contents = file.read()
             currentProgress=json.loads(file_contents)
             if currentProgress.get("environment",False):
-                i=currentProgress["environment"][varying]+global_env.get("STEP_INCREMENT")
+                if geometric:
+                    i = currentProgress["environment"][varying]*global_env.get("STEP_INCREMENT")
+                else :
+                    i=currentProgress["environment"][varying]+global_env.get("STEP_INCREMENT")
                 print(f"Resuming execution ! from {varying} = {i}")
                 
                 

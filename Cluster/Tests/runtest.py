@@ -67,6 +67,7 @@ def deploy(env):
         output = subprocess.check_output(get_pod_command, shell=True, universal_newlines=True)
         # Process the output lines
         podId=output.split("\n")[1].split(" ")[0]
+        print("deployment finished")
         return podId
         # Access and manipulate the dictionary as needed
         if __name__ == "__main__":
@@ -85,9 +86,9 @@ def warming(podId,init,number_of_warming):
             # execute init 4 times
     try:
         for i in range(number_of_warming):
+            print(f"warming {(i+1)}/{number_of_warming}")
             output = subprocess.check_output(commantToInit, shell=True, universal_newlines=True)
-            if __name__ == "__main__":
-                print(f"warming {(i+1)}/{number_of_warming}")
+            #if __name__ == "__main__":
             # the engine is warn : we now execute the desired command
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
