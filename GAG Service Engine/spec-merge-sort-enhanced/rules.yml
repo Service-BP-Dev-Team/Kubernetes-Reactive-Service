@@ -52,7 +52,7 @@ actions :
  - ref_cells = ~ref(cells_of_array)
  - i = getZero()
  - sync = i
- - out_arr[i/sync] = [Sort_Basic_It(pending_indices,ref_cells) for i,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[i/sync] = [ __internal Sort_Basic_It(pending_indices,ref_cells) for i,inc,${NUMBER_OF_BLOCKS}]
  
 ---
 #basic sort iterration 
