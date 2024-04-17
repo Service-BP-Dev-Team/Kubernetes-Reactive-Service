@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import com.reactive.service.app.api.InMemoryWorkspace;
+import com.reactive.service.model.configuration.Data;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -134,5 +135,11 @@ public class Base {
 
 	public Object second(Object array) {
 		return ((ArrayList) array).get(1);
+	}
+	
+	public Object getArray(Object array,Object index) {
+		Integer i =(Integer)index;
+		ArrayList<Data> tab= (ArrayList<Data>)array;
+		return tab.get(i).getValue();
 	}
 }

@@ -39,7 +39,8 @@ name : Sort_Basic_It
 kubename : ${KUBE_NAME}
 inputs : 
  - { name : index_in }
- - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+# - { name : in_arr, array: true, size: ${NUMBER_OF_BLOCKS} }
+ - { name : in_arr}
 outputs :
  - { name : out}
  - { name : index_out}

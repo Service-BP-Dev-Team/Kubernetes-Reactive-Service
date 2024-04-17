@@ -49,9 +49,10 @@ functions :
  - { classPath: com.local.Base, method: incrementNumber, label: inc}
 actions :
  - cells_of_array=split(inp_arr)
+ - ref_cells = ~ref(cells_of_array)
  - i = getZero()
  - sync = i
- - out_arr[i/sync] = [Sort_Basic_It(pending_indices,cells_of_array) for i,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[i/sync] = [Sort_Basic_It(pending_indices,ref_cells) for i,inc,${NUMBER_OF_BLOCKS}]
  
 ---
 #basic sort iterration 
@@ -65,11 +66,13 @@ guard :
 functions :
  - { classPath: com.local.Base, method: getZero, label: getZero}
  - { classPath: com.local.Base, method: incrementNumber, label: inc}
+ - { classPath: com.local.Base, method: getArray, label: getArray}
 actions :
 # - out_arr = sort_array_lists(inp_arr)
+ - arr = getArray(in_arr,index_in)
  - index_out = inc(index_in)
- - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
- - out = Check_output(in_arr[index_in],inter,inter_time)
+ - (inter, inter_time) =  __call BasicSort(arr)
+ - out = Check_output(arr,inter,inter_time)
  
 ---
 #basic sort iterration when the array is empty
@@ -83,13 +86,14 @@ guard :
 functions :
  - { classPath: com.local.Base, method: getZero, label: getZero}
  - { classPath: com.local.Base, method: incrementNumber, label: inc}
+ - { classPath: com.local.Base, method: getArray, label: getArray}
 actions :
 # - out_arr = sort_array_lists(inp_arr)
  - index_out = inc(index_in)
 # - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
- - inter = in_arr[index_in]
+ - inter = getArray(in_arr,index_in)
  - inter_time = getZero()
- - out = Check_output(in_arr[index_in],inter,inter_time)
+ - out = Check_output(inter,inter,inter_time)
 
 ---
 #basic sort work 

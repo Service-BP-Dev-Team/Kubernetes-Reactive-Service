@@ -180,11 +180,11 @@ public class SortFunc {
 	
 	public boolean index_basic_defined( Object i, Object arr) {
 		if(i!=null && arr!=null) {
-			ArrayList<ArrayList> array = (ArrayList<ArrayList>) arr;
+			ArrayList<Data> array = (ArrayList<Data>) arr;
 			Integer index = (Integer)i;
-			ArrayList el = array.get(index);
-			if(el!=null) {
-				if(el.isEmpty())return false;
+			Data el = array.get(index);
+			if(el.getValue()!=null) {
+				if(((ArrayList)el.getValue()).isEmpty())return false;
 				return true;
 			}
 		}
@@ -193,11 +193,11 @@ public class SortFunc {
 	
 	public boolean index_basic_defined_with_empty_array( Object i, Object arr) {
 		if(i!=null && arr!=null) {
-			ArrayList<ArrayList> array = (ArrayList<ArrayList>) arr;
+			ArrayList<Data> array = (ArrayList<Data>) arr;
 			Integer index = (Integer)i;
-			ArrayList el = array.get(index);
-			if(el!=null) {
-				if(el.isEmpty())return true;
+			Data el = array.get(index);
+			if(el.getValue()!=null) {
+				if(((ArrayList)el.getValue()).isEmpty())return true;
 				return false;
 			}
 		}
