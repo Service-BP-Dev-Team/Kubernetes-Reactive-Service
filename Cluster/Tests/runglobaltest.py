@@ -5,7 +5,7 @@ import json
 import psutil
 import time
 env_variables = {
-    'NUMBER_OF_BLOCKS': 1,
+  #  'NUMBER_OF_BLOCKS': 1,
  #   'NUMBER_OF_BLOCKS': '1',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
@@ -14,25 +14,25 @@ env_variables = {
     'NUMBER_OF_WORKER_PODS': 2,
     'WORKER_POD_CAPACITY':300,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 20000,
+    'MAX_LEN': 30000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
     'USE_VIRTUAL_THREAD' : True,
     'WORKER_REQUEST_FAIL_DETECT_DURATION':20,
     'VARYING' : 'NUMBER_OF_BLOCKS', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, or NUMBER_OF_WORKER_NODE
-    'STEP_INCREMENT' : 4,
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
-    'START_AT': 16,
+    'STEP_INCREMENT' : 4,
+    'START_AT': 4,
     'STOP_AT' : 256,
     'STEP_GROWTH': "GEOMETRIC", # the value are GEOMETRIC and ARITHMETIC 
     'DO_ONLY_INCREMENTAL_EXECUTION': True,
     'WARMING_INPUT_SIZE': 1000000,
     'NUMBER_OF_WARMING':10,
-    'NUMBER_OF_ITERATION':50,
-    'INPUT_SIZE_START':200000,
-    'INPUT_SIZE_INCREMENT':200000,
-    'INPUT_SIZE_STOP':2600000,
+    'NUMBER_OF_ITERATION':30,
+    'INPUT_SIZE_START':300000,
+    'INPUT_SIZE_INCREMENT':300000,
+    'INPUT_SIZE_STOP':3000000,
     'INPUT_SIZE_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
     #'INCREMENTAL_EXECUTION':True,
     
@@ -64,7 +64,7 @@ def isBaterryOkay():
 
     if plugged:
         print("The computer is plugged in.")
-        if percent > 65:
+        if percent > 60:
            result = True
     
     return result

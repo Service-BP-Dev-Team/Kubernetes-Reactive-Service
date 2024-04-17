@@ -50,7 +50,7 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
     specdir=os.path.join(source_directory,specdir_name)
     for filename in os.listdir(specdir):
         source_path = os.path.join(specdir, filename)
-        destination_path = os.path.join(destination_directory,'specification', filename)
+        destination_path = os.path.join(destination_directory,specdir_name, filename)
 
         if filename.endswith('.yml'):
             shutil.copy2(source_path, destination_path)
@@ -60,7 +60,7 @@ def buildEnvironment(env_variables,source_directory, destination_directory):
     specdir=os.path.join(source_directory,specdir_name)
     for filename in os.listdir(specdir):
         source_path = os.path.join(specdir, filename)
-        destination_path = os.path.join(destination_directory,'macro', filename)
+        destination_path = os.path.join(destination_directory,specdir_name, filename)
 
         if filename.endswith('.yml'):
             shutil.copy2(source_path, destination_path)

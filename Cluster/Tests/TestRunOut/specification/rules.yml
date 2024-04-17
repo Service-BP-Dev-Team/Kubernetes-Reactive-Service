@@ -30,9 +30,7 @@ functions :
  - { classPath: com.local.Base, method: sort, label: sort }
  # function from java.utils
 actions :
-# - out_list = sort(inp_list)
- - (inter, inter_time) =  __call BasicSort(inp_list)
- - out_list = Check_output(inp_list,inter,inter_time)
+ - out_list = sort(inp_list)
 
 
 
@@ -51,9 +49,10 @@ functions :
  - { classPath: com.local.Base, method: incrementNumber, label: inc}
 actions :
  - cells_of_array=split(inp_arr)
+ - ref_cells = ~ref(cells_of_array)
  - i = getZero()
  - sync = i
- - out_arr[i/sync] = [Sort_Basic_It(pending_indices,cells_of_array) for i,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[i/sync] = [ __internal Sort_Basic_It(pending_indices,ref_cells) for i,inc,${NUMBER_OF_BLOCKS}]
  
 ---
 #basic sort iterration 
@@ -67,11 +66,34 @@ guard :
 functions :
  - { classPath: com.local.Base, method: getZero, label: getZero}
  - { classPath: com.local.Base, method: incrementNumber, label: inc}
+ - { classPath: com.local.Base, method: getArray, label: getArray}
+actions :
+# - out_arr = sort_array_lists(inp_arr)
+ - arr = getArray(in_arr,index_in)
+ - index_out = inc(index_in)
+ - (inter, inter_time) =  __call BasicSort(arr)
+ - out = Check_output(arr,inter,inter_time)
+ 
+---
+#basic sort iterration when the array is empty
+kind : rule
+name : Sort_Basic_It_Rule_When_Array_is_empty
+service : Sort_Basic_It
+guard : 
+ classPath: com.local.SortFunc
+ method: index_basic_defined_with_empty_array
+ # The guard requires a maximum length l-1 of the input list
+functions :
+ - { classPath: com.local.Base, method: getZero, label: getZero}
+ - { classPath: com.local.Base, method: incrementNumber, label: inc}
+ - { classPath: com.local.Base, method: getArray, label: getArray}
 actions :
 # - out_arr = sort_array_lists(inp_arr)
  - index_out = inc(index_in)
- - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
- - out = Check_output(in_arr[index_in],inter,inter_time)
+# - (inter, inter_time) =  __call BasicSort(in_arr[index_in])
+ - inter = getArray(in_arr,index_in)
+ - inter_time = getZero()
+ - out = Check_output(inter,inter,inter_time)
 
 ---
 #basic sort work 
@@ -112,8 +134,10 @@ actions :
  - arr_right = divideRight(inp_arr) 
  - res_left =  RecSort(arr_left)
  - res_right =  RecSort(arr_right)
+ - ref_left = ~ref(res_left)
+ - ref_right = ~ref(res_right)
  - index = getZero()
- - out_arr[index/pending_indices] = [Merge_S(pending_indices,res_left,res_right) for index,inc,${NUMBER_OF_BLOCKS}]
+ - out_arr[index/pending_indices] = [ __internal Merge_S(pending_indices,ref_left,ref_right) for index,inc,${NUMBER_OF_BLOCKS}]
 
 
 ---
