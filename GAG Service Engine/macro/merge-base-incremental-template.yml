@@ -12,6 +12,7 @@ actions:
  - i = getZero()
  - merge_res=in_arr[i]
  - out_length=in_length
+# - out_arr[i]=id(merge_res)
  - out_arr[i] = in_arr[i]
 
  

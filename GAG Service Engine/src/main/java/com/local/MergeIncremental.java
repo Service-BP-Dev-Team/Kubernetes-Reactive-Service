@@ -9,12 +9,13 @@ public class MergeIncremental {
 
 	public boolean lenght_is_one(Object in_length, Object in_array) {
 		boolean result;
-		if(in_length!=null) {
+		if(in_length!=null && in_array!=null) {
 			//result= ((Integer) in_length ) == 1;
-			return ((Integer) in_length ) == 1;
+			boolean returnValue = ((Integer) in_length ) == 1;
+			return returnValue;
 		}
 		//else{result=false;}
-		//System.out.println("the inlength is "+in_length);
+		
 		//System.out.println("the result is "+result);
 		return false;
 	}

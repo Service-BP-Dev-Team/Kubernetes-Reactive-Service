@@ -142,4 +142,9 @@ public class Base {
 		ArrayList<Data> tab= (ArrayList<Data>)array;
 		return tab.get(i).getValue();
 	}
+	
+	public Object id(Object val) {
+		System.out.println("id is called");
+		return val;
+	}
 }

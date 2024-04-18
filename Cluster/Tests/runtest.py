@@ -134,7 +134,15 @@ def runtest(env):
                 # Process the output lines
                 #print(output)
                 if output:
-                    output_dict = json.loads(output)
+                    output_dict = {}
+                    try:
+                        output_dict = json.loads(output)
+                    except json.JSONDecodeError as e:
+                    # Log the JSON string and the error to a text file
+                        error_message = f"Error loading JSON: {str(e)}"
+                        with open("error_log.txt", "a") as file:
+                            file.write(f"JSON String: {output}\n")
+                            file.write(f"Error Message: {error_message}\n")
                     # Access and manipulate the dictionary as needed
                     duration=output_dict.get("duration",0)
                     if not duration ==0 :

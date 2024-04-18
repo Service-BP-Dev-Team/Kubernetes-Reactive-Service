@@ -185,10 +185,13 @@ public class Executor {
 		// copy outputs when it is no incremental
 		if (!incrementalExecution) {
 			for (Data d : configuration.getRoot().getOutputs()) {
-				outputsNonIncrementaBound.add(d);
+				outputsNonIncrementaBound.add(d.lightCopy());
 			}
 			realOutputs = configuration.getRoot().getOutputs();
 			configuration.getRoot().setOutputs(outputsNonIncrementaBound);
+			//rebuild datagroup for output in about O(n) where n is the number
+			// of output parameter
+			configuration.getRoot().rebuilOutputGroup();
 		}
 		// System.out.println("execute large");
 		Runnable runner = () -> {
@@ -234,7 +237,8 @@ public class Executor {
 	}
 
 	private void applyRule(Task task, DecompositionRule rule, ArrayList bindings) {
-
+		
+		
 		// match current Task;
 		task.setOpen(false); // we lock the task
 		Hashtable<ServiceInstance, Task> serviceTask = new Hashtable<>();
@@ -257,6 +261,7 @@ public class Executor {
 				for (Parameter par : si.getService().getInputParameters()) {
 					if (par.isArray()) {
 						DataGroup dg = DataGroup.createDataGroupFromParameter(par);
+						dg.setType(DataGroup.INPUT_GROUP_TYPE);
 						// we add all the input data of the group to the task inputs
 						inputs.addAll(dg.getCollection());
 
@@ -270,9 +275,11 @@ public class Executor {
 				// create outputs
 				for (Parameter par : si.getService().getOutputParameters()) {
 					if (par.isArray()) {
+						
 						DataGroup dg = DataGroup.createDataGroupFromParameter(par);
 						// we add all the output data of the group to the task outputs
 						outputs.addAll(dg.getCollection());
+						dg.setType(DataGroup.OUTPUT_GROUP_TYPE);
 						t.getDataGroups().add(dg);
 					} else {
 						Data d = new Data();
@@ -295,6 +302,7 @@ public class Executor {
 		// important we compute local computations
 		// before performing calls
 		computePendingLocalComputations();
+		
 		/*
 		 * really important comment here !!! There is an issue if we compute pending
 		 * local computations after invoking the service this is because of the way we
@@ -507,6 +515,12 @@ public class Executor {
 	}
 
 	public void invokeRemote(List<Task> tasks) {
+		for (Task t :tasks) {
+			if(!t.isInternal()) {
+				// make fast access
+				makeFastAccess(t.getOutputs());
+			}
+		}
 		for (Task t : tasks) {
 			// invoke now remote service in separate threads
 			// when the task is internal we do not invoke it
@@ -548,8 +562,7 @@ public class Executor {
 						exec.setContext(ctx);
 						exec.setSubExecutor(true);
 						exec.setConfiguration(conf);
-						// make fast access
-						makeFastAccess(newTask.getOutputs());
+						
 						exec.setGag(gag);
 						exec.setServiceCallId(sc.getId());
 

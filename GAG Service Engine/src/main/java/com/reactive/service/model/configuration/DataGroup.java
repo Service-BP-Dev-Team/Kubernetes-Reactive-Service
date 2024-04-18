@@ -12,6 +12,10 @@ public class DataGroup {
 	String name;
 	ArrayList<Data> collection;
 	Parameter parameter;
+	public static final int OUTPUT_GROUP_TYPE=0;
+	public static final int INPUT_GROUP_TYPE=1;
+	public static final int LOCAL_GROUP_TYPE=1;
+	private Integer type = LOCAL_GROUP_TYPE;
 	private String id;
 	
 	public DataGroup() {
@@ -75,7 +79,16 @@ public class DataGroup {
 	public void setId(String id) {
 		this.id = id;
 	}
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
 	
+	public boolean isOutputGroupType() {
+		return type == OUTPUT_GROUP_TYPE;
+	}
 	
 	
 	

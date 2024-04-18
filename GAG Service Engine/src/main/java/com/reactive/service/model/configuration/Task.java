@@ -271,6 +271,29 @@ public class Task implements Serializable{
 		this.internal = internal;
 	}
 	
+	// recreate output group for non incremental execution
+	public void rebuilOutputGroup() {
+		List<Data> alldata = getOutputs();
+		for (DataGroup g:dataGroups) {
+			if (g.isOutputGroupType()) {
+				g.setCollection(null);
+			}
+		}
+		// we rebuild group for output
+		for(Data d:alldata) {
+			if(d.getGroup()!=null) {
+				DataGroup dg = findGroupById(d.getGroup().getId());
+				d.setGroup(dg);
+				ArrayList<Data> col = dg.getCollection();
+				if(col==null) {
+					col= new ArrayList<>();
+				}
+				col.add(d);
+				dg.setCollection(col);
+			}
+		}
+	}
+	
 	
 	
 }

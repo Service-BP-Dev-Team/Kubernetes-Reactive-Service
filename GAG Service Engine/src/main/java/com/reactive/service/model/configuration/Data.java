@@ -82,6 +82,7 @@ public class Data implements Serializable{
 			// if the match is not set/defined because the
 			// index is not yet set/defined 
 			// what should we do ?
+			
 				if(!match.isDefined()) {
 					// we define its match when it is not defined
 					match.setValue(value);
@@ -133,6 +134,7 @@ public class Data implements Serializable{
 				valIdx=Integer.parseInt((String)idx);
 			}
 			Data realData = group.getCollection().get(valIdx);
+			//System.out.println("real data found");
 			return realData;
 		}
 		return null;
@@ -280,6 +282,9 @@ public class Data implements Serializable{
 	
 	public Data lightCopy() {
 		Data d = new Data();
+		d.setValue(value);
+		d.setIndex(index);
+		d.setGroup(group);
 		d.parameter=parameter;
 		return d;
 	
