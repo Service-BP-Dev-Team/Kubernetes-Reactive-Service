@@ -243,7 +243,7 @@ public class Task implements Serializable{
 		for(Data d:getAllData()) {
 			d.clear();
 		}
-		this.dataGroups.clear();
+		if(this.dataGroups!=null)this.dataGroups.clear();
 		this.dataGroups=null;
 		this.inputs.clear();
 		this.inputs=null;

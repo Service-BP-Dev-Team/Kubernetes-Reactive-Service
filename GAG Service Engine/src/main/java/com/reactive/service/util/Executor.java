@@ -759,6 +759,17 @@ public class Executor {
 			realOutputs.get(i).setValue(outputsNonIncrementaBound.get(i).getValue());
 		}
 		notifySubscribers();
+		//free memory
+		outputsNonIncrementaBound.clear();
+		outputsNonIncrementaBound=null;
+		for(DataGroup g : configuration.getRoot().getDataGroups()) {
+			g.getCollection().clear();
+			g.setCollection(null);
+		}
+		configuration.getRoot().getDataGroups().clear();
+		configuration.getRoot().setDataGroups(null);
+		//restore real outputs
+		configuration.getRoot().setOutputs(realOutputs);
 	}
 
 }
