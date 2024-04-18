@@ -72,7 +72,7 @@ public class MergeSortEnhancedWithAssessmentHandler extends Handler {
 				
 				Thread.sleep(1000);
 				timeElapsed+=1000;
-				if(timeElapsed >= 5000) { // stop after 100 seconds
+				if(timeElapsed >= 200000) { // stop after 200 seconds
 					String log = p.getSecond().getConfiguration().getRoot().getJsonRepresentation();
 					// write log on a file
 					System.out.println("time eplased so we stop");
