@@ -6,7 +6,7 @@ import psutil
 import time
 env_variables = {
   #  'NUMBER_OF_BLOCKS': 1,
- #   'NUMBER_OF_BLOCKS': '1',
+    'NUMBER_OF_BLOCKS': '16',
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
@@ -20,17 +20,17 @@ env_variables = {
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
     'USE_VIRTUAL_THREAD' : True,
     'WORKER_REQUEST_FAIL_DETECT_DURATION':20,
-    'VARYING' : 'NUMBER_OF_BLOCKS', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, or NUMBER_OF_WORKER_NODE
-    'WORKER_REQUEST_FAILURE_PROBABILITY':0.0,
-    'STEP_INCREMENT' : 4,
-    'START_AT': 128,
-    'STOP_AT' : 512,
-    'STEP_GROWTH': "GEOMETRIC", # the value are GEOMETRIC and ARITHMETIC 
+    'VARYING' : 'MAX_LEN', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, NUMBER_OF_WORKER_NODE, or MAX_LEN
+    'WORKER_REQUEST_FAILURE_PROBABILITY':0.5,
+    'STEP_INCREMENT' : 2000,
+    'START_AT': 8000,
+    'STOP_AT' : 20000,
+    'STEP_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
     #'DO_ONLY_INCREMENTAL_EXECUTION': True,
-    'WARMING_INPUT_SIZE': 1000000,
+    'WARMING_INPUT_SIZE': 500000,
     'NUMBER_OF_WARMING':10,
-    'NUMBER_OF_ITERATION':30,
-    'INPUT_SIZE_START':300000,
+    'NUMBER_OF_ITERATION':50,
+    'INPUT_SIZE_START':3000000,
     'INPUT_SIZE_INCREMENT':300000,
     'INPUT_SIZE_STOP':3000000,
     'INPUT_SIZE_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
@@ -87,6 +87,9 @@ def perform_test(env,execution_type,global_env):
     elif global_env.get("VARYING",False)=="NUMBER_OF_WORKER_PODS":
         varying = "NUMBER_OF_WORKER_PODS"
         destinationDirectory="NumberOfWorkers"
+    elif global_env.get("VARYING",False)=="MAX_LEN":
+        varying = "MAX_LEN"
+        destinationDirectory="Maxlen"    
     else:
         varying = "WORKER_REQUEST_FAILURE_PROBABILITY"
         destinationDirectory="Probability"
@@ -135,7 +138,7 @@ def perform_test(env,execution_type,global_env):
         hour = now.hour
         minutes = now.minute
         #run the test and get the result in a file
-        file_name =f"{execution_type}_{year}_{month}_{day}_{hour}_{minutes}.json"
+        file_name =f"{execution_type}_{varying}={i}{year}_{month}_{day}_{hour}_{minutes}.json"
         file_path = os.path.join("Results",destinationDirectory,folder_execution_type,file_name)
         running_env[varying]=i
         result = runtest(running_env)

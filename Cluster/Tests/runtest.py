@@ -1,6 +1,7 @@
 import subprocess
 import json
 import time
+import signal
 from changeenv import buildEnvironment
 from cpuusage import waitForNormalCpuUsage
 
@@ -61,7 +62,7 @@ def deploy(env):
             print(f"Error executing command: {e}")
 
     #wait for the deployment to finish
-    time.sleep(120)
+    time.sleep(60)
     # Run the command to get one pod id 
     try:
         output = subprocess.check_output(get_pod_command, shell=True, universal_newlines=True)
@@ -74,6 +75,11 @@ def deploy(env):
             print(podId)
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
+
+# Define a function to handle the timeout
+def timeout_handler(signum, frame):
+    raise TimeoutError("Execution time exceeded the maximum limit.")
+
 
 def warming(podId,init,number_of_warming):
         
@@ -129,8 +135,20 @@ def runtest(env):
             i=0    
             while i < number_of_iteration:
                 reloadExecution= not waitForNormalCpuUsage()
-                output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
-                print(f"{(i+1)} / {number_of_iteration} : ")
+                discardPreviousResultWhenReload = True
+                max_execution_time = 60 * 3 # the maximal time we wait for a result
+                # Set the alarm signal to trigger the timeout handler
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(max_execution_time)
+                try:
+                    output = subprocess.check_output(commantToRun, shell=True, universal_newlines=True)
+                    print(f"{(i+1)} / {number_of_iteration} : ")
+                    signal.alarm(0) #we cancel the timer
+                except TimeoutError as e:
+                    # Handle the timeout error
+                    output=False
+                    print("Timeout Error:", str(e))
+
                 # Process the output lines
                 #print(output)
                 if output:
@@ -156,6 +174,9 @@ def runtest(env):
                             print(f"statistics -> {statistics}")
                         sumResult+=duration
                         element_of_result.append({"duration":duration,"statistics":statistics})
+                        if(input>1000000 and (i+1)%5==0 and env.get("WORKER_REQUEST_FAILURE_PROBABILITY",0.0) >=0.4):
+                            reloadExecution=True
+                            discardPreviousResultWhenReload=False
                         i=i+1
                     else:
                         reloadExecution=True
@@ -163,8 +184,10 @@ def runtest(env):
                     reloadExecution=True
                 if reloadExecution:
                     print("performing a redeployment")
-                    i=0 # discard previous result
-                    element_of_result=[] # discard previous result for this assessement
+                    signal.alarm(0) #we cancel the timer
+                    if discardPreviousResultWhenReload:
+                        i=0 # discard previous result
+                        element_of_result=[] # discard previous result for this assessement
                     result['redeployment']=result["redeployment"]+1
                     #redeploy
                     podId=deploy(env)
