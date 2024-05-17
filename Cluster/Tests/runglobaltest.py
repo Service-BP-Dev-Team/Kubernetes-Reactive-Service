@@ -14,18 +14,19 @@ env_variables = {
     'NUMBER_OF_WORKER_PODS': 2,
     'WORKER_POD_CAPACITY':300,
     'SPEC_TO_LOAD' : "",
-    'MAX_LEN': 10000,
+  #  'MAX_LEN': 10000,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
     'USE_VIRTUAL_THREAD' : True,
-    'WORKER_REQUEST_FAIL_DETECT_DURATION':20,
+    'WORKER_REQUEST_FAIL_DETECT_DURATION':50,
     'VARYING' : 'MAX_LEN', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, NUMBER_OF_WORKER_NODE, or MAX_LEN
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.5,
     'STEP_INCREMENT' : 2000,
-    'START_AT': 8000,
+    'STEP_SET': [11719,23438,46875,93750,187500],
+    'START_AT': 6000,
     'STOP_AT' : 20000,
-    'STEP_GROWTH': "ARITHMETIC", # the value are GEOMETRIC and ARITHMETIC 
+    'STEP_GROWTH': "STEP_SET", # the value are GEOMETRIC, ARITHMETIC and STEP_SET
     #'DO_ONLY_INCREMENTAL_EXECUTION': True,
     'WARMING_INPUT_SIZE': 500000,
     'NUMBER_OF_WARMING':10,
@@ -42,7 +43,7 @@ env_variables = {
 initSize=env_variables.get("WARMING_INPUT_SIZE")
 
 inputSize= env_variables.get("INPUT_SIZE_START")
-globalKeys=["VARYING","STEP_INCREMENT","STEP_GROWTH","START_AT","STOP_AT","DO_ONLY_INCREMENTAL_EXECUTION"]
+globalKeys=["VARYING","STEP_LIST","STEP_INCREMENT","STEP_GROWTH","START_AT","STOP_AT","DO_ONLY_INCREMENTAL_EXECUTION"]
 running_env = {key:value for key,value in env_variables.items() 
                if not key in globalKeys }
 
@@ -77,7 +78,12 @@ def perform_test(env,execution_type,global_env):
     
     # Create a new file with the generated name
     geometric = global_env.get("STEP_GROWTH", False)=="GEOMETRIC"
+    arithmetic= global_env.get("STEP_GROWTH", False)=="ARITHMETIC"
+    is_step_set = global_env.get("STEP_GROWTH", False)=="STEP_SET"
+    #when it is a step set
+    step_set=global_env.get("STEP_SET",[])
     print(f"the geomertric step growth is set to {geometric}")
+    print(f"the step set is set to {is_step_set}")
     varying=""
     destinationDirectory=""
     #when varying number_of_blocks
@@ -93,7 +99,7 @@ def perform_test(env,execution_type,global_env):
     else:
         varying = "WORKER_REQUEST_FAILURE_PROBABILITY"
         destinationDirectory="Probability"
-    i=global_env.get("START_AT")
+    i=global_env.get("START_AT") if (arithmetic or geometric) else 0
     # Get the current date and time
     now = datetime.datetime.now()
     #get the last place we were before we left
@@ -106,8 +112,12 @@ def perform_test(env,execution_type,global_env):
             if currentProgress.get("environment",False):
                 if geometric:
                     i = currentProgress["environment"][varying]*global_env.get("STEP_INCREMENT")
-                else :
+                elif arithmetic :
                     i=currentProgress["environment"][varying]+global_env.get("STEP_INCREMENT")
+                else :
+                    
+                    index=step_set.index(currentProgress["environment"][varying])
+                    i=index+1
                 print(f"Resuming execution ! from {varying} = {i}")
                 
                 
@@ -124,7 +134,8 @@ def perform_test(env,execution_type,global_env):
         with open(str(executionGlobalParameterFilePath),"w") as current:
             current.write(json.dumps(env_execution_to_store))
     #do the execution
-    while (i <= global_env.get("STOP_AT")):
+    step_stop = global_env.get("STOP_AT") if (arithmetic or geometric) else (len(step_set)-1)
+    while (i <= step_stop):
         if not isBaterryOkay() :
             #we do not continue execution if we do not have enough batery
             return
@@ -137,10 +148,11 @@ def perform_test(env,execution_type,global_env):
         day = now.day
         hour = now.hour
         minutes = now.minute
+        varying_value=i if (geometric or arithmetic) else step_set[i]
         #run the test and get the result in a file
-        file_name =f"{execution_type}_{varying}={i}{year}_{month}_{day}_{hour}_{minutes}.json"
+        file_name =f"{execution_type}_{varying}={varying_value}_{year}_{month}_{day}_{hour}_{minutes}.json"
         file_path = os.path.join("Results",destinationDirectory,folder_execution_type,file_name)
-        running_env[varying]=i
+        running_env[varying]=varying_value
         result = runtest(running_env)
         output = {}
         output["environment"]=running_env
@@ -154,8 +166,11 @@ def perform_test(env,execution_type,global_env):
         #increment for next execution
         if geometric:
             i=i*global_env.get("STEP_INCREMENT")
-        else:
+        elif arithmetic:
             i+=global_env.get("STEP_INCREMENT")
+        else :
+            #when the step are a list we increment the index
+            i=i+1
         now = datetime.datetime.now()
         #store where we are in a file
         #storing where we are is necessary in order to not perform

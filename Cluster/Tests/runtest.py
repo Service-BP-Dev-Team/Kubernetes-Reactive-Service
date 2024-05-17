@@ -147,6 +147,7 @@ def runtest(env):
                 except TimeoutError as e:
                     # Handle the timeout error
                     output=False
+                    discardPreviousResultWhenReload=False #we keep previous result
                     print("Timeout Error:", str(e))
 
                 # Process the output lines
@@ -174,7 +175,7 @@ def runtest(env):
                             print(f"statistics -> {statistics}")
                         sumResult+=duration
                         element_of_result.append({"duration":duration,"statistics":statistics})
-                        if(input>1000000 and (i+1)%5==0 and env.get("WORKER_REQUEST_FAILURE_PROBABILITY",0.0) >=0.4):
+                        if(input>1000000 and (i+1)%4==0 and env.get("WORKER_REQUEST_FAILURE_PROBABILITY",0.0) >=0.4):
                             reloadExecution=True
                             discardPreviousResultWhenReload=False
                         i=i+1
