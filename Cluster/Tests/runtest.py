@@ -175,9 +175,11 @@ def runtest(env):
                             print(f"statistics -> {statistics}")
                         sumResult+=duration
                         element_of_result.append({"duration":duration,"statistics":statistics})
-                        if(input>1000000 and (i+1)%4==0 and env.get("WORKER_REQUEST_FAILURE_PROBABILITY",0.0) >=0.4):
-                            reloadExecution=True
-                            discardPreviousResultWhenReload=False
+                        if(input>1000000):
+                            fail_proba=env.get("WORKER_REQUEST_FAILURE_PROBABILITY",0.0)
+                            if (fail_proba ==0.1 and (i+1) % 12 ==0) or (fail_proba==0.2 and (i+1)%10==0) or (fail_proba==0.3 and (i+1)%7==0) or (fail_proba==0.4 and (i+1)%5==0) or (fail_proba==0.5 and (i+1)%4==0) or (fail_proba==0.6 and (i+1)%3==0) or (fail_proba==0.7 and (i+1)%2==0) :
+                                reloadExecution=True
+                                discardPreviousResultWhenReload=False
                         i=i+1
                     else:
                         reloadExecution=True

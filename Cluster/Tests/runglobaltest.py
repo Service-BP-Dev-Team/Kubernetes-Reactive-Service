@@ -6,7 +6,7 @@ import psutil
 import time
 env_variables = {
   #  'NUMBER_OF_BLOCKS': 1,
-    'NUMBER_OF_BLOCKS': '16',
+    'NUMBER_OF_BLOCKS': 32,
     'KUBE_CONTROLLER_NAME': 'java-rest-service:8000',
     'KUBE_NAME': 'java-rest-service:8000',
     'KUBE_WORKER_NAME': 'java-worker-service:8000',
@@ -14,18 +14,20 @@ env_variables = {
     'NUMBER_OF_WORKER_PODS': 2,
     'WORKER_POD_CAPACITY':300,
     'SPEC_TO_LOAD' : "",
-  #  'MAX_LEN': 10000,
+    'MAX_LEN': 11719,
     'SYNC_IN_NOTIFICATION_TIME' : 1,
     'READY_TASK_WAIT_TIME' : 1,
     'MAX_CONCURRENT_SERVICE_REQUEST':1,
     'USE_VIRTUAL_THREAD' : True,
     'WORKER_REQUEST_FAIL_DETECT_DURATION':50,
-    'VARYING' : 'MAX_LEN', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, NUMBER_OF_WORKER_NODE, or MAX_LEN
+    'VARYING' : 'WORKER_REQUEST_FAILURE_PROBABILITY', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, NUMBER_OF_WORKER_NODE, or MAX_LEN
     'WORKER_REQUEST_FAILURE_PROBABILITY':0.5,
-    'STEP_INCREMENT' : 2000,
-    'STEP_SET': [11719,23438,46875,93750,187500],
-    'START_AT': 6000,
-    'STOP_AT' : 20000,
+    #'STEP_INCREMENT' : 0.1,
+    #'STEP_SET': [11719,23438,46875,93750,187500],
+    #'STEP_SET': [5860,11719,23438,46875],
+    'STEP_SET': [0.0,0.3],
+    #'START_AT': 0.1,
+    #'STOP_AT' : 0.7,
     'STEP_GROWTH': "STEP_SET", # the value are GEOMETRIC, ARITHMETIC and STEP_SET
     #'DO_ONLY_INCREMENTAL_EXECUTION': True,
     'WARMING_INPUT_SIZE': 500000,
@@ -65,7 +67,7 @@ def isBaterryOkay():
 
     if plugged:
         print("The computer is plugged in.")
-        if percent > 60:
+        if percent > 30:
            result = True
     
     return result
@@ -110,15 +112,22 @@ def perform_test(env,execution_type,global_env):
             file_contents = file.read()
             currentProgress=json.loads(file_contents)
             if currentProgress.get("environment",False):
+                resuming_value=0
                 if geometric:
                     i = currentProgress["environment"][varying]*global_env.get("STEP_INCREMENT")
+                    resuming_value=i
                 elif arithmetic :
                     i=currentProgress["environment"][varying]+global_env.get("STEP_INCREMENT")
+                    resuming_value=i
                 else :
                     
                     index=step_set.index(currentProgress["environment"][varying])
                     i=index+1
-                print(f"Resuming execution ! from {varying} = {i}")
+                    if i<len(step_set):
+                        resuming_value=step_set[i]
+                    else :
+                        resuming_value=-1
+                print(f"Resuming execution ! from {varying} = {resuming_value}")
                 
                 
     else:
