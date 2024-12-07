@@ -17,7 +17,7 @@
   (3) destroy all machines with "vagrant destroy" and relaunch with "vagrant up"
 
 - Step 3 connect to each machine with "vagrant ssh machine_name" (eg "vagrant ssh master" for the master) and
-     install docker using "sh '/vagrant/Custom Scripts/docher_install.sh' "
+     install docker using "sh '/vagrant/Custom Scripts/docker_install.sh' "
 - Step 4 you can make a first deployment by executing "kubectl apply -f /vagrant/nginx/deployment.yml" in the master machine. 
 
 For more details about the config of vagrant with kubernetes go through this link : [Vagrant+Kubectl+vbox](https://blog.devops.dev/how-to-setup-kubernetes-cluster-with-vagrant-e2c808795840?gi=58dccfb37276)

@@ -29,5 +29,7 @@ nodes:
 software:
   box: bento/ubuntu-22.04
   calico: 3.25.0
-  kubernetes: 1.26.1-00
+  kubernetes: 1.28.1-1.1
+#  kubernetes: 1.26.1-00
+#  kubernetes: 1.30.0-00
   os: xUbuntu_22.04
