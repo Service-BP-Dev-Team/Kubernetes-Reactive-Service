@@ -1,0 +1,2 @@
+step to run the test: 
+1- run start.sh that is in cluster/'Gag Service Engine'. This will build the docker image and push it to the docker registry of the  master node.

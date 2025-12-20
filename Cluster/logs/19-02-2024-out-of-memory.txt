@@ -1,0 +1,23 @@
+cat /tmp/error.txt 
+java.lang.reflect.InvocationTargetException
+	at jdk.internal.reflect.GeneratedMethodAccessor110.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:567)
+	at com.reactive.service.util.Operation.executeMethodWithReflexion(Operation.java:75)
+	at com.reactive.service.model.configuration.PendingLocalFunctionComputation.lambda$execute$0(PendingLocalFunctionComputation.java:100)
+	at java.base/java.lang.Thread.run(Thread.java:835)
+Caused by: java.lang.OutOfMemoryError: Java heap space
+	at java.base/java.util.Arrays.copyOf(Arrays.java:3690)
+	at java.base/java.util.ArrayList.grow(ArrayList.java:237)
+	at java.base/java.util.ArrayList.grow(ArrayList.java:242)
+	at java.base/java.util.ArrayList.add(ArrayList.java:485)
+	at java.base/java.util.ArrayList.add(ArrayList.java:498)
+	at com.local.SortFunc.merge_sort(SortFunc.java:68)
+	at jdk.internal.reflect.GeneratedMethodAccessor110.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:567)
+	at com.reactive.service.util.Operation.executeMethodWithReflexion(Operation.java:75)
+	at com.reactive.service.model.configuration.PendingLocalFunctionComputation.lambda$execute$0(PendingLocalFunctionComputation.java:100)
+	at com.reactive.service.model.configuration.PendingLocalFunctionComputation$$Lambda$52/0x0000000801234440.run(Unknown Source)
+	... 1 more
+
