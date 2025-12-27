@@ -1,2 +1,9 @@
 step to run the test: 
-1- run start.sh that is in cluster/'Gag Service Engine'. This will build the docker image and push it to the docker registry of the  master node.
+if you have error with kvm then run this sudo modprobe -r kvm_intel
+1- connect to master node and run start.sh that is in /vagrant/'Gag Service Engine'. This will build the docker image and push it to the docker registry of the  master node.
+
+2- Install pip3 and psutils.
+sudo apt install python3-pip
+pip3 install psutil
+
+

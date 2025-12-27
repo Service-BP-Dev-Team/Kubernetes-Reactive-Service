@@ -100,9 +100,6 @@ def warming(podId,init,number_of_warming):
         print(f"Error executing command: {e}")
 
 def runtest(env):
-    input_start=env.get("INPUT_SIZE_START")
-    input_stop=env.get("INPUT_SIZE_STOP")
-    input_increment=env.get("INPUT_SIZE_INCREMENT")
     init=env.get("WARMING_INPUT_SIZE")
     number_of_warming = env.get("NUMBER_OF_WARMING",10)
     number_of_iteration = env.get("NUMBER_OF_ITERATION",20)
@@ -121,6 +118,16 @@ def runtest(env):
     podCommandBase="\"curl -X POST java-rest-service:8000/api/service/merge-sort-enhanced/assesment -d \'{\\\"size\\\":"; 
     #print(commantToRun)
 
+
+    geometric = env.get("INPUT_SIZE_GROWTH", False)=="GEOMETRIC"
+    is_input_set = env.get("INPUT_SIZE_GROWTH", False)=="INPUT_SET"
+    if is_input_set:
+        input_start=env.get("INPUT_SET")[0]
+        input_stop=env.get("INPUT_SET")[-1]
+    else:
+        input_start=env.get("INPUT_SIZE_START")
+        input_stop=env.get("INPUT_SIZE_STOP")
+        input_increment=env.get("INPUT_SIZE_INCREMENT")
     # Run the command that assess the execution time 
     try:
         sumResult=0
@@ -128,7 +135,8 @@ def runtest(env):
         input=input_start
         podCommand=podCommandBase+f"{input}"+"}\'\""
         commantToRun=f"kubectl exec -it {podId} -- /bin/bash -c {podCommand}"
-        geometric = env.get("INPUT_SIZE_GROWTH", False)=="GEOMETRIC"
+        index=0 # this is only for the case where the input is a set. 
+
         while input<=input_stop:
             element_of_result=[]
             print(f"performing execution for input {input}")
@@ -205,6 +213,12 @@ def runtest(env):
             #update input
             if geometric:
                 input=input*input_increment
+            elif is_input_set:
+                index+=1
+                if index<len(env['INPUT_SET']):
+                    input=env['INPUT_SET'][index]
+                else:
+                    input+=1 #we add a simple value to stop the iterration
             else:
                 input+=input_increment
             #update command to run
