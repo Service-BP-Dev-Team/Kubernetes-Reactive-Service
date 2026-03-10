@@ -18,7 +18,7 @@ def std_dev(values, mean):
     return sqrt(sum([(val-mean)**2 for val in values])/len(values))
 
 f_names = glob.glob("*.json")
-tests = sorted([get_data(name) for name in f_names], key=lambda d: d['environment']['NUMBER_OF_WORKER_PODS'])
+tests = sorted([get_data(name) for name in f_names], key=lambda d: d['environment']['NUMBER_OF_BLOCKS'])
 var_blocks = [{'K' : d['environment']['NUMBER_OF_BLOCKS'],
             'ins': [{'length': float(key),
                      'mean': mean_value([dic['duration'] for dic in d['result'][key]]),
@@ -39,7 +39,7 @@ for met in var_blocks:
     plt.plot(ax, fy, '-', label = 'K='+str(met['K']))
     plt.legend(loc="upper left")
 
-plt.savefig('Worker_means.png')
+plt.savefig('Varying_blocks_wpods=4.png')
 plt.show()
 print(len(y))
 plt.close()

@@ -19,13 +19,13 @@ env_variables = {
     'USE_VIRTUAL_THREAD' : True,
     'WORKER_REQUEST_FAIL_DETECT_DURATION':50,
     'VARYING' : 'WORKER_REQUEST_FAILURE_PROBABILITY', # possible case are NUMBER_OF_BLOCKS,  WORKER_REQUEST_FAILURE_PROBABILITY, NUMBER_OF_WORKER_PODS, or MAX_LEN
-    "NUMBER_OF_BLOCKS": 64,
-    "STEP_SET": [0.0],
+    "NUMBER_OF_BLOCKS": 16,
+    "STEP_SET": [0.0,0.05],
     'STEP_GROWTH': "STEP_SET", # the value are GEOMETRIC, ARITHMETIC and STEP_SET
     'DO_ONLY_INCREMENTAL_EXECUTION': False,
     'WARMING_INPUT_SIZE': 500000,
     'NUMBER_OF_WARMING':10,
-    'NUMBER_OF_ITERATION':60,
+    'NUMBER_OF_ITERATION':25,
     'INPUT_SIZE_START':3000000,
     'INPUT_SIZE_INCREMENT':300000,
     'INPUT_SIZE_STOP':3000000,
@@ -305,7 +305,7 @@ if env_variables.get("VARYING",False):
     if not env_variables.get("DO_ONLY_INCREMENTAL_EXECUTION",False):
         perform_test(running_env,"NON_INCREMENTAL",env_variables)
     # Perform incremental test
-    perform_test(running_env,"INCREMENTAL",env_variables)
+    # perform_test(running_env,"INCREMENTAL",env_variables)
         
 else:
     print(runtest(running_env))

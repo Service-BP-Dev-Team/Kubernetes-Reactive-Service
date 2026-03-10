@@ -83,8 +83,8 @@ def draw_data_with_suffix(data1, data2, suffix1="inc", suffix2="non_inc"):
         f = interp1d(x, y, kind='linear')
         ax = linspace(min(x), max(x), 600)
         fy = f(ax)
-        plt.plot(x, y, 'o', label='Data Points ' + suffix1 + ' K=' + str(met['K']))
-        plt.plot(ax, fy, '-', label='K=' + suffix1 + ' ' + str(met['K']))
+        plt.plot(x, y, 'o')
+        plt.plot(ax, fy, '-', label='K='+ str(met['K'])+ '-' + suffix1)
 
     for met in create_var_blocks(data2):
         x = get_list(met['ins'], 'length')
@@ -92,13 +92,13 @@ def draw_data_with_suffix(data1, data2, suffix1="inc", suffix2="non_inc"):
         f = interp1d(x, y, kind='linear')
         ax = linspace(min(x), max(x), 600)
         fy = f(ax)
-        plt.plot(x, y, 'o', label='Data Points ' + suffix2 + ' K=' + str(met['K']))
-        plt.plot(ax, fy, '-', label='K=' + suffix2 + ' ' + str(met['K']))
+        plt.plot(x, y, 'o')
+        plt.plot(ax, fy, '-', label='K='+ str(met['K'])+ '-' + suffix2)
 
     plt.legend(loc="upper left")
 
     # Save and show the combined plot
-    plt.savefig('Worker_means_combined.png')
+    plt.savefig('Maxlen_K_16.png')
     plt.show()
     plt.close()
 
