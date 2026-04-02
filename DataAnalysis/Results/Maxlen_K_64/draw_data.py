@@ -63,7 +63,7 @@ def mean_value(values):
 
 def std_dev(values, mean):
     return sqrt(sum([(val-mean)**2 for val in values])/len(values))
-def draw_data_with_suffix(data1, data2, suffix1="inc", suffix2="non_inc"):
+def draw_data_with_suffix(data1, data2, suffix1="", suffix2="-non_inc"):
     plt.figure()
 
     # Function to create var_blocks from provided data
@@ -84,7 +84,7 @@ def draw_data_with_suffix(data1, data2, suffix1="inc", suffix2="non_inc"):
         ax = linspace(min(x), max(x), 600)
         fy = f(ax)
         plt.plot(x, y, 'o')
-        plt.plot(ax, fy, '-', label='K='+ str(met['K'])+ '-' + suffix1)
+        plt.plot(ax, fy, '-', label='K='+ str(met['K']) + suffix1)
 
     for met in create_var_blocks(data2):
         x = get_list(met['ins'], 'length')
@@ -93,7 +93,7 @@ def draw_data_with_suffix(data1, data2, suffix1="inc", suffix2="non_inc"):
         ax = linspace(min(x), max(x), 600)
         fy = f(ax)
         plt.plot(x, y, 'o')
-        plt.plot(ax, fy, '-', label='K='+ str(met['K'])+ '-' + suffix2)
+        plt.plot(ax, fy, '-', label='K='+ str(met['K'])+ suffix2)
 
     plt.legend(loc="upper left")
 
