@@ -115,7 +115,7 @@ sudo systemctl start docker
 # in /vagrant/Application/domain.crt (shared folder).
 # All nodes must trust this certificate to interact with the registry.
 
-CERT_PATH="/vagrant/Application/domain.crt"
+CERT_PATH="/vagrant/certificates/domain.crt"
 
 if [ -f "$CERT_PATH" ]; then
   echo "Trusting local Docker registry certificate..."

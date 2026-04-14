@@ -63,7 +63,7 @@ EOF
 # ------------------------------------------------------------
 # Docker requires SAN (Subject Alternative Name), not just CN
 
-CERT_DIR="/certificates"
+CERT_DIR="/vagrant/certificates"
 mkdir -p $CERT_DIR
 cd $CERT_DIR
 
@@ -78,24 +78,23 @@ default_bits = 4096
 prompt = no
 default_md = sha256
 distinguished_name = dn
-req_extensions = req_ext
+x509_extensions = v3_req
 
 [dn]
 CN = $CONTROL_IP
 
-[req_ext]
+[v3_req]
 subjectAltName = @alt_names
 
 [alt_names]
 IP.1 = $CONTROL_IP
 EOF
 
-sudo openssl req -x509 -nodes -days 365 \
+openssl req -x509 -nodes -days 365 \
   -newkey rsa:4096 \
   -keyout domain.key \
   -out domain.crt \
-  -config san.cnf \
-  -extensions req_ext
+  -config san.cnf
 
 # ------------------------------------------------------------
 # Ensure registry uses the latest certificate
@@ -109,7 +108,7 @@ fi
 
 echo "Starting local Docker registry..."
 sudo docker run -d -p 5000:5000 --restart=always --name registry \
-  -v /certificates:/certificates \
+  -v /vagrant/certificates:/certificates \
   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certificates/domain.crt \
   -e REGISTRY_HTTP_TLS_KEY=/certificates/domain.key \
   registry:2

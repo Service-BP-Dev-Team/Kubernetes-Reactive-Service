@@ -10,7 +10,7 @@ config_path="/vagrant/configs"
 # Trust registry certificate (SYSTEM + DOCKER) on worker nodes
 # ------------------------------------------------------------
 
-CERT_PATH="/vagrant/Application/domain.crt"
+CERT_PATH="/vagrant/certificates/domain.crt"
 
 if [ -f "$CERT_PATH" ]; then
   echo "Configuring trust for private registry..."
