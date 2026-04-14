@@ -92,3 +92,36 @@ cat > /etc/default/kubelet << EOF
 KUBELET_EXTRA_ARGS=--node-ip=$local_ip
 ${ENVIRONMENT}
 EOF
+
+# ------------------------------------------------------------
+# 8. Install Docker (used for local registry, NOT Kubernetes runtime)
+# ------------------------------------------------------------
+# Kubernetes uses CRI-O, but we install Docker separately
+# to run and interact with a local container registry.
+
+if ! command -v docker &> /dev/null; then
+  echo "Installing Docker..."
+  sh /vagrant/Custom\ Scripts/docker_install.sh
+fi
+
+# Ensure Docker is enabled and running
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# ------------------------------------------------------------
+# 9. Trust local Docker registry certificate (if available)
+# ------------------------------------------------------------
+# The master node generates a self-signed certificate and places it
+# in /vagrant/Application/domain.crt (shared folder).
+# All nodes must trust this certificate to interact with the registry.
+
+CERT_PATH="/vagrant/Application/domain.crt"
+
+if [ -f "$CERT_PATH" ]; then
+  echo "Trusting local Docker registry certificate..."
+  sudo cp $CERT_PATH /usr/local/share/ca-certificates/domain.crt
+  sudo update-ca-certificates
+fi
+
+# Restart Docker to apply certificate trust changes
+sudo systemctl restart docker || true
