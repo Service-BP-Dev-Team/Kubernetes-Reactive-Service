@@ -5,3 +5,11 @@
 /Cluster/Specification
 .metadata/
 /Cluster/Tests/TestRunOut/specification/log.json
+
+/.vagrant/
+/.metadata/
+/Application/
+/GAG\ Service\ Engine/target/
+/Specification
+.metadata/
+/Tests/TestRunOut/specification/log.json
