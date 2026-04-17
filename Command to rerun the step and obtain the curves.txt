@@ -1,0 +1,2 @@
+python3 runglobaltest.py --env-file Sets/set1.json
+
