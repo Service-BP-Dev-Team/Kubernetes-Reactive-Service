@@ -101,7 +101,7 @@ EOF
 
 if ! command -v docker &> /dev/null; then
   echo "Installing Docker..."
-  sh /vagrant/Custom\ Scripts/docker_install.sh
+  sh /vagrant/Deployment\ Scripts/docker_install.sh
 fi
 
 # Ensure Docker is enabled and running

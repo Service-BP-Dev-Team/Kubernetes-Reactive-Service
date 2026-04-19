@@ -20,16 +20,9 @@ nodes:
       - cpu: 2
         memory: 4096
         number: 2
-#shared_folders:
-#  - host_path: "../GAG Service Engine/"
-#    vm_path: "/GAG Service Engine/"
-#  - host_path: "../Specification/"
-#    vm_path: "/Specification/"
 
 software:
   box: bento/ubuntu-22.04
   calico: 3.25.0
   kubernetes: 1.28.1-1.1
-#  kubernetes: 1.26.1-00
-#  kubernetes: 1.30.0-00
   os: xUbuntu_22.04

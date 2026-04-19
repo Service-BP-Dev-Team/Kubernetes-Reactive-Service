@@ -1,1 +1,1 @@
-kubeadm join --cri-socket unix:///var/run/crio/crio.sock 10.0.0.10:6443 --token awu95d.fc5msncvr13vajda --discovery-token-ca-cert-hash sha256:376d6370a7068909fd0b2cded9c8a8da13b4474b1641e369f3953d2274e0d5db 
+kubeadm join --cri-socket unix:///var/run/crio/crio.sock 10.0.0.10:6443 --token j64iyw.s76vwvbbym2gd7t9 --discovery-token-ca-cert-hash sha256:4bceaa3fe8453055b269d6692a86fa68197ad3a3982bc4ac729e97333efcccb2 

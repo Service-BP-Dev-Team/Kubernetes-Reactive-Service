@@ -46,7 +46,7 @@ Vagrant.configure("2") do |config|
         "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
         "OS" => settings["software"]["os"]
       },
-      path: "scripts/common.sh"
+      path: "Deployment Scripts/common.sh"
     master.vm.provision "shell",
       env: {
         "CALICO_VERSION" => settings["software"]["calico"],
@@ -54,7 +54,7 @@ Vagrant.configure("2") do |config|
         "POD_CIDR" => settings["network"]["pod_cidr"],
         "SERVICE_CIDR" => settings["network"]["service_cidr"]
       },
-      path: "scripts/master.sh"
+      path: "Deployment Scripts/master.sh"
   end
   # Initialize counter variable
   
@@ -83,12 +83,12 @@ Vagrant.configure("2") do |config|
           "OS" => settings["software"]["os"],
           "CONTROL_IP" => settings["network"]["control_ip"]
         },
-        path: "scripts/common.sh"
+        path: "Deployment Scripts/common.sh"
       node.vm.provision "shell",
         env: {
           "CONTROL_IP" => settings["network"]["control_ip"]
         },
-        path: "scripts/node.sh"
+        path: "Deployment Scripts/node.sh"
     end
 
   end
