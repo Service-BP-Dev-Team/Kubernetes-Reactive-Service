@@ -21,9 +21,9 @@ The project is structured as follows:
 
 # 2 Specification 
 
-The specification of the merge sort implemented as a composition of incremental services can be found in the folder `Tests/TestRunIn`. Recall that the principle is to represent a recursive sort with a variable number of input and output cells. In this repository, this number is defined by the parameter `\( $NUMBER\_OF\_BLOCKS \)` (in the paper it is called `\( $NUMBER\_OF\_CELLS \)`), which is configurable at deployment time.
+The specification of the merge sort implemented as a composition of incremental services can be found in the folder `Tests/TestRunIn`. Recall that the principle is to represent a recursive sort with a variable number of input and output cells. In this repository, this number is defined by the parameter `NUMBER_OF_BLOCKS` (in the paper it is called `NUMBER_OF_CELLS`), which is configurable at deployment time.
 
-The idea is that a recursive service `RecSort` can merge any available pair \((c_i, c_j)\), where \(i, j \in \{1, \dots, NUMBER\_OF\_BLOCKS\}\) and \(i \neq j\). In a non-incremental execution, all cells must be available before merging can begin. In contrast, incremental execution allows merging of any available pair as soon as it is ready, making the process faster and more robust.
+The idea is that a recursive service `RecSort` can merge any available pair (ci, cj), where i and j belong to {1, ..., NUMBER_OF_BLOCKS} and i is different from j. In a non-incremental execution, all cells must be available before merging can begin. In contrast, incremental execution allows merging of any available pair as soon as it is ready, making the process faster and more robust.
 
 Below is a snippet of the specification using incremental computation. The complete specification can be found in `Tests/TestRunIn/specification`. In that folder, the file `services.yml` contains the service declarations, while `rules.yml` specifies the behavior and composition rules.
 
