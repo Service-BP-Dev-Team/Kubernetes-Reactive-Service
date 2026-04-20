@@ -21,7 +21,7 @@ The project is structured as follows:
 
 # 2 Specification 
 
-The specification of the merge sort implemented as a composition of incremental services can be found in the folder `Tests/TestRunIn`. Recall that the principle is to represent a recursive sort with a variable number of input and output cells. In this repository, this number is defined by the parameter `$NUMBER_OF_BLOCKS` (in the paper it is called `$NUMBER_OF_CELLS`), which is configurable at deployment time.
+The specification of the merge sort implemented as a composition of incremental services can be found in the folder `Tests/TestRunIn`. Recall that the principle is to represent a recursive sort with a variable number of input and output cells. In this repository, this number is defined by the parameter `\( $NUMBER\_OF\_BLOCKS \)` (in the paper it is called `\( $NUMBER\_OF\_CELLS \)`), which is configurable at deployment time.
 
 The idea is that a recursive service `RecSort` can merge any available pair \((c_i, c_j)\), where \(i, j \in \{1, \dots, NUMBER\_OF\_BLOCKS\}\) and \(i \neq j\). In a non-incremental execution, all cells must be available before merging can begin. In contrast, incremental execution allows merging of any available pair as soon as it is ready, making the process faster and more robust.
 
@@ -152,8 +152,7 @@ Within the `Tests` directory, there are several folders and scripts essential fo
 * **`runglobaltest.py`**: This is the main entry point for running batch experiments. Environment variables can be defined in two ways:
     1.  Updating the `env_variables` dictionary directly inside the script.
     2.  Using the `--env-file` argument: `--env-file /path/to/env/file`.
-* **`runglobaltestandmerge.py`**: This script allows you to re-run specific experiments that produced inconsistent results (outliers) and merge them with the initial dataset. 
-    > **Pro Tip:** Processor rates can fluctuate due to thermal throttling. For consistent results, we strongly recommend running these tests only when the machine is plugged into a power source.
+* **`runglobaltestandmerge.py`**: This script allows you to re-run specific experiments that produced inconsistent results (outliers) and merge them with the initial output data. Outliers can happen, for example, when processor rates fluctuate due to thermal throttling or because of background processes. For consistent results, we strongly recommend running these tests only when the machine is plugged into a power source, and when you are not running other resource-intensive programs on your computer.
 * **`Scripts`**: Contains subfolders (`Set1`, `Set2`, etc.) for each test set discussed in the paper. Each folder typically includes:
     * `set#.py`: Script to plot the results after experimentation.
     * `paper_data/`: The original experimental data from the paper.
