@@ -249,7 +249,7 @@ Tests 5 and 6 analyze incremental behavior with variable worker failure rates an
 
 Each of the tests above can take up to 5 hours to complete. In particular, the first test set can take up to 8 hours to complete. You can stop a test at any time by typing `Ctrl+C` twice. Note that after you stop a step, you can resume it by running 
 ```bash
-python3 runglobaltest.py --env-file Scripts/Set\#/set\#.json
+python3 runglobaltest.py --env-file Scripts/Set#/set#.json
 ```
 , where `#` is the test number. This is particularly helpful, since you can stop a step and complete it later once you have time. However, it will resume from the last synchronization point, so you may lose the output generated in the last hour; this will be recreated automatically by the script.
 
