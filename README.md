@@ -21,7 +21,7 @@ The project is structured as follows:
 
 # 2 Specification 
 
-The specification of the merge sort implemented as a composition of incremental services can be found in the folder `Tests/TestRunIn`. Recall that the principle is to represent a recursive sort with a variable number of input and output cells. In this repository, this number is defined by the parameter `$NUMBER_OF_BLOCKS`, which is configurable at deployment time.
+The specification of the merge sort implemented as a composition of incremental services can be found in the folder `Tests/TestRunIn`. Recall that the principle is to represent a recursive sort with a variable number of input and output cells. In this repository, this number is defined by the parameter `$NUMBER_OF_BLOCKS` (in the paper it is called `$NUMBER_OF_CELLS`), which is configurable at deployment time.
 
 The idea is that a recursive service `RecSort` can merge any available pair \((c_i, c_j)\), where \(i, j \in \{1, \dots, NUMBER\_OF\_BLOCKS\}\) and \(i \neq j\). In a non-incremental execution, all cells must be available before merging can begin. In contrast, incremental execution allows merging of any available pair as soon as it is ready, making the process faster and more robust.
 
@@ -215,7 +215,7 @@ Generate the curve with:
 python3 Scripts/Set4/set4.py --dir Results/Maxlen
 ```
 
-> **Note:** Tests 3 and 4 both focus on the maximum threshold for recursive sorting and share the same output directory. Ensure the `Results/Maxlen` folder is **empty** before starting these runs to avoid data inconsitency.
+Tests 3 and 4 both focus on the maximum threshold for recursive sorting and share the same output directory. Ensure the `Results/Maxlen` folder is **empty** before starting these runs to avoid data inconsitency.
 
 ### 5. Run the Fifth Test Set
 To execute the fifth test set:
@@ -243,9 +243,8 @@ Generate the curve with:
 python3 Scripts/Set6/set6.py --dir Results/Probability
 ```
 
-> **Important:** Tests 5 and 6 analyze incremental behavior with variable worker failure rates and share the `Results/Probability` folder. Ensure this directory is empty before running either test. 
-> 
-> Additionally, in these sets, `MAX_CONCURRENT_SERVICE_REQUEST` is restricted to `1` per pod. This simplifies failure simulation: when a failure occurs, only one data cell (an array of the threshold length) is lost. While pods still process requests in parallel, this restriction ensures that a single failure doesn't wipe out multiple concurrent tasks. We have done this simple restriction to simplify the process of creating artificial faillure. 
+Tests 5 and 6 analyze incremental behavior with variable worker failure rates and share the `Results/Probability` folder. Ensure this directory is empty before running either test. 
+ Additionally, in these sets, `MAX_CONCURRENT_SERVICE_REQUEST` is restricted to `1` per pod. This simplifies failure simulation: when a failure occurs, only one data cell (an array of the threshold length) is lost. While pods still process requests in parallel, this restriction ensures that a single failure doesn't wipe out multiple concurrent tasks. We have done this simple restriction to simplify the process of creating artificial faillure. 
 
 
 Each of the tests above can take up to 5 hours to complete. In particular, the first test set can take up to 8 hours to complete. You can stop a test at any time by typing `Ctrl+C` twice. Note that after you stop a step, you can resume it by running 
